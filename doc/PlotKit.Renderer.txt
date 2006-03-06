@@ -1,0 +1,152 @@
+PlotKit Renderer
+================
+
+A Renderer is responsible for translating the layout calculated by PlotKit.Layout and draw it on to a HTML Canvas, SVG object or any other way. One way to use the renderer is to allow theming of graphs by tweaking the layout. 
+
+PlotKit includes some common basic renderers, so you do not need to customise anything if you just plan to change the spacing, colors, fonts, or layout.
+
+PlotKit Renderers should follow an informal protocol to allow users to plug and play different renderers. Below is the informal protocol:
+
+PlotKit Renderer Protocol
+-------------------------
+* Constructor: ``new Renderer(element, layout, options = {})
+
+  ``element`` is the element which this renderer will perform on, ``layout`` is the PlotKit.Layout object and ``options`` is an associative dictionary described below.
+
+* class function: ``isSupported()``
+
+  Optional check that returns ``true`` if the renderer is supported in the current browser.
+
+* object method: ``render()``
+
+  Renders to canvas, can be called multiple times, but ``clear()`` must be called between invokations.
+
+* object method: ``clear()``
+
+  Clear the canvas.
+
+PlotKit Renderer Options
+------------------------
+
+To allow some basic flexibility of the output, a renderer should accept and act on the following options passed in the constructor:
+
+<table>
+  <thead>
+	<tr><td>Option name</td><td>Description</td><td>Type</td><td>Default</td></tr>
+  </thead>
+ <tbody>
+	<tr>
+		<th>backgroundColor</th>
+		<td>color to use for background</td>
+		<td>MochiKit.Color.Color</td>
+		<td>Color.whiteColor()</td>
+	</tr>
+	<tr>
+		<th>colorScheme</th>
+		<td>Color scheme used</td>
+		<td>Array of MochiKit.Color.Color</td>
+		<td>output of PlotKit.Base.colorScheme()</td>
+	</tr>
+	<tr>
+		<th>strokeColor</th>
+		<td>Color used stroking. If set to null, the renderer will
+  attempt to use strokeColorTransform</td>
+		<td>MochiKit.Color.Color or null</td>
+		<td>null</td>
+	</tr>
+	<tr>
+		<th>strokeColorTransform</th>
+		<td>Name of the method to call to transform Color into stroke color.</td>
+		<td>string (name of a function that accepts no arguments)</td>
+		<td>"asStrokeColor"</td>
+	</tr>
+
+
+	<tr>
+		<th>drawBackground</th>
+		<td>Whether the background should be drawn</td>
+		<td>boolean</td>
+		<td>true</td>
+	</tr>
+	<tr>
+		<th>shouldFill</th>
+		<td>Should fill in area under chart</td>
+		<td>boolean</td>
+		<td>true</td>
+	</tr>
+	<tr>
+		<th>shouldStroke</th>
+		<td>Should stroke the borders of shapes in chart</td>
+		<td>boolean</td>
+		<td>true</td>
+	</tr>
+	<tr>
+		<th>strokeWidth</th>
+		<td>Width of stroke used (if shouldStroke is set)</td>
+		<td>float</td>
+		<td>0.1</td>
+	</tr>
+	<tr>
+		<th>padding</th>
+		<td>Padding of the graph drawn (excluding labels)</td>
+		<td>Object with properties: top, bottom, left, right.</td>
+		<td>{left: 30, right:20, top: 10, bottom: 10}</td>
+	</tr>
+	<tr>
+		<th>drawYAxis</th>
+		<td>draw Y Axis</td>
+		<td>boolean</td>
+		<td>true</td>
+	</tr>
+	<tr>
+		<th>drawXAxis</th>
+		<td>draw X Axis</td>
+		<td>boolean</td>
+		<td>true</td>
+	</tr>
+	<tr>
+		<th>axisLineColor</th>
+		<td>Color of axes line.</td>
+		<td>MochiKit.Color.Color</td>
+		<td>Color.blackColor()</td>
+	</tr>
+	<tr>
+		<th>axisLineWidth</th>
+		<td>axis line width</td>
+		<td>float</td>
+		<td>0.5</td>
+	</tr>
+	<tr>
+		<th>axisTickSize</th>
+		<td>length or height of a tick on the y and x axis respectively, in pixels</td>
+		<td>float</td>
+		<td>3.0</td>
+	</tr>
+	<tr>
+		<th>axisLabelColor</th>
+		<td>color of text label on axis.</td>
+		<td>MochiKit.Color.Color</td>
+		<td>Color.blackColor()</td>
+	</tr>
+	<tr>
+		<th>axisLabelFontSize</th>
+		<td>Font size of labels in pixels </td>
+		<td>integer</td>
+		<td>9</td>
+	</tr>
+	<tr>
+		<th>axisLabelWidth</th>
+		<td>Width of labels on ticks, in pixels</td>
+		<td>integer</td>
+		<td>50</td>
+	</tr>
+	<tr>
+		<th>enableEvents</th>
+		<td>Enable events (if supported)</td>
+		<td>boolean</td>
+		<td>true</td>
+	</tr>
+</tbody>
+</table>
+
+	
