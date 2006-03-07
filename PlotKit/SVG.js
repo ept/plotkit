@@ -65,6 +65,7 @@ PlotKit.SVGRenderer.prototype.__init__ = function(element, layout, options) {
         "axisLineWidth": 0.5,
         "axisTickSize": 3,
         "axisLabelColor": Color.blackColor(),
+        "axisLabelFont": "Arial",
         "axisLabelFontSize": 10,
         "axisLabelWidth": 50,
         "axisLabelUseDiv": true,
@@ -76,13 +77,26 @@ PlotKit.SVGRenderer.prototype.__init__ = function(element, layout, options) {
     this.style = layout.style;
     this.element = MochiKit.DOM.getElement(element);
     this.container = this.element.parentNode;
-    this.height = element.getAttribute('height');
-    this.width = element.getAttribute('width');
+    this.height = parseInt(element.getAttribute("height"));
+    this.width = parseInt(element.getAttribute("width"));
+    this.document = document;
+    this.root = this.element;
+
+    // Adobe SVG Support:
+    // - if an exception is thrown, then no Adobe SVG Plugin support.
+    try {
+        this.document = this.element.getSVGDocument();
+        this.root = isNil(this.document.documentElement) ? this.element : this.document.documentElement;
+    }
+    catch (e) {
+    }
 
     this.element.style.zIndex = 1;
 
     if (isNil(this.element))
-        throw "SVGRenderer() - passed canvas is not found";
+        throw "SVGRenderer() - passed SVG object is not found";
+    if (isNil(this.container))
+        throw "SVGRenderer() - No DIV's around the SVG.";
 
     // internal state
     this.xlabels = new Array();
@@ -95,7 +109,7 @@ PlotKit.SVGRenderer.prototype.__init__ = function(element, layout, options) {
         h: this.height - this.options.padding.top - this.options.padding.bottom
     };
 
-  MochiKit.DOM.updateNodeAttributes(this.container, 
+    MochiKit.DOM.updateNodeAttributes(this.container, 
     {"style":{ "position": "relative", "width": this.width + "px"}});
 
     
@@ -131,6 +145,7 @@ PlotKit.SVGRenderer.prototype._renderBarOrLine = function(data, plotFunc, startF
         var setName = setNames[i];
         var attrs = new Array();
         var color = colorScheme[i%colorCount];
+
         if (this.options.shouldFill)
             attrs["fill"] = color.toRGBString();
         else
@@ -188,8 +203,8 @@ PlotKit.SVGRenderer.prototype._renderLineChart = function() {
     var endLine = function(attrs) {
         this._tempPointsBuffer += (this.area.w + this.area.x) + ","  +(this.area.h + this.area.y);
         attrs["points"] = this._tempPointsBuffer;
-        var poly = PlotKit.SVGRenderer.POLYGON(attrs);
-        this.element.appendChild(poly);
+        var elem = this.createSVGElement("polygon", attrs);
+        this.root.appendChild(elem);
     };
 
     this._renderBarOrLine(this.layout.points, 
@@ -227,7 +242,7 @@ PlotKit.SVGRenderer.prototype._renderPieChart = function() {
                 attrs["stroke"] = color[this.options.strokeColorTransform]().toRGBString();
             attrs["strokeWidth"] = this.options.strokeWidth;
         }
-        this.element.appendChild(PlotKit.SVGRenderer.CIRCLE(attrs));
+        this.root.appendChild(this.createSVGElement("circle", attrs));
         return;
 	}
 
@@ -264,8 +279,8 @@ PlotKit.SVGRenderer.prototype._renderPieChart = function() {
 
         attrs["d"] = pathString;
 
-        var slice = PlotKit.SVGRenderer.PATH(attrs);
-        this.element.appendChild(slice);
+        var slice = this.createSVGElement("path", attrs);
+        this.root.appendChild(slice);
     }
 };
 
@@ -311,7 +326,7 @@ PlotKit.SVGRenderer.prototype._renderAxis = function() {
                 if (this.options.axisLabelUseDiv) {
                     var label = DIV(labelStyle, tick[1]);
                     label.style.top = (y - this.options.axisLabelFontSize) + "px";
-                    label.style.left = (x - this.options.padding.left + 3) + "px";
+                    label.style.left = (x - this.options.padding.left + this.options.axisTickSize) + "px";
                     label.style.textAlign = "left";
                     label.style.width = (this.options.padding.left - 3) + "px";
                     MochiKit.DOM.appendChildNodes(this.container, label);
@@ -319,14 +334,17 @@ PlotKit.SVGRenderer.prototype._renderAxis = function() {
                 }
                 else {
                     var attrs = {
-                        y: (y - this.options.axisLabelFontSize),
+                        y: y + 3,
                         x: (x - this.options.padding.left + 3),
-                        fontFamily: "arial",
+                        width: (this.options.padding.left - this.options.axisTickSize) + "px",
+                        height: (this.options.axisLabelFontSize + 3) + "px",
+                        fontFamily: "Arial",
                         fontSize: this.options.axisLabelFontSize + "px",
                         fill: this.options.axisLabelColor.toRGBString()
                     };
-                    var label = PlotKit.SVGRenderer.TEXT(attrs, tick[1]);
-                    this.element.appendChild(label);
+                    var label = this.createSVGElement("text", attrs);
+                    label.appendChild(this.document.createTextNode(tick[1]));
+                    this.root.appendChild(label);
                 }
             };
             
@@ -341,11 +359,11 @@ PlotKit.SVGRenderer.prototype._renderAxis = function() {
             var drawTick = function(tick) {
                 var x = this.area.x + tick[0] * this.area.w;
                 var y = this.area.y + this.area.h;
-                this._drawLine(x, y, x, y + 3, lineAttrs);
+                this._drawLine(x, y, x, y + this.options.axisTickSize, lineAttrs);
 
                 if (this.options.axisLabelUseDiv) {
                     var label = DIV(labelStyle, tick[1]);
-                    label.style.top = (y + 3) + "px";
+                    label.style.top = (y + this.options.axisTickSize) + "px";
                     label.style.left = (x - this.options.axisLabelWidth/2) + "px";
                     label.style.textAlign = "center";
                     label.style.width = this.options.axisLabelWidth + "px";
@@ -353,13 +371,19 @@ PlotKit.SVGRenderer.prototype._renderAxis = function() {
                     this.xlabels.push(label);
                 }
                 else {
-                     var attrs = {
-                         y: (y - this.options.axisLabelFontSize),
-                         x: (x - this.options.padding.left + 3),
-                         fill: this.options.axisLabelColor.toRGBString()
-                     };
-                     var label = PlotKit.SVGRenderer.TEXT(attrs, tick[1]);
-                     MochiKit.DOM.appendChildNodes(this.element, label);
+                    var attrs = {
+                        y: (y + this.options.axisTickSize + this.options.axisLabelFontSize),
+                        x: x - 3,
+                        width: this.options.axisLabelWidth + "px",
+                        height: (this.options.axisLabelFontSize + 3) + "px",
+                        fontFamily: "Arial",
+                        fontSize: this.options.axisLabelFontSize + "px",
+                        fill: this.options.axisLabelColor.toRGBString(),
+                        textAnchor: "middle"
+                    };
+                    var label = this.createSVGElement("text", attrs);
+                    label.appendChild(this.document.createTextNode(tick[1]));
+                    this.root.appendChild(label);
                 }
             };
             
@@ -409,39 +433,74 @@ PlotKit.SVGRenderer.prototype._renderPieAxis = function() {
                           "color": this.options.axisLabelColor.toHexString()
                         };
 
+            var svgattrib = {"width": labelWidth + "px",
+                             "fontSize": this.options.axisLabelFontSize + "px",
+                             "height": (this.options.axisLabelFontSize + 3) + "px"
+            };
+
             if (normalisedAngle <= Math.PI * 0.5) {
                 // text on top and align left
-                attrib["textAlign"] = "left";
-                attrib["verticalAlign"] = "top";
-                attrib["left"] = labelx + "px";
-                attrib["top"] = (labely - this.options.axisLabelFontSize) + "px";
+                MochiKit.Base.update(attrib, {
+                    'textAlign': 'left', 'verticalAlign': 'top',
+                    'left': labelx + 'px',
+                    'top':  (labely - this.options.axisLabelFontSize) + "px"
+                });
+                MochiKit.Base.update(svgattrib, {
+                    "x": labelx,
+                    "y" :(labely - this.options.axisLabelFontSize),
+                    "textAnchor": "left"
+                        });
             }
             else if ((normalisedAngle > Math.PI * 0.5) && (normalisedAngle <= Math.PI)) {
                 // text on bottom and align left
-                attrib["textAlign"] = "left";
-                attrib["verticalAlign"] = "bottom";     
-                attrib["left"] = labelx + "px";
-                attrib["top"] = labely + "px";
-
+                MochiKit.Base.update(attrib, {
+                    'textAlign': 'left', 'verticalAlign': 'bottom',
+                    'left': labelx + 'px',
+                    'top':  labely + "px"
+                });
+                MochiKit.Base.update(svgattrib, {
+                    'textAnchor': 'left',
+                    'x': labelx,
+                    'y':  labely
+                });
             }
             else if ((normalisedAngle > Math.PI) && (normalisedAngle <= Math.PI*1.5)) {
                 // text on bottom and align right
-                attrib["textAlign"] = "right";
-                attrib["verticalAlign"] = "bottom"; 
-                attrib["left"] = (labelx  - labelWidth) + "px";
-                attrib["top"] = labely + "px";
+                MochiKit.Base.update(attrib, {
+                    'textAlign': 'right', 'verticalAlign': 'bottom',
+                    'left': labelx + 'px',
+                    'top':  labely + "px"
+                });
+                MochiKit.Base.update(svgattrib, {
+                    'textAnchor': 'right',
+                    'x': labelx - labelWidth,
+                    'y':  labely
+                });
             }
             else {
                 // text on top and align right
-                attrib["textAlign"] = "left";
-                attrib["verticalAlign"] = "bottom";  
-                attrib["left"] = (labelx  - labelWidth) + "px";
-                attrib["top"] = (labely - this.options.axisLabelFontSize) + "px";
+                MochiKit.Base.update(attrib, {
+                    'textAlign': 'left', 'verticalAlign': 'bottom',
+                    'left': labelx + 'px',
+                    'top':  labely + "px"
+                });
+                MochiKit.Base.update(svgattrib, {
+                    'textAnchor': 'left',
+                    'x': labelx - labelWidth,
+                    'y':  labely - this.options.axisLabelFontSize
+                });
             }
-    
-            var label = DIV({'style': attrib}, this.layout.xticks[i][1]);
-            this.xlabels.push(label);
-            MochiKit.DOM.appendChildNodes(this.container, label);
+
+            if (this.options.axisLabelUseDiv) {
+                var label = DIV({'style': attrib}, this.layout.xticks[i][1]);
+                this.xlabels.push(label);
+                MochiKit.DOM.appendChildNodes(this.container, label);
+            }
+            else {
+                var label = this.createSVGElement("text", svgattrib);
+                label.appendChild(this.document.createTextNode(this.layout.xticks[i][1]))
+                this.root.appendChild(label);
+            }
       }
         
     }
@@ -459,8 +518,8 @@ PlotKit.SVGRenderer.prototype._drawRect = function(x, y, w, h, moreattrs) {
     if (moreattrs)
         MochiKit.Base.update(attrs, moreattrs);
 
-    var elem = PlotKit.SVGRenderer.RECT(attrs);
-    this.element.appendChild(elem);
+    var elem = this.createSVGElement("rect", attrs);
+    this.root.appendChild(elem);
 };
 
 PlotKit.SVGRenderer.prototype._drawLine = function(x1, y1, x2, y2, moreattrs) {
@@ -468,8 +527,8 @@ PlotKit.SVGRenderer.prototype._drawLine = function(x1, y1, x2, y2, moreattrs) {
     if (moreattrs)
         MochiKit.Base.update(attrs, moreattrs);
 
-    var elem = PlotKit.SVGRenderer.LINE(attrs);
-    this.element.appendChild(elem);
+    var elem = this.createSVGElement("line", attrs);
+    this.root.appendChild(elem);
 }
 
 PlotKit.SVGRenderer.prototype.clear = function() {
@@ -489,31 +548,64 @@ PlotKit.SVGRenderer.prototype.clear = function() {
     this.ylabels = new Array();
 };
 
-PlotKit.SVGRenderer.createSVGDOM = function(name, attrs/*, nodes.. */) {
-    var elem = document.createElementNS("http://www.w3.org/2000/svg", name);
+PlotKit.SVGRenderer.prototype.createSVGElement = function(name, attrs) {
+    var isNil = MochiKit.Base.isUndefinedOrNull;
+    var elem;
+    var doc = isNil(this.document) ? document : this.document;
+
+    try {
+        elem = doc.createElementNS("http://www.w3.org/2000/svg", name);
+    }
+    catch (e) {
+        elem = doc.createElement(name);
+        elem.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    }
+
     if (attrs)
         MochiKit.DOM.updateNodeAttributes(elem, attrs);
 
-    if (arguments.length <= 3) {
-        return elem;
+    // TODO: we don't completely emulate the MochiKit.DOM.createElement
+    //       as we don't care about nodes contained. We really should though.
+
+    return elem;
+
+};
+
+PlotKit.SVGRenderer.SVGNS = 'http://www.w3.org/2000/svg';
+
+PlotKit.SVGRenderer.SVG = function(attrs) {
+    // we have to do things differently for IE+AdobeSVG.
+    // My guess this works (via trial and error) is that we need to
+    // have an SVG object in order to use SVGDocument.createElementNS
+    // but IE doesn't allow us to that.
+
+    var ie = navigator.appVersion.match(/MSIE (\d\.\d)/);
+    var opera = (navigator.userAgent.toLowerCase().indexOf("opera") != -1);
+    if (ie && (ie[1] >= 6) && (!opera)) {
+        var width = attrs["width"] ? attrs["width"] : "100";
+        var height = attrs["height"] ? attrs["height"] : "100";
+        var eid = attrs["id"] ? attrs["id"] : "notunique";
+        
+        var html = '<svg:svg width="' + width + '" height="' + height + '" ';
+        html += 'id="' + eid + '" version="1.1" baseProfile="full">';
+
+        var canvas = document.createElement(html);
+
+        // create embedded SVG inside SVG.
+        var group = canvas.getSVGDocument().createElementNS(PlotKit.SVGRenderer.SVGNS, "svg");
+        group.setAttribute("width", width);
+        group.setAttribute("height", height);
+        canvas.getSVGDocument().appendChild(group);
+
+        return canvas;
     }
     else {
-        var args = MochiKit.Base.extend([elem], arguments, 2);
-        return MochiKit.DOM.appendChildNodes.apply(this, args);
+        return PlotKit.SVGRenderer.prototype.createSVGElement("svg", attrs);
     }
 };
+                                                            
 
-PlotKit.SVGRenderer.createSVGDOMFunc = function(/* tag, attrs, nodes */) {
-    return MochiKit.Base.partial.apply(this, MochiKit.Base.extend([PlotKit.SVGRenderer.createSVGDOM], arguments));
-};
-
-PlotKit.SVGRenderer.RECT = PlotKit.SVGRenderer.createSVGDOMFunc("rect");
-PlotKit.SVGRenderer.POLYGON = PlotKit.SVGRenderer.createSVGDOMFunc("polygon");
-PlotKit.SVGRenderer.PATH = PlotKit.SVGRenderer.createSVGDOMFunc("path");
-PlotKit.SVGRenderer.SVG = PlotKit.SVGRenderer.createSVGDOMFunc("svg");
-PlotKit.SVGRenderer.LINE = PlotKit.SVGRenderer.createSVGDOMFunc("line");
-PlotKit.SVGRenderer.CIRCLE = PlotKit.SVGRenderer.createSVGDOMFunc("circle");
-PlotKit.SVGRenderer.TEXT = PlotKit.SVGRenderer.createSVGDOMFunc("text");
+//PlotKit.SVGRenderer.SVG = MochiKit.Base.partial(PlotKit.SVGRenderer.prototype.createSVGElement, "svg");
 
 /*
 

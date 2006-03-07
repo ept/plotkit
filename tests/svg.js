@@ -6,7 +6,8 @@ var options = {
     "axisLineColor": Color.blackColor(),
     "padding": {top: 5, bottom: 20, left: 40, right: 10},
     "backgroundColor": Color.whiteColor(),
-    "strokeColor": null
+    "strokeColor": null,
+    "axisLabelUseDiv": false
 };
 
 function genericTest(num, plotStyle) {
@@ -76,6 +77,7 @@ function generateUnitTest(num, func, data, type, desc) {
     addLoadEvent(partial(func, num, type));
     
     return DIV({"class": "unit"}, [table, canvas, ending]);
+    return DIV({"class": "unit"}, [table, ending]);
 }
 
 function generateTests() {
@@ -95,8 +97,7 @@ function generateTests() {
 
     tests.appendChild(H2(null, "Simple Tests"));
 
-    tests.appendChild(generateUnitTest(1, genericTest, simpleData1,
-    "bar", ""));
+    tests.appendChild(generateUnitTest(1, genericTest, simpleData1, "bar", ""));
 
     tests.appendChild(generateUnitTest(2, genericTest, simpleData1, 
     "line", ""));
@@ -140,6 +141,7 @@ function generateTests() {
 
      tests.appendChild(generateUnitTest(16, genericTest, ninety,
      "pie", ""));
+
 }
 
 addLoadEvent(generateTests);

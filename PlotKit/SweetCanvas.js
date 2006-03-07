@@ -149,7 +149,7 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
         // faux shadow for firefox
         context.save();
         context.fillStyle = Color.blackColor().colorWithAlpha(0.2).toRGBString();
-        context.translate(0, -2);
+        context.translate(-1, -2);
         bind(makePath, this)();        
         context.fill();
         context.restore();

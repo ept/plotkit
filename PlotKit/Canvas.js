@@ -93,6 +93,7 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
         "axisLineWidth": 0.5,
         "axisTickSize": 3,
         "axisLabelColor": Color.blackColor(),
+        "axisLabelFont": "Arial",
         "axisLabelFontSize": 9,
 		"axisLabelWidth": 50,
         "enableEvents": true,
@@ -414,7 +415,7 @@ PlotKit.CanvasRenderer.prototype._renderAxis = function() {
                 var y = this.area.y + this.area.h;
                 context.beginPath();
                 context.moveTo(x, y);
-                context.lineTo(x, y + 3);
+                context.lineTo(x, y + this.options.axisTickSize);
                 context.closePath();
                 context.stroke();
 
