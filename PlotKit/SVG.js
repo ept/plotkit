@@ -1,8 +1,8 @@
 // -------------------------------------------------------------------------
-// NOTES: - Cannot use MochiKit.js, need to include everything individually.
-//        - Need document header hack for Adobe SVG plugin
-//
-//
+// NOTES: - If you use XHTML1.1 strict, then you must include each MochiKit
+//          file individuall.
+//        - For IE support, you must include the AdobeSVG object hack.
+//          See tests/svg.html for details.
 // -------------------------------------------------------------------------
 // -------------------------------------------------------------------------
 // Check required components
@@ -279,8 +279,8 @@ PlotKit.SVGRenderer.prototype._renderPieChart = function() {
 
         attrs["d"] = pathString;
 
-        var slice = this.createSVGElement("path", attrs);
-        this.root.appendChild(slice);
+        var elem = this.createSVGElement("path", attrs);
+        this.root.appendChild(elem);
     }
 };
 
