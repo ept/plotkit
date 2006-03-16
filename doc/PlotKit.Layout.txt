@@ -1,3 +1,16 @@
+{% extends "base" %}
+{% load markup %}
+{% block pageid %}code{% endblock %}
+{% block headers %}
+<link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block title %}PlotKit.Layout{% endblock %}
+
+{% block content %}
+<div class="page doc api">
+{% filter markdown %}
+[PlotKit Home](PlotKit.html) | [<<](PlotKit.Base.html) | [>>](PlotKit.Renderer.html)
+
 PlotKit Layout
 ==============
 
@@ -8,18 +21,23 @@ The layout engine abstracts away all the complex layout problems with plotting c
 PlotKit Layout also is responsible for simple chart state querying so renderers can implement basic event support for objects on the canvas.
 
 Constructor
------------
+===========
  
-   new Layout(style, options);
+  `new Layout(style, options);`
 
 Layout takes the following arguments:
 
-* __style__ which can be ``bar``, ``line`` or ``pie`` which represnts the style of the graph that is desired.
-* __options__ is a dictionary/associative array of layout options. Unrecognised keys are ignored. The following options are supported:
+__style__ which can be `bar`, `line` or `pie` which represnts the style of the graph that is desired.
 
-### Bar and Line Chart Layout options
+__options__ is a dictionary/associative array of layout options. Unrecognised keys are ignored. The following options are supported:
 
-<table>
+Layout Options
+==============
+
+Bar and Line Chart layout options
+---------------------------------
+
+<table cellpadding="0" cellspacing="0">
   <thead>
 	<tr><td>Option name</td><td>Description</td><td>Type</td><td>Default</td></tr>
   </thead>
@@ -56,7 +74,7 @@ Layout takes the following arguments:
 	</tr>
 	<tr>
 		<th>xTicks</th>
-		<td>X values at which ticks should be drawn. Automatically calculated if not defined using the parameters ``xNumberOfTicks`` and ``xTickPrecision``.</td>
+		<td>X values at which ticks should be drawn. Automatically calculated if not defined using the parameters `xNumberOfTicks` and ``xTickPrecision``.</td>
 		<td>Array of {label: "somelabel", v:value}.</td>
 		<td>null</td>
 	</tr>
@@ -93,7 +111,8 @@ Layout takes the following arguments:
  	</tbody>
 </table>
 
-### Pie Chart Layout Options
+Pie Chart Layout Options
+------------------------
 
 <table>
   <thead>
@@ -110,11 +129,11 @@ Layout takes the following arguments:
 </table>	
 
 Layout Properties
------------------
+=================
 
 There are some properties you can access, either because you are using a layout inside a renderer or if you would like additional information. Under normal operations, you will not need to, or should modify these parameters.
 
-<table>
+<table cellpadding="0" cellspacing="0">
   <thead>
 	<tr><td>Property</td><td>Type</td><td>Description</td></tr>
   </thead>
@@ -158,15 +177,16 @@ There are some properties you can access, either because you are using a layout 
 </table>
 
 Layout Types
-------------
+============
 
 Here are the definition of the types that you will encounter if you access the properties of the Layout object, specifically ``bars``, ``points`` and ``slices``. If you are not writing a renderer, you do not need to know this.
 
-### Bar Type
+Bar Type
+--------
 
 Represents a bar that the renderer will draw. It contains the following properties.
 
-<table>
+<table cellpadding="0" cellspacing="0">
   <thead>
 	<tr><td>Property</td><td>Type</td><td>Description</td></tr>
   </thead>
@@ -194,11 +214,12 @@ Represents a bar that the renderer will draw. It contains the following properti
   </tbody>
 </table>
 
-### Point Type
+Point Type
+----------
 
 This represents a point on a line chart.
 
-<table>
+<table cellpadding="0" cellspacing="0">
   <thead>
 	<tr><td>Property</td><td>Type</td><td>Description</td></tr>
   </thead>
@@ -221,7 +242,8 @@ This represents a point on a line chart.
   </tbody>
 </table>
 
-### Slice Type
+Slice Type
+----------
 
 This represents a pie slice in a pie chart.
 
@@ -254,7 +276,7 @@ This represents a pie slice in a pie chart.
 </table>
 
 Layout Methods
-----------------
+==============
 
 * ``addDataset(name, values)``
   
@@ -279,17 +301,21 @@ Layout Methods
   __Note that the specification of this function is subject to change__.
    
 Layout Notes
-------------
+============
 
-### Pie Chart Data and Ticks Restrictions
+Pie Chart Data and Ticks Restrictions
+-------------------------------------
 
 Note that you can only use one dataset for pie charts. Only the y value of the dataset will be used, but the x value must be unique and set as it will correspond to the xTicks that are given.
 
 Labels for pie charts will only use xTicks.
 
 Layout Examples
----------------
+===============
 
+{% endfilter %}
+</div>
+{% endblock %}
 
 
 

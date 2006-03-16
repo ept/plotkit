@@ -1,3 +1,16 @@
+{% extends "base" %}
+{% load markup %}
+{% block pageid %}code{% endblock %}
+{% block headers %}
+<link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block title %}PlotKit.SVG{% endblock %}
+
+{% block content %}
+<div class="page doc api">
+{% filter markdown %}
+[PlotKit Home](PlotKit.html) | [<<](PlotKit.Canvas.html) | [>>](PlotKit.SweetCanvas.html)
+
 PlotKit SVG
 ===========
 
@@ -8,22 +21,33 @@ Important Implementation Requirements
 
 In order to use the SVG Renderer, the file and webserver must support inline SVG files. This means the following conditions must exist:
 
-1. The HTML file must be XHTML compliant. So it should start off with this:
+###The HTML file must be XHTML compliant. 
+
+So it should start off with this:
 
 	<?xml version="1.0" encoding="UTF-8"?>
-	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html
+	xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
+	xmlns:svg="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
 	<head>        
 	  <object id="AdobeSVG" classid="clsid:78156a80-c6a1-4bbf-8e6a-3cd390eeb4e2"></object>
 	  <?import namespace="svg" implementation="#AdobeSVG"?>
 	...
 
-2. The mimetype returns from the web server must be application/xhtml+xml. To do this you'll need to rename your file as .xml or .xhtml if you are using Apache.
+###Non XHTML Compliant javascript includes
 
-3. You cannot use the autoloading MochiKit.js, but instead include all the JS files individually or use the packed MochiKit. This is because MochiKit's way of autoloading is not XHTML compliant.
+You cannot use the autoloading MochiKit.js, but instead include all the JS files individually or use the packed MochiKit. This is because MochiKit's way of autoloading is not XHTML compliant.
 
 An example of this is in the tests.
 
 PlotKit SVG Options
 -------------------
 
-There are no additional options for the SVG Renderer aprt from the default Renderer options.
+There are no additional options for the SVG Renderer apart from the default Renderer options.
+
+{% endfilter %}
+</div>
+{% endblock %}

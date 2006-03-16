@@ -1,0 +1,79 @@
+{% extends "base" %}
+{% load markup %}
+{% block pageid %}code{% endblock %}
+{% block title %}PlotKit Documentation{% endblock %}
+{% block headers %}
+<link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+
+{% block content %}
+<div class="page doc">
+{% filter markdown %}
+PlotKit
+=======
+
+[PlotKit][] is a Javascript graph plotting library. It is aimed at web
+applications that require plotting series of data in modern web
+browsers. 
+
+PlotKit requires [MochiKit][].
+
+PlotKit supports both HTML Canvas and SVG, along with an 
+[emulated canvas for Internet Explorer][IECanvas].
+
+PlotKit is easily extensible to include other rendering engines,
+styles and layouts. Please pursue the documentation for more
+information.
+
+PlotKit is licensed under the BSD License, so you can include it in
+your free or commercial applications without worrying.
+
+PlotKit Components
+==================
+
+Base Classes
+------------
+
+* [Base][] : Common functionality that is used in other classes,
+  including default styles.
+* [Layout][] : The default chart layout engine, supports bar, line and
+               pie charts.
+
+Renderers
+---------
+
+* [CanvasRenderer][]: Basic renderer using an HTML Canvas.
+* [SVGRenderer][]: Basic renderer using SVG.
+* [SweetCanvasRenderer][]: Customised Renderer that builds on
+   CanvasRenderer to provide nicer looking charts.
+* [SweetSVGRenderer][]: Customised renderer that builds on SVGRenderer
+   to provide nicer looking charts.
+
+Extra Documentation
+===================
+
+* PlotKit quick start.
+* [SVG/Canvas Browser Support Status][Browser]
+
+Version History
+===============
+
+* PlotKit 0.8
+ - Total rewrite from CanvasGraph 0.7
+
+[PlotKit]: http://www.liquidx.net/plotkit/
+[MochiKit]: http://mochikit.com/
+[IECanvas]: http://me.eae.net/archive/2005/12/29/canvas-in-ie/
+[Base]: PlotKit.Base.html
+[Styles]: PlotKit.Styles.html
+[Layout]: PlotKit.Layout.html
+[CanvasRenderer]: PlotKit.Canvas.html
+[SVGRenderer]: PlotKit.SVG.html
+[SweetCanvasRenderer]: PlotKit.SweetCanvas.html
+[SweetSVGRenderer]: PlotKit.SweetSVG.html
+[Browser]: SVGCanvasCompat.html
+
+{% endfilter %}
+</div>
+{% endblock %}
