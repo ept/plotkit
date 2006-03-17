@@ -211,12 +211,13 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
 
 	// NOTE NOTE!! Canvas Tag draws the circle clockwise from the y = 0, x = 1
 	// so we have to subtract 90 degrees to make it start at y = 1, x = 0
+
     if (!this.isIE) {
         context.save();
-        context.fillStyle = Color.blackColor().colorWithAlpha(0.2).toRGBString();
+        var shadowColor = Color.blackColor().colorWithAlpha(0.2);
+        context.fillStyle = shadowColor.toRGBString();
         context.shadowBlur = 5.0;
         context.shadowColor = Color.fromHexString("#888888").toRGBString();
-        
         context.translate(1, 1);
         context.beginPath();
         context.moveTo(centerx, centery);
@@ -226,9 +227,9 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
         context.restore();
     }
 
+    context.save();
     context.strokeStyle = Color.whiteColor().toRGBString();
     context.lineWidth = 2.0;    
-    context.save();
     for (var i = 0; i < slices.length; i++) {
         var color = this.options.colorScheme[i%colorCount];
         context.fillStyle = color.toRGBString();

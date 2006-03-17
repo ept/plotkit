@@ -244,7 +244,12 @@ function drawPieGraph() {
    var plotter = new PlotKit.SweetCanvasRenderer(canvas, layout, options);
    plotter.render();
 }
-MochiKit.DOM.addLoadEvent(drawPieGraph);
+
+// Damn opera 9 has a bug with javascript subclassing??
+// but works in sweet.html, grr!!
+if (navigator.userAgent.toLowerCase().indexOf("opera") == -1) {
+   MochiKit.DOM.addLoadEvent(drawPieGraph);
+}
 
 //-->
 </script>
