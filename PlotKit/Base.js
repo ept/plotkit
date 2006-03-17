@@ -1,67 +1,15 @@
 /*
-
-    PlotKit Project
-    ---------------
-   
-    PlotKit Project is a collection of Javascript classes that allows
+    PlotKit
+    =======
+    PlotKit is a collection of Javascript classes that allows
     you to quickly visualise data using different types of charts.
-    
-    Features:
-    - Plots bar charts, line charts and pie charts.
-    - Clean interface between layout and rendering engine.
-    - Includes HTML Canvas, Inline SVG and Canvas on IE support.
 
-    Browser Support:
-    - Safari 2.0 (Canvas HTML) 
-    - Firefox 1.5 (SVG and Canvas)
-    - Opera 9.0 (SVG and Canvas)
-    - IE 6.0 (Emulated Canvas via VML)
-
-    More Info:
-    - <http://www.liquidx.net/plotkit/>
-    - <http://www.liquidx.net/plotkit/docs/>
-
-    Requirements
-    ------------
-    * MochiKit 1.1+ (Base, Async, Color, DOM, Logging)
-      <http://www.MochiKit.com>    
+    For license/info/documentation: http://www.liquidx.net/plotkit/
 
     Copyright
     ---------
-    Copyright 2005,2006 (c) Alastair Tse <alastair^tse.id.au>
-    For use under the BSD license. See end of file.
-    
-    Changes (Ascending Order)
-    -------------------------
-    
-    * When known as CanvasGraph..
-    
-    [11 Dec 2005] 0.5   * Initial Public Release 
-    [12 Dec 2005] 0.5.1 * Minor bugfix 
-    
-      - drawGrid's color usage. Thanks to  Philippe Marschall.
-      
-    [27 Dec 2005] 0.6   * Major Bugfix Release
-    
-      - Added Unit Tests
-      - Fix alignment error with bar charts
-      - Fix origin at 0 value for line charts
-      - Fix bugs with plotting single values in dataset
-      
-    [12 Jan 2005] 0.7   * Major Reorganisation
-      - Put everything into its own namespace, GraphKit.
-        (a la. MochiKit).
-      - Export CanvasGraph globally for backwards compat.
-
-    * Now known as PlotKit..
-
-    [04 Mar 2006] 0.8   * Major Rewrite
-      - Break backwards compatibility. Users must port their code to the
-        new PlotKit.API
-      - Split rendering engine to Canvas.js, and Base.js.
-      - Add optional Canvas on IE support. (webfx)
-      - Add Inline SVG support.
-
+    Copyright 2005,2006 (c) Alastair Tse <alastair^liquidx.net>
+    For use under the BSD license. <http://www.liquidx.net/plotkit>
 */
 
 // --------------------------------------------------------------------
@@ -78,7 +26,7 @@ try {
     }
 } 
 catch (e) {    
-    throw "canvasGraph depends on MochiKit.{Base,Color,DOM,Format}"
+    throw "PlotKit depends on MochiKit.{Base,Color,DOM,Format}"
 }
 
 // -------------------------------------------------------------------
@@ -185,19 +133,6 @@ MochiKit.Base.update(PlotKit.Base, {
         return mb.map(makeColor, scheme);
     },
 
-    baseColors: function () {
-        var hexColor = MochiKit.Color.Color.fromHexString;
-        return [hexColor("#123474"),
-                hexColor("#476fb2"),
-                hexColor("#be2c2b"),
-                hexColor("#85b730"),
-                hexColor("#734a99"),
-                hexColor("#26a1c5"),
-                hexColor("#fb8707"),
-                hexColor("#000000"),
-                hexColor("#ffffff")];
-    },
-
     baseDarkPrimaryColors: function () {
         var hexColor = MochiKit.Color.Color.fromHexString;
         return [hexColor("#ad3f40"),
@@ -215,14 +150,35 @@ MochiKit.Base.update(PlotKit.Base, {
                 hexColor("#5d83da"),
                 hexColor("#78a15d")];
     },
+    
+    baseBlueColors: function () {
+         var hexColor = MochiKit.Color.Color.fromHexString;
+         return [hexColor("#4b6b94"), hexColor("#5d81b4"), hexColor("#acbad2")];
+    },
 
-    palette: function(baseColor) {
-        var fractions = [0.0, 0.1, 0.2, 0.3, 0.4];
+    palette: function(baseColor, fromLevel, toLevel, increment) {
+        var isNil = MochiKit.Base.isUndefinedOrNull;
+        var fractions = new Array();
+        if (isNil(increment))
+            increment = 0.1;
+        if (isNil(toLevel))
+            toLevel = 0.4;
+        if (isNil(fromLevel))
+            fromLevel = -0.2;
+
+        var level = fromLevel;
+        while (level <= toLevel) {
+            fractions.push(level);
+            level += increment;
+        }
+            
         var makeColor = function(color, fraction) {
             return color.lighterColorWithLevel(fraction);
         };
         return MochiKit.Base.map(partial(makeColor, baseColor), fractions);
     },
+    
+
                        
 
     // The follow functions are from quirksmode.org
@@ -259,13 +215,104 @@ MochiKit.Base.update(PlotKit.Base, {
    }
 });    
 
+PlotKit.Base.baseColors = function () {
+   var hexColor = MochiKit.Color.Color.fromHexString;
+   return [hexColor("#476fb2"),
+           hexColor("#be2c2b"),
+           hexColor("#85b730"),
+           hexColor("#734a99"),
+           hexColor("#26a1c5"),
+           hexColor("#fb8707"),
+           hexColor("#000000")];
+};
+
+PlotKit.Base.officeBaseStyle = {
+    "axisLineWidth": 2.0,
+    "axisLabelColor": Color.grayColor(),
+    "axisLineColor": Color.whiteColor(),
+    "padding": {top: 5, bottom: 20, left: 40, right: 10},
+    "shouldStroke": true
+};    
+
+MochiKit.Base.update(PlotKit.Base,{
+    officeBlue: function() {
+        var r = {
+        "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[0]),
+        "backgroundColor": PlotKit.Base.baseColors()[0].lighterColorWithLevel(0.45)
+        };
+        MochiKit.Base.update(r, PlotKit.Base.officeBaseStyle);
+        return r;
+    },
+    officeRed: function() {
+        var r = {
+        "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[1]),
+        "backgroundColor": PlotKit.Base.baseColors()[1].lighterColorWithLevel(0.5)
+        };
+        MochiKit.Base.update(r, PlotKit.Base.officeBaseStyle);
+        return r;
+    },
+    officeGreen: function() {
+        var r = {
+        "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[2]),
+        "backgroundColor": PlotKit.Base.baseColors()[2].lighterColorWithLevel(0.5)
+        };
+        MochiKit.Base.update(r, PlotKit.Base.officeBaseStyle);
+        return r;
+    },
+    officePurple: function() {
+        var r = {
+        "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[3]),
+        "backgroundColor": PlotKit.Base.baseColors()[3].lighterColorWithLevel(0.5)
+        };
+        MochiKit.Base.update(r, PlotKit.Base.officeBaseStyle);
+        return r;
+    },
+    
+    officeCyan: function() {
+        var r = {
+            "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[4]),
+            "backgroundColor": PlotKit.Base.baseColors()[4].lighterColorWithLevel(0.5)
+            };
+        MochiKit.Base.update(r, PlotKit.Base.officeBaseStyle);
+        return r;
+    },
+    
+    officeOrange: function() {
+        var r = {
+            "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[5]),
+            "backgroundColor": PlotKit.Base.baseColors()[5].lighterColorWithLevel(0.4)
+            };
+        MochiKit.Base.update(r, PlotKit.Base.officeBaseStyle);
+        return r;
+    },
+    
+    officeBlack: function() {
+        var r = {
+        "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[6], 0.0, 0.6),
+        "backgroundColor": PlotKit.Base.baseColors()[6].lighterColorWithLevel(0.9)
+        };
+        MochiKit.Base.update(r, PlotKit.Base.officeBaseStyle);
+        return r;
+    }
+});
+
+
 PlotKit.Base.EXPORT = [
-   "roundInterval",
+   "baseColors",
    "collapse",
-   "uniq",
    "colorScheme",
    "findPosX",
-   "findPosY"
+   "findPosY",
+   "officeBaseStyle",
+   "officeBlue",
+   "officeRed",
+   "officeGreen",
+   "officePurple",
+   "officeCyan",
+   "officeOrange",
+   "officeBlack",
+   "roundInterval",
+   "uniq",
 ];
 
 PlotKit.Base.EXPORT_OK = [];
@@ -284,37 +331,3 @@ PlotKit.Base.__new__ = function() {
 PlotKit.Base.__new__();
 MochiKit.Base._exportSymbols(this, PlotKit.Base);
 
-/*
-
- Copyright (c) 2005, 2006 Alastair Tse <alastair@tse.id.au>
-
- All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-* Redistributions of source code must retain the above copyright notice,
-  this list of conditions and the following disclaimer. 
-
-* Redistributions in binary form must reproduce the above copyright
-  notice, this list of conditions and the following disclaimer in the
-  documentation and/or other materials provided with the distribution.
-
-* Neither the name of Alastair Tse nor the names of its contributors may
-  be used to endorse or promote products derived from this software
-  without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
-IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- 
-*/ 

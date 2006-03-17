@@ -8,8 +8,8 @@
     
     Copyright
     ---------
-    Copyright 2005,2006 (c) Alastair Tse <alastair^tse.id.au>
-    For use under the BSD license. See end of file.
+    Copyright 2005,2006 (c) Alastair Tse <alastair^liquidx.net>
+    For use under the BSD license. <http://www.liquidx.net/plotkit>
     
 */
 

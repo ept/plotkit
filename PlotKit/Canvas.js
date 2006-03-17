@@ -29,8 +29,8 @@
     
     Copyright
     ---------
-    Copyright 2005,2006 (c) Alastair Tse <alastair^tse.id.au>
-    For use under the BSD license. See end of file.
+    Copyright 2005,2006 (c) Alastair Tse <alastair^liquidx.net>
+    For use under the BSD license. <http://www.liquidx.net/plotkit>
     
 */
 // --------------------------------------------------------------------
@@ -81,7 +81,7 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
         "drawBackground": true,
         "backgroundColor": Color.whiteColor(),
         "padding": {left: 30, right: 20, top: 10, bottom: 10},
-        "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[1]),
+        "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[0]),
         "strokeColor": Color.whiteColor(),
         "strokeColorTransform": "asStrokeColor",
         "strokeWidth": 0.5,
@@ -96,6 +96,7 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
         "axisLabelFont": "Arial",
         "axisLabelFontSize": 9,
 		"axisLabelWidth": 50,
+		"pieRadius": 0.4,
         "enableEvents": true,
         "IECanvasHTC": "PlotKit/iecanvas.htc"
     };
@@ -308,7 +309,8 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
 
     var centerx = this.area.x + this.area.w * 0.5;
     var centery = this.area.y + this.area.h * 0.5;
-    var radius = Math.min(this.area.w / 2.0, this.area.h / 2.0);
+    var radius = Math.min(this.area.w * this.options.pieRadius, 
+                          this.area.h * this.options.pieRadius);
 
 	// NOTE NOTE!! Canvas Tag draws the circle clockwise from the y = 0, x = 1
 	// so we have to subtract 90 degrees to make it start at y = 1, x = 0
@@ -455,7 +457,8 @@ PlotKit.CanvasRenderer.prototype._renderPieAxis = function() {
 		
 		var centerx = this.area.x + this.area.w * 0.5;
 	    var centery = this.area.y + this.area.h * 0.5;
-	    var radius = Math.min(this.area.w / 2.0, this.area.h / 2.0);
+	    var radius = Math.min(this.area.w * this.options.pieRadius,
+	                          this.area.h * this.options.pieRadius);
 		var labelWidth = this.options.axisLabelWidth;
 		
 		for (var i = 0; i < this.layout.xticks.length; i++) {
@@ -559,7 +562,7 @@ PlotKit.CanvasRenderer.prototype.clear = function() {
 PlotKit.CanvasRenderer.prototype._initialiseEvents = function() {
     var connect = MochiKit.Signal.connect;
     var bind = MochiKit.Base.bind;
-    MochiKit.Signal.register_signals(this, ['onmouseover', 'onclick', 'onmouseout', 'onmousemove']);
+    MochiKit.Signal.registerSignals(this, ['onmouseover', 'onclick', 'onmouseout', 'onmousemove']);
     //connect(this.element, 'onmouseover', bind(this.onmouseover, this));
     //connect(this.element, 'onmouseout', bind(this.onmouseout, this));
     //connect(this.element, 'onmousemove', bind(this.onmousemove, this));
@@ -567,9 +570,15 @@ PlotKit.CanvasRenderer.prototype._initialiseEvents = function() {
 };
 
 PlotKit.CanvasRenderer.prototype._resolveObject = function(e) {
-	var x = (e.event().offsetX - this.area.x) / this.area.w;
-	var y = (e.event().offsetY - this.area.y) / this.area.h;
+    // does not work in firefox
+	//var x = (e.event().offsetX - this.area.x) / this.area.w;
+	//var y = (e.event().offsetY - this.area.y) / this.area.h;
+
+    var x = (e.mouse().page.x - PlotKit.Base.findPosX(this.element) - this.area.x) / this.area.w;
+    var y = (e.mouse().page.y - PlotKit.Base.findPosY(this.element) - this.area.y) / this.area.h;
 	
+    log(x, y);
+
     var isHit = this.layout.hitTest(x, y);
     if (isHit)
         return isHit;
@@ -646,33 +655,3 @@ PlotKit.CanvasRenderer.isSupported = function(canvasName) {
     }
     return true;
 };
-
-
-
-/*
-
- Copyright (c) 2005, 2006 Alastair Tse <alastair@tse.id.au>
-
- All rights reserved.
-
- Redistribution and use in source and binary forms, with or without modification, are
- permitted provided that the following conditions are met:
- 
-  * Redistributions of source code must retain the above copyright notice, this list of
- conditions and the following disclaimer. * Redistributions in binary form must reproduce
- the above copyright notice, this list of conditions and the following disclaimer in the
- documentation and/or other materials provided with the distribution. * Neither the name
- of the <ORGANIZATION> nor the names of its contributors may be used to endorse or
- promote products derived from this software without specific prior written permission.
- 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
- EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
- THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
- OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- 
-*/ 

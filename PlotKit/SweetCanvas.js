@@ -1,3 +1,14 @@
+/*
+    PlotKit Sweet Canvas Renderer
+    =============================
+    Canvas Renderer for PlotKit which looks pretty!
+
+    Copyright
+    ---------
+    Copyright 2005,2006 (c) Alastair Tse <alastair^liquidx.net>
+    For use under the BSD license. <http://www.liquidx.net/plotkit>
+*/
+
 // -------------------------------------------------------------------------
 // Check required components
 // -------------------------------------------------------------------------
@@ -13,24 +24,24 @@ catch (e) {
 }
 
 
-if (typeof(PlotKit.SweetRenderer) == 'undefined') {
-    PlotKit.SweetRenderer = {};
+if (typeof(PlotKit.SweetCanvasRenderer) == 'undefined') {
+    PlotKit.SweetCanvasRenderer = {};
 }
 
-PlotKit.SweetRenderer = function(element, layout, options) {
+PlotKit.SweetCanvasRenderer = function(element, layout, options) {
     if (arguments.length > 0) {
         this.__init__(element, layout, options);
     }
 };
 
-PlotKit.SweetRenderer.NAME = "PlotKit.SweetRenderer";
-PlotKit.SweetRenderer.VERSION = PlotKit.VERSION;
+PlotKit.SweetCanvasRenderer.NAME = "PlotKit.SweetCanvasRenderer";
+PlotKit.SweetCanvasRenderer.VERSION = PlotKit.VERSION;
 
-PlotKit.SweetRenderer.__repr__ = function() {
+PlotKit.SweetCanvasRenderer.__repr__ = function() {
     return "[" + this.NAME + " " + this.VERSION + "]";
 };
 
-PlotKit.SweetRenderer.toString = function() {
+PlotKit.SweetCanvasRenderer.toString = function() {
     return this.__repr__();
 };
 
@@ -38,35 +49,32 @@ PlotKit.SweetRenderer.toString = function() {
 // Subclassing Magic
 // ---------------------------------------------------------------------
 
-PlotKit.SweetRenderer.prototype = new PlotKit.CanvasRenderer();
-PlotKit.SweetRenderer.prototype.constructor = PlotKit.SweetRenderer;
-PlotKit.SweetRenderer.__super__ = PlotKit.CanvasRenderer.prototype;
+PlotKit.SweetCanvasRenderer.prototype = new PlotKit.CanvasRenderer();
+PlotKit.SweetCanvasRenderer.prototype.constructor = PlotKit.SweetCanvasRenderer;
+PlotKit.SweetCanvasRenderer.__super__ = PlotKit.CanvasRenderer.prototype;
 
 // ---------------------------------------------------------------------
 // Constructor
 // ---------------------------------------------------------------------
 
-PlotKit.SweetRenderer.prototype.__init__ = function(element, layout, options) { 
-    PlotKit.SweetRenderer.__super__.__init__.call(this, element, layout, options);
+PlotKit.SweetCanvasRenderer.prototype.__init__ = function(element, layout, options) { 
+    var additionalOptions = PlotKit.Base.officeBlue();
+    MochiKit.Base.update(additionalOptions, options);
+    PlotKit.SweetCanvasRenderer.__super__.__init__.call(this, element, layout, additionalOptions);
 };
 
 // ---------------------------------------------------------------------
 // Extended Plotting Functions
 // ---------------------------------------------------------------------
 
-PlotKit.SweetRenderer.prototype._renderBarChart = function() {
+PlotKit.SweetCanvasRenderer.prototype._renderBarChart = function() {
     var bind = MochiKit.Base.bind;
-    var shadowGradient = [
-       Color.blackColor().colorWithAlpha(0.1).toRGBString(),
-       Color.blackColor().colorWithAlpha(0.2).toRGBString(),
-       Color.blackColor().colorWithAlpha(0.3).toRGBString(),
-       Color.blackColor().colorWithAlpha(0.4).toRGBString()
-    ];
+    var shadowColor = Color.blackColor().colorWithAlpha(0.1).toRGBString();
 
     var prepareFakeShadow = function(context, x, y, w, h) {
-        context.fillStyle = shadowGradient[0];
+        context.fillStyle = shadowColor;
         context.fillRect(x-2, y-2, w+4, h+2); 
-        context.fillStyle = shadowGradient[0];
+        context.fillStyle = shadowColor;
         context.fillRect(x-1, y-1, w+2, h+1); 
     };
 
@@ -170,20 +178,77 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
 };
 
 
-
-
-PlotKit.SweetRenderer.prototype._renderBackground = function() {
+PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
     var context = this.element.getContext("2d");
-    context.fillStyle = Color.whiteColor().toRGBString();
-    context.fillRect(0, 0, this.width, this.height);
+    context.save();
 
-    context.fillStyle = Color.fromHexString("#e0e3ec").toRGBString();
+    var colorCount = this.options.colorScheme.length;
+    var slices = this.layout.slices;
+
+    var centerx = this.area.x + this.area.w * 0.5;
+    var centery = this.area.y + this.area.h * 0.5;
+    var radius = Math.min(this.area.w * this.options.pieRadius, 
+                          this.area.h * this.options.pieRadius);
+
+	// NOTE NOTE!! Canvas Tag draws the circle clockwise from the y = 0, x = 1
+	// so we have to subtract 90 degrees to make it start at y = 1, x = 0
+
+    context.save();
+    context.fillStyle = Color.blackColor().colorWithAlpha(0.2).toRGBString();
+    context.shadowBlur = 5.0;
+    context.shadowColor = Color.fromHexString("#888888").toRGBString();
+    
+    context.translate(1, 1);
+    context.beginPath();
+    context.moveTo(centerx, centery);
+    context.arc(centerx, centery, radius + 2, 0, Math.PI*2, false);
+    context.closePath();
+    context.fill();
+    context.restore();
+
+
+    context.strokeStyle = Color.whiteColor().toRGBString();
+    context.lineWidth = 2.0;    
+    for (var i = 0; i < slices.length; i++) {
+        var color = this.options.colorScheme[i%colorCount];
+        context.save();
+        context.fillStyle = color.toRGBString();
+
+        var makePath = function() {
+            context.beginPath();
+            context.moveTo(centerx, centery);
+            context.arc(centerx, centery, radius, 
+                        slices[i].startAngle - Math.PI/2,
+                        slices[i].endAngle - Math.PI/2,
+                        false);
+            context.lineTo(centerx, centery);
+            context.closePath();
+        };
+        
+        
+
+        makePath();
+    	context.fill();
+        makePath();
+		context.stroke();
+		
+        context.restore();
+    }
+};
+
+
+PlotKit.SweetCanvasRenderer.prototype._renderBackground = function() {
+    var context = this.element.getContext("2d");
+    //context.fillStyle = Color.whiteColor().toRGBString();
+    //context.fillRect(0, 0, this.width, this.height);
+
+    context.fillStyle = this.options.backgroundColor.toRGBString();
     context.fillRect(this.area.x, this.area.y, this.area.w, this.area.h);
 
     if (this.layout.style == "bar" || this.layout.style == "line") {
         context.save();
         context.strokeStyle = Color.whiteColor().toRGBString();
-        context.lineWidth = 0.5;
+        context.lineWidth = 1.0;
         for (var i = 0; i < this.layout.yticks.length; i++) {
             var y = this.layout.yticks[i][0] * this.area.h + this.area.y;
             var x = this.area.x;
@@ -195,4 +260,8 @@ PlotKit.SweetRenderer.prototype._renderBackground = function() {
         }
         context.restore();
     }
+    else {
+        PlotKit.SweetCanvasRenderer.__super__._renderBackground.call(this);
+    }
+        
 };

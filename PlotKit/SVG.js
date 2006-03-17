@@ -1,3 +1,14 @@
+/*
+    PlotKit SVG
+    ===========
+    SVG Renderer for PlotKit
+
+    Copyright
+    ---------
+    Copyright 2005,2006 (c) Alastair Tse <alastair^liquidx.net>
+    For use under the BSD license. <http://www.liquidx.net/plotkit>
+*/
+
 // -------------------------------------------------------------------------
 // NOTES: - If you use XHTML1.1 strict, then you must include each MochiKit
 //          file individuall.
@@ -21,7 +32,6 @@ catch (e) {
 
 // ---------------------------------------------------------------------------
 //  SVG Renderer
-//   * Draws the graph on a HTML Canvas with labels using DIVs
 // ---------------------------------------------------------------------------
 
 PlotKit.SVGRenderer = function(element, layout, options) {
@@ -69,6 +79,7 @@ PlotKit.SVGRenderer.prototype.__init__ = function(element, layout, options) {
         "axisLabelFontSize": 10,
         "axisLabelWidth": 50,
         "axisLabelUseDiv": true,
+        "pieRadius": 0.4,
         "enableEvents": true
     };
 
@@ -101,6 +112,9 @@ PlotKit.SVGRenderer.prototype.__init__ = function(element, layout, options) {
     // internal state
     this.xlabels = new Array();
     this.ylabels = new Array();
+
+    // initialise some meta structures in SVG
+    this.defs = this.createSVGElement("defs");
 
     this.area = {
         x: this.options.padding.left,
@@ -220,7 +234,8 @@ PlotKit.SVGRenderer.prototype._renderPieChart = function() {
 
     var centerx = this.area.x + this.area.w * 0.5;
     var centery = this.area.y + this.area.h * 0.5;
-    var radius = Math.min(this.area.w / 2.0, this.area.h / 2.0);
+    var radius = Math.min(this.area.w * this.options.pieRadius, 
+                          this.area.h * this.options.pieRadius);
 
     // NOTE NOTE!! Canvas Tag draws the circle clockwise from the y = 0, x = 1
     // so we have to subtract 90 degrees to make it start at y = 1, x = 0
@@ -240,8 +255,9 @@ PlotKit.SVGRenderer.prototype._renderPieChart = function() {
                 attrs["stroke"] = this.options.strokeColor.toRGBString();
             else if (this.options.strokeColorTransform)
                 attrs["stroke"] = color[this.options.strokeColorTransform]().toRGBString();
-            attrs["strokeWidth"] = this.options.strokeWidth;
+            attrs["style"] = "stroke-width: " + this.options.strokeWidth;
         }
+
         this.root.appendChild(this.createSVGElement("circle", attrs));
         return;
 	}
@@ -260,7 +276,7 @@ PlotKit.SVGRenderer.prototype._renderPieChart = function() {
                 attrs["stroke"] = this.options.strokeColor.toRGBString();
             else if (this.options.strokeColorTransform)
                 attrs["stroke"] = color[this.options.strokeColorTransform]().toRGBString();
-            attrs["strokeWidth"] = this.options.strokeWidth;
+            attrs["style"] = "stroke-width:" + this.options.strokeWidth;
         }
 
         var largearc = 0;
@@ -342,6 +358,23 @@ PlotKit.SVGRenderer.prototype._renderAxis = function() {
                         fontSize: this.options.axisLabelFontSize + "px",
                         fill: this.options.axisLabelColor.toRGBString()
                     };
+                    
+                    /* we can do clipping just like DIVs
+                    http://www.xml.com/pub/a/2004/06/02/svgtype.html */
+                    /*
+                    var mask = this.createSVGElement("mask", {id: "mask" + tick[0]});
+                    var maskShape = this.createSVGElement("rect",
+                        {y: y + 3,
+                         x: (x - this.options.padding.left + 3),
+                         width: (this.options.padding.left - this.options.axisTickSize) + "px",
+                         height: (this.options.axisLabelFontSize + 3) + "px",
+                         style: {"fill": "#ffffff", "stroke": "#000000"}});
+                    mask.appendChild(maskShape);
+                    this.defs.appendChild(mask);
+                    
+                    attrs["filter"] = "url(#mask" + tick[0] + ")";
+                    */
+                    
                     var label = this.createSVGElement("text", attrs);
                     label.appendChild(this.document.createTextNode(tick[1]));
                     this.root.appendChild(label);
@@ -425,17 +458,19 @@ PlotKit.SVGRenderer.prototype._renderPieAxis = function() {
             var labelx = centerx + Math.sin(normalisedAngle) * (radius + 10);
             var labely = centery - Math.cos(normalisedAngle) * (radius + 10);
 
-            var attrib = {"position": "absolute",
-                          "zIndex": 11,
-                          "width": labelWidth + "px",
-                          "fontSize": this.options.axisLabelFontSize + "px",
-                          "overflow": "hidden",
-                          "color": this.options.axisLabelColor.toHexString()
-                        };
+            var attrib = {
+                "position": "absolute",
+                 "zIndex": 11,
+                "width": labelWidth + "px",
+                "fontSize": this.options.axisLabelFontSize + "px",
+                "overflow": "hidden",
+                "color": this.options.axisLabelColor.toHexString()
+            };
 
-            var svgattrib = {"width": labelWidth + "px",
-                             "fontSize": this.options.axisLabelFontSize + "px",
-                             "height": (this.options.axisLabelFontSize + 3) + "px"
+            var svgattrib = {
+                "width": labelWidth + "px",
+                "fontSize": this.options.axisLabelFontSize + "px",
+                "height": (this.options.axisLabelFontSize + 3) + "px"
             };
 
             if (normalisedAngle <= Math.PI * 0.5) {
@@ -603,34 +638,37 @@ PlotKit.SVGRenderer.SVG = function(attrs) {
         return PlotKit.SVGRenderer.prototype.createSVGElement("svg", attrs);
     }
 };
-                                                            
 
-//PlotKit.SVGRenderer.SVG = MochiKit.Base.partial(PlotKit.SVGRenderer.prototype.createSVGElement, "svg");
+PlotKit.SVGRenderer.isSupported = function() {
+    var isOpera = (navigator.userAgent.toLowerCase().indexOf("opera") != -1);
+    var ieVersion = navigator.appVersion.match(/MSIE (\d\.\d)/);
+    var safariVersion = navigator.userAgent.match(/AppleWebKit\/(\d+)/);
+    var operaVersion = navigator.userAgent.match(/Opera\/(\d*\.\d*)/);
+    var mozillaVersion = navigator.userAgent.match(/rv:(\d*\.\d*).*Gecko/);
+    
 
-/*
+    if (ieVersion && (ieVersion[1] >= 6) && !isOpera) {
+        var dummysvg = document.createElement('<svg:svg width="1" height="1" baseProfile="full" version="1.1" id="dummy">');
+        try {
+            dummysvg.getSVGDocument();
+            dummysvg = null;
+            return true;
+        }
+        catch (e) {
+            return false;
+        }
+    }
+    
+    /* support not really there yet. no text and paths are buggy
+    if (safariVersion && (safariVersion[1] > 419))
+        return true;
+    */
 
- Copyright (c) 2005, 2006 Alastair Tse <alastair@tse.id.au>
-
- All rights reserved.
-
- Redistribution and use in source and binary forms, with or without modification, are
- permitted provided that the following conditions are met:
- 
-  * Redistributions of source code must retain the above copyright notice, this list of
- conditions and the following disclaimer. * Redistributions in binary form must reproduce
- the above copyright notice, this list of conditions and the following disclaimer in the
- documentation and/or other materials provided with the distribution. * Neither the name
- of the <ORGANIZATION> nor the names of its contributors may be used to endorse or
- promote products derived from this software without specific prior written permission.
- 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
- EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
- THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
- OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- 
-*/ 
+    if (operaVersion && (operaVersion[1] > 8.9))
+        return true
+    
+    if (mozillaVersion && (mozillaVersion > 1.7))
+        return true;
+    
+    return false;
+};
