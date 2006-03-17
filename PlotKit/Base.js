@@ -230,8 +230,7 @@ PlotKit.Base.officeBaseStyle = {
     "axisLineWidth": 2.0,
     "axisLabelColor": Color.grayColor(),
     "axisLineColor": Color.whiteColor(),
-    "padding": {top: 5, bottom: 20, left: 40, right: 10},
-    "shouldStroke": true
+    "padding": {top: 5, bottom: 30, left: 10, right: 10}
 };    
 
 MochiKit.Base.update(PlotKit.Base,{

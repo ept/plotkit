@@ -147,7 +147,7 @@ See this in an [HTML example here][example1].
 We mentioned that both the layout and renderer may take some additional options. In order to take advantage of that, we can use a simple options dictionary to store options for both layout and the renderer, in this way:
 
     var options = {
-       "IECanvasHTC": "../PlotKit/iecanvas.htc",
+       "IECanvasHTC": "/plotkit/iecanvas.htc",
        "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[0]),
        "padding": {left: 0, right: 0, top: 10, bottom: 30},
        "xTicks": [{v:0, label:"zero"}, 
@@ -211,9 +211,10 @@ Alastair Tse - Last Updated: 17th March 2006
 </div>
 <script type="text/javascript">
 <!--
+
 var options = {
-   "IECanvasHTC": "../PlotKit/iecanvas.htc",
-   "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[0]),
+   "IECanvasHTC": "../plotkit/iecanvas.htc",
+   "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[0]), 
    "padding": {left: 10, right: 10, top: 10, bottom: 30},
    "xTicks": [{v:0, label:"zero"}, 
               {v:1, label:"one"}, 
@@ -223,6 +224,7 @@ var options = {
    "drawYAxis": false,
    "pieRadius": 0.35
 };
+
 
 function drawBarGraph() {
    var layout = new PlotKit.Layout("bar", options);

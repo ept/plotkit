@@ -100,11 +100,24 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
         "enableEvents": true,
         "IECanvasHTC": "PlotKit/iecanvas.htc"
     };
-
     MochiKit.Base.update(this.options, options ? options : {});
+
+    // we need to refetch the element because of this horrible Canvas on IE
+    // crap
+    this.element_id = element.id ? element.id : element;
+
+    // Stuff relating to Canvas on IE support
+    var self = PlotKit.CanvasRenderer;
+    this.isIE = self.IECanvasEmulationIfNeeded(this.options.IECanvasHTC);
+    this.IEDelay = 0.5;
+    this.maxTries = 5;
+    this.renderDelay = null;
+    this.clearDelay = null;
+
     this.layout = layout;
     this.style = layout.style;
-    this.element = MochiKit.DOM.getElement(element);
+    this.element = MochiKit.DOM.getElement(this.element_id);
+    //this.element = element;
     this.container = this.element.parentNode;
     this.height = element.height;
     this.width = element.width;
@@ -114,12 +127,10 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     if (isNil(this.element))
         throw "CanvasRenderer() - passed canvas is not found";
 
-    this.isIE = this.IECanvasEmulationIfNeeded(this.element);
-    this.IEDelay = 0.3;
     if (!this.isIE && !(PlotKit.CanvasRenderer.isSupported(this.element)))
         throw "CanvasRenderer() - Canvas is not supported.";
 
-    if (isNil(this.container) || (this.container.nodeName == "div"))
+    if (isNil(this.container) || (this.container.nodeName != "DIV"))
         throw "CanvasRenderer() - <canvas> needs to be enclosed in <div>";
 
     // internal state
@@ -137,6 +148,8 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     MochiKit.DOM.updateNodeAttributes(this.container, 
     {"style":{ "position": "relative", "width": this.width + "px"}});
 
+
+
     // load event system if we have Signals
     this.event_isinside = null;
     if (MochiKit.Signal && this.options.enableEvents) {
@@ -145,28 +158,40 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     
 };
 
-PlotKit.CanvasRenderer.prototype.IECanvasEmulationIfNeeded = function(elem) {
+PlotKit.CanvasRenderer.IECanvasEmulationIfNeeded = function(htc) {
     var ie = navigator.appVersion.match(/MSIE (\d\.\d)/);
     var opera = (navigator.userAgent.toLowerCase().indexOf("opera") != -1);
     if ((!ie) || (ie[1] < 6) || (opera))
         return false;
 
-    this.element.style.width = this.element.width + "px";
-    this.element.style.height = this.element.height + "px";
-
     if (isUndefinedOrNull(MochiKit.DOM.getElement('VMLRender'))) {
+        // before we add VMLRender, we need to recreate all canvas tags
+        // programmatically otherwise IE will not recognise it
+
+        var nodes = document.getElementsByTagName('canvas');
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (node.getContext) { return; } // Other implementation, abort
+            var newNode = MochiKit.DOM.CANVAS(
+               {id: node.id, 
+                width: "" + parseInt(node.width),
+                height: "" + parseInt(node.height)}, "");
+            newNode.style.width = parseInt(node.width) + "px";
+            newNode.style.height = parseInt(node.height) + "px";
+            node.id = node.id + "_old";
+            MochiKit.DOM.swapDOM(node, newNode);
+        }
+
         document.namespaces.add("v");
         var vmlopts = {'id':'VMLRender',
                        'codebase':'vgx.dll',
                        'classid':'CLSID:10072CEC-8CC1-11D1-986E-00A0C955B42E'};
         var vml = MochiKit.DOM.createDOM('object', vmlopts);
         document.body.appendChild(vml);
-        var htc = this.options.IECanvasHTC;
         var vmlStyle = document.createStyleSheet();
         vmlStyle.addRule("canvas", "behavior: url('" + htc + "');");
         vmlStyle.addRule("v\\:*", "behavior: url(#VMLRender);");
     }
-
     return true;
 };
 
@@ -174,12 +199,19 @@ PlotKit.CanvasRenderer.prototype.render = function() {
     if (this.isIE) {
         // VML takes a while to start up, so we just poll every this.IEDelay
         try {
+            if (this.renderDelay) {
+                this.renderDelay.cancel();
+                this.renderDelay = null;
+            }
             var context = this.element.getContext("2d");
         }
         catch (e) {
             this.isFirstRender = false;
-            this.delay = MochiKit.Async.wait(this.IEDelay);
-            this.delay.addCallback(bind(this.render, this));
+            if (this.maxTries-- > 0) {
+                log("trying again");
+                this.renderDelay = MochiKit.Async.wait(this.IEDelay);
+                this.renderDelay.addCallback(bind(this.render, this));
+            }
             return;
         }
     }
@@ -302,8 +334,6 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
 
 PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
     var context = this.element.getContext("2d");
-    context.save();
-
     var colorCount = this.options.colorScheme.length;
     var slices = this.layout.slices;
 
@@ -311,6 +341,13 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
     var centery = this.area.y + this.area.h * 0.5;
     var radius = Math.min(this.area.w * this.options.pieRadius, 
                           this.area.h * this.options.pieRadius);
+
+    if (this.isIE) {
+        centerx = parseInt(centerx);
+        centery = parseInt(centery);
+        radius = parseInt(radius);
+    }
+
 
 	// NOTE NOTE!! Canvas Tag draws the circle clockwise from the y = 0, x = 1
 	// so we have to subtract 90 degrees to make it start at y = 1, x = 0
@@ -331,20 +368,22 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
             context.closePath();
         };
 
-		if (this.options.shouldFill) {
-            makePath();
-        	context.fill();
+        if (Math.abs(slices[i].startAngle - slices[i].endAngle) > 0.001) {
+            if (this.options.shouldFill) {
+                makePath();
+                context.fill();
+            }
+            
+            if (this.options.shouldStroke) {
+                makePath();
+                context.lineWidth = this.options.strokeWidth;
+                if (this.options.strokeColor)
+                    context.strokeStyle = this.options.strokeColor.toRGBString();
+                else if (this.options.strokeColorTransform)
+                    context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
+                context.stroke();
+            }
         }
-
-		if (this.options.shouldStroke) {
-            makePath();
-			context.lineWidth = this.options.strokeWidth;
-            if (this.options.strokeColor)
-                context.strokeStyle = this.options.strokeColor.toRGBString();
-            else if (this.options.strokeColorTransform)
-                context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
-			context.stroke();
-		}
         context.restore();
     }
 };
@@ -526,20 +565,26 @@ PlotKit.CanvasRenderer.prototype._renderPieAxis = function() {
 
 PlotKit.CanvasRenderer.prototype._renderBackground = function() {
     var context = this.element.getContext("2d");
+    context.save();
     context.fillStyle = this.options.backgroundColor.toString();
     context.fillRect(0, 0, this.width, this.height);
+    context.restore();
 };
 
 PlotKit.CanvasRenderer.prototype.clear = function() {
     if (this.isIE) {
         // VML takes a while to start up, so we just poll every this.IEDelay
         try {
+            if (this.clearDelay) {
+                this.clearDelay.cancel();
+                this.clearDelay = null;
+            }
             var context = this.element.getContext("2d");
         }
         catch (e) {
             this.isFirstRender = false;
-            this.delay = MochiKit.Async.wait(this.IEDelay);
-            this.delay.addCallback(bind(this.clear, this));
+            this.clearDelay = MochiKit.Async.wait(this.IEDelay);
+            this.clearDelay.addCallback(bind(this.clear, this));
             return;
         }
     }
@@ -577,7 +622,7 @@ PlotKit.CanvasRenderer.prototype._resolveObject = function(e) {
     var x = (e.mouse().page.x - PlotKit.Base.findPosX(this.element) - this.area.x) / this.area.w;
     var y = (e.mouse().page.y - PlotKit.Base.findPosY(this.element) - this.area.y) / this.area.h;
 	
-    log(x, y);
+    //log(x, y);
 
     var isHit = this.layout.hitTest(x, y);
     if (isHit)

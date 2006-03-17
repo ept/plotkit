@@ -57,10 +57,10 @@ PlotKit.SweetCanvasRenderer.__super__ = PlotKit.CanvasRenderer.prototype;
 // Constructor
 // ---------------------------------------------------------------------
 
-PlotKit.SweetCanvasRenderer.prototype.__init__ = function(element, layout, options) { 
-    var additionalOptions = PlotKit.Base.officeBlue();
-    MochiKit.Base.update(additionalOptions, options);
-    PlotKit.SweetCanvasRenderer.__super__.__init__.call(this, element, layout, additionalOptions);
+PlotKit.SweetCanvasRenderer.prototype.__init__ = function(el, layout, opts) { 
+    var moreOpts = PlotKit.Base.officeBlue();
+    MochiKit.Base.update(moreOpts, opts);
+    PlotKit.SweetCanvasRenderer.__super__.__init__.call(this, el, layout, moreOpts);
 };
 
 // ---------------------------------------------------------------------
@@ -104,8 +104,17 @@ PlotKit.SweetCanvasRenderer.prototype._renderBarChart = function() {
 
         context.shadowBlur = 5.0;
         context.shadowColor = Color.fromHexString("#888888").toRGBString();
-        
-        prepareFakeShadow(context, x, y, w, h);
+
+        if (this.isIE) {
+            context.save();
+            context.fillStyle = "#cccccc";
+            context.fillRect(x-2, y-2, w+4, h+2); 
+            context.restore();
+        }
+        else {
+            prepareFakeShadow(context, x, y, w, h);
+        }
+
         context.fillStyle = chooseColor(bar.name).toRGBString();
         context.fillRect(x, y, w, h);
 
@@ -156,7 +165,13 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
 
         // faux shadow for firefox
         context.save();
-        context.fillStyle = Color.blackColor().colorWithAlpha(0.2).toRGBString();
+        if (this.isIE) {
+            context.fillStyle = "#cccccc";
+        }
+        else {
+            context.fillStyle = Color.blackColor().colorWithAlpha(0.2).toRGBString();
+        }
+
         context.translate(-1, -2);
         bind(makePath, this)();        
         context.fill();
@@ -177,10 +192,8 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
     }
 };
 
-
 PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
     var context = this.element.getContext("2d");
-    context.save();
 
     var colorCount = this.options.colorScheme.length;
     var slices = this.layout.slices;
@@ -190,28 +203,34 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
     var radius = Math.min(this.area.w * this.options.pieRadius, 
                           this.area.h * this.options.pieRadius);
 
+    if (this.isIE) {
+        centerx = parseInt(centerx);
+        centery = parseInt(centery);
+        radius = parseInt(radius);
+    }
+
 	// NOTE NOTE!! Canvas Tag draws the circle clockwise from the y = 0, x = 1
 	// so we have to subtract 90 degrees to make it start at y = 1, x = 0
-
-    context.save();
-    context.fillStyle = Color.blackColor().colorWithAlpha(0.2).toRGBString();
-    context.shadowBlur = 5.0;
-    context.shadowColor = Color.fromHexString("#888888").toRGBString();
-    
-    context.translate(1, 1);
-    context.beginPath();
-    context.moveTo(centerx, centery);
-    context.arc(centerx, centery, radius + 2, 0, Math.PI*2, false);
-    context.closePath();
-    context.fill();
-    context.restore();
-
+    if (!this.isIE) {
+        context.save();
+        context.fillStyle = Color.blackColor().colorWithAlpha(0.2).toRGBString();
+        context.shadowBlur = 5.0;
+        context.shadowColor = Color.fromHexString("#888888").toRGBString();
+        
+        context.translate(1, 1);
+        context.beginPath();
+        context.moveTo(centerx, centery);
+        context.arc(centerx, centery, radius + 2, 0, Math.PI*2, false);
+        context.closePath();
+        context.fill();
+        context.restore();
+    }
 
     context.strokeStyle = Color.whiteColor().toRGBString();
     context.lineWidth = 2.0;    
+    context.save();
     for (var i = 0; i < slices.length; i++) {
         var color = this.options.colorScheme[i%colorCount];
-        context.save();
         context.fillStyle = color.toRGBString();
 
         var makePath = function() {
@@ -224,29 +243,24 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
             context.lineTo(centerx, centery);
             context.closePath();
         };
-        
-        
 
-        makePath();
-    	context.fill();
-        makePath();
-		context.stroke();
-		
-        context.restore();
+        if (Math.abs(slices[i].startAngle - slices[i].endAngle) > 0.0001) {
+            makePath();
+            context.fill();
+            makePath();
+            context.stroke();
+        }
     }
+    context.restore();
 };
-
 
 PlotKit.SweetCanvasRenderer.prototype._renderBackground = function() {
     var context = this.element.getContext("2d");
-    //context.fillStyle = Color.whiteColor().toRGBString();
-    //context.fillRect(0, 0, this.width, this.height);
-
-    context.fillStyle = this.options.backgroundColor.toRGBString();
-    context.fillRect(this.area.x, this.area.y, this.area.w, this.area.h);
-
+   
     if (this.layout.style == "bar" || this.layout.style == "line") {
         context.save();
+        context.fillStyle = this.options.backgroundColor.toRGBString();
+        context.fillRect(this.area.x, this.area.y, this.area.w, this.area.h);
         context.strokeStyle = Color.whiteColor().toRGBString();
         context.lineWidth = 1.0;
         for (var i = 0; i < this.layout.yticks.length; i++) {
@@ -263,5 +277,4 @@ PlotKit.SweetCanvasRenderer.prototype._renderBackground = function() {
     else {
         PlotKit.SweetCanvasRenderer.__super__._renderBackground.call(this);
     }
-        
 };

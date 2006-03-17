@@ -106,7 +106,8 @@ PlotKit.SVGRenderer.prototype.__init__ = function(element, layout, options) {
 
     if (isNil(this.element))
         throw "SVGRenderer() - passed SVG object is not found";
-    if (isNil(this.container))
+
+    if (isNil(this.container) || this.container.nodeName != "DIV")
         throw "SVGRenderer() - No DIV's around the SVG.";
 
     // internal state
