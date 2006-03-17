@@ -1,24 +1,14 @@
 /* actual tests */
 
-var options = {
-    "axisLineWidth": 2.0,
-    "axisLabelColor": Color.grayColor(),
-    "axisLineColor": Color.whiteColor(),
-    "colorScheme": [Color.fromHexString('#4b6b94'),
-                    Color.fromHexString('#5d81b4'),
-                    Color.fromHexString('#acbad2')],
-    "padding": {top: 5, bottom: 20, left: 40, right: 10},
-    "IECanvasHTC":"../PlotKit/iecanvas.htc"
-};
-
+var options = {"IECanvasHTC":"../PlotKit/iecanvas.htc"};
+MochiKit.Base.update(options, PlotKit.Base.officePurple());
 
 function genericTest(num, plotStyle) {
-
 	var l = new PlotKit.Layout(plotStyle, {});
 	var success = l.addDatasetFromTable("data" + num, $("test" + num));
 	l.evaluate();
 	var c = $("test" + num + "canvas");
-	var g = new PlotKit.SweetRenderer(c, l, options);
+	var g = new PlotKit.SweetCanvasRenderer(c, l, options);
 	g.render();
 }
 
@@ -26,9 +16,13 @@ function dualDataSet(num, plotStyle) {
 	var l = new PlotKit.Layout(plotStyle, {});
 	l.addDatasetFromTable("data1." + num, $("test" + num), 0, 1);	
 	l.addDatasetFromTable("data2." + num, $("test" + num), 0, 2);	
+	l.addDatasetFromTable("data3." + num, $("test" + num), 0, 1);	
+	l.addDatasetFromTable("data4." + num, $("test" + num), 0, 2);	
+	l.addDatasetFromTable("data5." + num, $("test" + num), 0, 1);	
+	l.addDatasetFromTable("data6." + num, $("test" + num), 0, 2);	
 	l.evaluate();
 	var c = $("test" + num + "canvas");
-	var g = new PlotKit.SweetRenderer(c, l, options);
+	var g = new PlotKit.SweetCanvasRenderer(c, l, options);
 	g.render();
 }
 
@@ -76,7 +70,7 @@ function generateTests() {
     var floatData1 = [[0, 0.5], [1, 0.4], [2, 0.3]];
     var missingData = [[0, 1], [1, 4], [3, 16], [5, 17]];
     
-    var dualData = [[0,0,0], [1,2,1], [2,4,4], [3,8,9], [4,16,16], [5,32,25], [6, 64, 36], [7, 128, 49]];
+    var dualData = [[0,0,0], [1,2,1], [2,4,4], [3,8,9]]; // , [4,16,16], [5,32,25], [6, 64, 36], [7, 128, 49]];
 
     tests.appendChild(H2(null, "Simple Tests"));
 
@@ -89,6 +83,9 @@ function generateTests() {
     "line", ""));
     tests.appendChild(generateUnitTest(4, dualDataSet, dualData,
     "line", ""));
+    
+    tests.appendChild(generateUnitTest(5, genericTest, simpleData1,
+    "pie", ""));
 }
 
 addLoadEvent(generateTests);

@@ -33,7 +33,8 @@ function demoWithStyle(style) {
         "shouldStroke": true,
         "drawXAxis": true,
         "drawYAxis": true,
-        "padding": {left: 40, right: 10, top: 10, bottom: 20}
+        "padding": {left: 40, right: 10, top: 10, bottom: 20},
+        "axisLabelUseDiv": false
     };
 
     if (style == "pie") {
@@ -69,7 +70,7 @@ function demoWithStyle(style) {
     options["colorScheme"] = PlotKit.Base.colorScheme().reverse()
     drawDemo($('test7'),  layout, options);
     options["drawBackground"] = true;
-    options["backgroundColor"] = Color.blueColor().lighterColor(0.9);
+    options["backgroundColor"] = Color.blueColor().lighterColorWithLevel(0.45);
     drawDemo($('test8'),  layout, options);
     options["drawBackground"] = false;
     options["axisLineColor"] = Color.grayColor();
