@@ -80,7 +80,7 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     this.options = {
         "drawBackground": true,
         "backgroundColor": Color.whiteColor(),
-        "padding": {left: 30, right: 20, top: 10, bottom: 10},
+        "padding": {left: 30, right: 30, top: 5, bottom: 10},
         "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[0]),
         "strokeColor": Color.whiteColor(),
         "strokeColorTransform": "asStrokeColor",
@@ -119,8 +119,8 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     this.element = MochiKit.DOM.getElement(this.element_id);
     //this.element = element;
     this.container = this.element.parentNode;
-    this.height = element.height;
-    this.width = element.width;
+    this.height = this.element.height;
+    this.width = this.element.width;
 
     // --- check whether everything is ok before we return
 
@@ -130,7 +130,7 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     if (!this.isIE && !(PlotKit.CanvasRenderer.isSupported(this.element)))
         throw "CanvasRenderer() - Canvas is not supported.";
 
-    if (isNil(this.container) || (this.container.nodeName != "DIV"))
+    if (isNil(this.container) || (this.container.nodeName.toLowerCase() != "div"))
         throw "CanvasRenderer() - <canvas> needs to be enclosed in <div>";
 
     // internal state
@@ -148,14 +148,16 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     MochiKit.DOM.updateNodeAttributes(this.container, 
     {"style":{ "position": "relative", "width": this.width + "px"}});
 
-
-
     // load event system if we have Signals
-    this.event_isinside = null;
-    if (MochiKit.Signal && this.options.enableEvents) {
-        this._initialiseEvents();
+    try {
+        this.event_isinside = null;
+        if (MochiKit.Signal && this.options.enableEvents) {
+            this._initialiseEvents();
+        }
     }
-    
+    catch (e) {
+        // still experimental
+    }
 };
 
 PlotKit.CanvasRenderer.IECanvasEmulationIfNeeded = function(htc) {
@@ -208,7 +210,6 @@ PlotKit.CanvasRenderer.prototype.render = function() {
         catch (e) {
             this.isFirstRender = false;
             if (this.maxTries-- > 0) {
-                log("trying again");
                 this.renderDelay = MochiKit.Async.wait(this.IEDelay);
                 this.renderDelay.addCallback(bind(this.render, this));
             }
@@ -566,7 +567,7 @@ PlotKit.CanvasRenderer.prototype._renderPieAxis = function() {
 PlotKit.CanvasRenderer.prototype._renderBackground = function() {
     var context = this.element.getContext("2d");
     context.save();
-    context.fillStyle = this.options.backgroundColor.toString();
+    context.fillStyle = this.options.backgroundColor.toRGBString();
     context.fillRect(0, 0, this.width, this.height);
     context.restore();
 };
@@ -696,7 +697,11 @@ PlotKit.CanvasRenderer.isSupported = function(canvasName) {
         var context = canvas.getContext("2d");
     }
     catch (e) {
-        return false;
+        var ie = navigator.appVersion.match(/MSIE (\d\.\d)/);
+        var opera = (navigator.userAgent.toLowerCase().indexOf("opera") != -1);
+        if ((!ie) || (ie[1] < 6) || (opera))
+            return false;
+        return true;
     }
     return true;
 };

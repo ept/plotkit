@@ -62,7 +62,7 @@ PlotKit.SVGRenderer.prototype.__init__ = function(element, layout, options) {
     this.options = {
         "drawBackground": true,
         "backgroundColor": Color.whiteColor(),
-        "padding": {left: 30, right: 20, top: 10, bottom: 10},
+        "padding": {left: 30, right: 30, top: 5, bottom: 10},
         "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[1]),
         "strokeColor": Color.whiteColor(),
         "strokeColorTransform": "asStrokeColor",
@@ -76,7 +76,7 @@ PlotKit.SVGRenderer.prototype.__init__ = function(element, layout, options) {
         "axisTickSize": 3,
         "axisLabelColor": Color.blackColor(),
         "axisLabelFont": "Arial",
-        "axisLabelFontSize": 10,
+        "axisLabelFontSize": 9,
         "axisLabelWidth": 50,
         "axisLabelUseDiv": true,
         "pieRadius": 0.4,
@@ -88,8 +88,8 @@ PlotKit.SVGRenderer.prototype.__init__ = function(element, layout, options) {
     this.style = layout.style;
     this.element = MochiKit.DOM.getElement(element);
     this.container = this.element.parentNode;
-    this.height = parseInt(element.getAttribute("height"));
-    this.width = parseInt(element.getAttribute("width"));
+    this.height = parseInt(this.element.getAttribute("height"));
+    this.width = parseInt(this.element.getAttribute("width"));
     this.document = document;
     this.root = this.element;
 
@@ -107,7 +107,7 @@ PlotKit.SVGRenderer.prototype.__init__ = function(element, layout, options) {
     if (isNil(this.element))
         throw "SVGRenderer() - passed SVG object is not found";
 
-    if (isNil(this.container) || this.container.nodeName != "DIV")
+    if (isNil(this.container) || this.container.nodeName.toLowerCase() != "div")
         throw "SVGRenderer() - No DIV's around the SVG.";
 
     // internal state
@@ -439,7 +439,8 @@ PlotKit.SVGRenderer.prototype._renderPieAxis = function() {
         
         var centerx = this.area.x + this.area.w * 0.5;
         var centery = this.area.y + this.area.h * 0.5;
-        var radius = Math.min(this.area.w / 2.0, this.area.h / 2.0);
+        var radius = Math.min(this.area.w * this.options.pieRadius + 10, 
+                              this.area.h * this.options.pieRadius + 10);
         var labelWidth = this.options.axisLabelWidth;
         
         for (var i = 0; i < this.layout.xticks.length; i++) {
@@ -471,7 +472,8 @@ PlotKit.SVGRenderer.prototype._renderPieAxis = function() {
             var svgattrib = {
                 "width": labelWidth + "px",
                 "fontSize": this.options.axisLabelFontSize + "px",
-                "height": (this.options.axisLabelFontSize + 3) + "px"
+                "height": (this.options.axisLabelFontSize + 3) + "px",
+                "fill": this.options.axisLabelColor.toRGBString()
             };
 
             if (normalisedAngle <= Math.PI * 0.5) {

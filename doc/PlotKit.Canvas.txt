@@ -70,6 +70,9 @@ IE Support is done thanks to webfx's great iecanvas.htc which emulates
 part of the WHATWG canvas specification. Note that alpha values and
 clear() does not work in IE.
 
+Remember that iecanvas.htc __must__ reside on the same domain as the
+HTML page itself.
+
 [PlotKit.Renderer]: PlotKit.Renderer.html
 [Browser]: SVGCanvasCompat.html
 

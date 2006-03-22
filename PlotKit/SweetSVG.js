@@ -59,9 +59,9 @@ PlotKit.SweetSVGRenderer.__super__ = PlotKit.SVGRenderer.prototype;
 // ---------------------------------------------------------------------
 
 PlotKit.SweetSVGRenderer.prototype.__init__ = function(element, layout, options) { 
-    var additionalOptions = PlotKit.Base.officeBlue();
-    MochiKit.Base.update(additionalOptions, options);
-    PlotKit.SweetSVGRenderer.__super__.__init__.call(this, element, layout, options);
+    var moreOpts = PlotKit.Base.officeBlue();
+    MochiKit.Base.update(moreOpts, options);
+    PlotKit.SweetSVGRenderer.__super__.__init__.call(this, element, layout, moreOpts);
     //this._addDropShadowFilter();
 };
 
@@ -178,7 +178,8 @@ PlotKit.SweetSVGRenderer.prototype._renderBackground = function() {
     
 
     if (this.layout.style == "bar" || this.layout.style == "line") {
-        this._drawRect(this.area.x, this.area.y, this.area.w, this.area.h, attrs);                
+        this._drawRect(this.area.x, this.area.y, 
+                       this.area.w, this.area.h, attrs);                
         for (var i = 0; i < this.layout.yticks.length; i++) {
             this._drawRect(this.area.x,
                            this.layout.yticks[i][0] * this.area.h + this.area.y,

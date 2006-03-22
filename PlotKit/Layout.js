@@ -385,7 +385,7 @@ PlotKit.Layout.prototype._evaluateLineCharts = function() {
     var i = 0;
     for (var setName in this.datasets) {
         var dataset = this.datasets[setName];
-        dataset.sort(function(a, b) { return compare(a[0], b[0]); });
+        dataset.sort(function(a, b) { return compare(parseFloat(a[0]), parseFloat(b[0])); });
         for (var j = 0; j < dataset.length; j++) {
             var item = dataset[j];
             var point = {
