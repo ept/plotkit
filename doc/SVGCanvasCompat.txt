@@ -1,7 +1,7 @@
 {% extends "base" %}
 {% load markup %}
 {% block pageid %}code{% endblock %}
-{% block title %}PlotKit Documentation{% endblock %}
+{% block title %}SVG and Canvas Support Status in Various Browsers.{% endblock %}
 {% block headers %}
 <link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
 {% endblock %}
@@ -119,7 +119,7 @@ Quirks (Inline)
   ``text`` elements when inlined. Note that it does for Linux and Windows.
 
 * __Opera 9__ will refuse to draw an element if attribute ``filter``
-  is defined.
+    is defined.
 
 * __Internet Explorer 7__ will not work with the Adobe SVG
  Viewer. Also, it's native SVG renderer does not work with inline content either.

@@ -54,8 +54,6 @@ You cannot use the autoloading MochiKit.js, but instead include all the JS files
 An example of this is in the tests.
 
 
-
-
 PlotKit SVG Options
 -------------------
 
