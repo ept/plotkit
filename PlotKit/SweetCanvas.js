@@ -164,17 +164,18 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
         };
 
         // faux shadow for firefox
-        context.save();
-        if (this.isIE) {
-            context.fillStyle = "#cccccc";
+        if (this.options.shouldFill) {
+            context.save();
+            if (this.isIE) {
+                context.fillStyle = "#cccccc";
+            }
+            else {
+                context.fillStyle = Color.blackColor().colorWithAlpha(0.2).toRGBString();
+            }
+            context.translate(-1, -2);
+            bind(makePath, this)();        
+            context.fill();
         }
-        else {
-            context.fillStyle = Color.blackColor().colorWithAlpha(0.2).toRGBString();
-        }
-
-        context.translate(-1, -2);
-        bind(makePath, this)();        
-        context.fill();
         context.restore();
 
         context.shadowBlur = 5.0;
@@ -183,11 +184,14 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
         context.lineWidth = 2.0;
         context.strokeStyle = Color.whiteColor().toRGBString();
 
-        bind(makePath, this)();
-        context.fill();
-        bind(makePath, this)();
-        context.stroke();
-
+        if (this.options.shouldFill) {
+            bind(makePath, this)();
+            context.fill();
+        }
+        if (this.options.shouldStroke) {
+            bind(makePath, this)();
+            context.stroke();
+        }
         context.restore();
     }
 };
