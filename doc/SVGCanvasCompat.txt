@@ -34,7 +34,7 @@ March 2006. These include:
 
 I am also looking at some experiemental browsers as of March 2006. 
 
-* [Internet Explorer 7 beta 2][IE7]
+* [Internet Explorer 7 beta 2 preview + ASV][IE7]
 * [Safari WebKit+SVG Nightly 2006-03-11][WebkitNightly]
 * [Firefox Deerpark Nightly 2006-03-11][FirefoxNightly]
 
@@ -121,8 +121,8 @@ Quirks (Inline)
 * __Opera 9__ will refuse to draw an element if attribute ``filter``
     is defined.
 
-* __Internet Explorer 7__ will not work with the Adobe SVG
- Viewer. Also, it's native SVG renderer does not work with inline content either.
+* __Internet Explorer 7b2p + ASV__ will not work with the Adobe SVG
+ Viewer.
 
 
 Disclaimer

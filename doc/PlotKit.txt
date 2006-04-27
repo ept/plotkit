@@ -17,7 +17,7 @@ PlotKit
 applications that require plotting series of data in modern web
 browsers. 
 
-PlotKit requires [MochiKit][].
+PlotKit requires [MochiKit][] SVN (as of 28 March 2006).
 
 PlotKit supports both HTML Canvas and SVG, along with an 
 [emulated canvas for Internet Explorer][IECanvas].
