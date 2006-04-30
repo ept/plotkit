@@ -35,7 +35,7 @@
 
 
 <h1> State of SVG and Canvas in Modern Browsers</h1>
-<p> <strong>By: Alastair Tse - Last Updated: 15 March 2006</strong> 
+<p> <strong>By: Alastair Tse - Last Updated: 27 April 2006</strong> 
 </p>
 <p>My friends, just like HTML and CSS, different browsers support
    different subsections of the SVG and Canvas specification. As part of
@@ -105,15 +105,13 @@
 
 <h2> Quirks</h2>
 <ul>
- <li>
-      <strong>Safari</strong> will forget a path after <code>fill()</code> or <code>stroke()</code> has
-  been called. Therefore, if you need to fill and stroke the same
-  path, you must draw the path out twice.
- </li>
-</ul>
-<p>  path, you must draw the path out twice.
+ <li><p> <strong>Safari</strong> will forget a path after <code>fill()</code> or <code>stroke()</code> has
+   been called. Therefore, if you need to fill and stroke the same
+   path, you must draw the path out twice.
 </p>
-<ul>
+
+ </li>
+
  <li><p> <strong>Opera</strong> will not obey <code>stroke()</code> for arc paths.
 </p>
 
@@ -202,19 +200,18 @@ height=&quot;1&quot;&gt;&lt;/object&gt;
  </li>
 
  <li><p> <strong>Opera 9</strong> will refuse to draw an element if attribute <code>filter</code>
-   is defined.
-</p>
-
- </li>
-
- <li><p> <strong>Internet Explorer 7b2p + ASV</strong> will not work with the Adobe SVG
-    Viewer.
+     is defined.
 </p>
 
  </li>
 </ul>
-<p> Viewer.
+<p>  is defined.
 </p>
+<ul>
+ <li>
+      <strong>Internet Explorer 7b2p + ASV</strong> will not work with the Adobe SVG Viewer.
+ </li>
+</ul>
 
 <h1> Disclaimer</h1>
 <p>The above is presented as-is with my own findings. There may be

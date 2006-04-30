@@ -93,6 +93,7 @@ function generateTests() {
 
     tests.appendChild(generateUnitTest(1, genericTest, simpleData1,
     "bar", ""));
+
     tests.appendChild(generateUnitTest(2, genericTest, simpleData1, 
     "line", ""));
 

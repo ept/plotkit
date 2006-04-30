@@ -11,22 +11,6 @@
     
     It uses DIVs for labels.
     
-    Notes About IE Support
-    ----------------------
-    
-    This class relies on iecanvas.htc for Canvas Emulation under IE[1].
-    iecanvas.htc is included in the distribution of PlotKit for convenience. In order to enable IE support, you must set the following option when initialising the renderer:
-    
-    var renderOptions = {
-        "IECanvasHTC": "contrib/iecanvas.htc"
-    };
-    var engine = new CanvasRenderer(canvasElement, layout, renderOptions);
-    
-    Where "contrib/iecanvas.htc" is the path to the htc behavior relative
-    to where your HTML is.
-    
-    This is only needed for IE support.
-    
     Copyright
     ---------
     Copyright 2005,2006 (c) Alastair Tse <alastair^liquidx.net>
@@ -97,28 +81,26 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
         "axisLabelFontSize": 9,
 		"axisLabelWidth": 50,
 		"pieRadius": 0.4,
-        "enableEvents": true,
-        "IECanvasHTC": "PlotKit/iecanvas.htc"
+        "enableEvents": true
     };
     MochiKit.Base.update(this.options, options ? options : {});
 
-    // we need to refetch the element because of this horrible Canvas on IE
-    // crap
-    this.element_id = element.id ? element.id : element;
-
-    // Stuff relating to Canvas on IE support
-    var self = PlotKit.CanvasRenderer;
-    this.isIE = self.IECanvasEmulationIfNeeded(this.options.IECanvasHTC);
-    this.IEDelay = 0.5;
-    this.maxTries = 5;
-    this.renderDelay = null;
-    this.clearDelay = null;
-
     this.layout = layout;
     this.style = layout.style;
-    this.element = MochiKit.DOM.getElement(this.element_id);
-    //this.element = element;
+    this.element = element;
     this.container = this.element.parentNode;
+
+    // Stuff relating to Canvas on IE support    
+    this.isIE = PlotKit.Base.excanvasSupported();
+
+    if (this.isIE) {
+        this.IEDelay = 0.5;
+        this.maxTries = 5;
+        this.renderDelay = null;
+        this.clearDelay = null;
+        this.element = G_vmlCanvasManager.initElement(this.element);
+    }
+
     this.height = this.element.height;
     this.width = this.element.width;
 
@@ -158,43 +140,6 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     catch (e) {
         // still experimental
     }
-};
-
-PlotKit.CanvasRenderer.IECanvasEmulationIfNeeded = function(htc) {
-    var ie = navigator.appVersion.match(/MSIE (\d\.\d)/);
-    var opera = (navigator.userAgent.toLowerCase().indexOf("opera") != -1);
-    if ((!ie) || (ie[1] < 6) || (opera))
-        return false;
-
-    if (isUndefinedOrNull(MochiKit.DOM.getElement('VMLRender'))) {
-        // before we add VMLRender, we need to recreate all canvas tags
-        // programmatically otherwise IE will not recognise it
-
-        var nodes = document.getElementsByTagName('canvas');
-        for (var i = 0; i < nodes.length; i++) {
-            var node = nodes[i];
-            if (node.getContext) { return; } // Other implementation, abort
-            var newNode = MochiKit.DOM.CANVAS(
-               {id: node.id, 
-                width: "" + parseInt(node.width),
-                height: "" + parseInt(node.height)}, "");
-            newNode.style.width = parseInt(node.width) + "px";
-            newNode.style.height = parseInt(node.height) + "px";
-            node.id = node.id + "_old";
-            MochiKit.DOM.swapDOM(node, newNode);
-        }
-
-        document.namespaces.add("v");
-        var vmlopts = {'id':'VMLRender',
-                       'codebase':'vgx.dll',
-                       'classid':'CLSID:10072CEC-8CC1-11D1-986E-00A0C955B42E'};
-        var vml = MochiKit.DOM.createDOM('object', vmlopts);
-        document.body.appendChild(vml);
-        var vmlStyle = document.createStyleSheet();
-        vmlStyle.addRule("canvas", "behavior: url('" + htc + "');");
-        vmlStyle.addRule("v\\:*", "behavior: url(#VMLRender);");
-    }
-    return true;
 };
 
 PlotKit.CanvasRenderer.prototype.render = function() {
@@ -593,17 +538,15 @@ PlotKit.CanvasRenderer.prototype.clear = function() {
     var context = this.element.getContext("2d");
     context.clearRect(0, 0, this.width, this.height);
 
-    
-    for (var i = 0; i < this.xlabels.length; i++) {
-        MochiKit.DOM.removeElement(this.xlabels[i]);
-    }        
-    for (var i = 0; i < this.ylabels.length; i++) {
-        MochiKit.DOM.removeElement(this.ylabels[i]);
-    }            
+    MochiKit.Iter.forEach(this.xlabels, MochiKit.DOM.removeElement);
+    MochiKit.Iter.forEach(this.ylabels, MochiKit.DOM.removeElement);
     this.xlabels = new Array();
     this.ylabels = new Array();
-    
 };
+
+// ----------------------------------------------------------------
+//  Everything below here is experimental and undocumented.
+// ----------------------------------------------------------------
 
 PlotKit.CanvasRenderer.prototype._initialiseEvents = function() {
     var connect = MochiKit.Signal.connect;

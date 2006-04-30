@@ -178,10 +178,14 @@ MochiKit.Base.update(PlotKit.Base, {
         return MochiKit.Base.map(partial(makeColor, baseColor), fractions);
     },
     
+    excanvasSupported: function() {
+         if (/MSIE/.test(navigator.userAgent) && !window.opera) {
+             return true;
+         }
+         return false;
+    },
 
-                       
-
-    // The follow functions are from quirksmode.org
+    // The following functions are from quirksmode.org
     // http://www.quirksmode.org/js/findpos.html
 
     findPosX: function(obj) {
@@ -312,6 +316,7 @@ PlotKit.Base.EXPORT = [
    "officeBlack",
    "roundInterval",
    "uniq",
+   "excanvasSupported"
 ];
 
 PlotKit.Base.EXPORT_OK = [];

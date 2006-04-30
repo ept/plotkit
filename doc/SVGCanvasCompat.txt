@@ -13,7 +13,7 @@
 State of SVG and Canvas in Modern Browsers
 ==========================================
 
-__By: Alastair Tse - Last Updated: 15 March 2006__
+__By: Alastair Tse - Last Updated: 27 April 2006__
 
 
 My friends, just like HTML and CSS, different browsers support
@@ -65,8 +65,8 @@ Quirks
 ------
 
 * __Safari__ will forget a path after ``fill()`` or ``stroke()`` has
-  been called. Therefore, if you need to fill and stroke the same
-  path, you must draw the path out twice.
+    been called. Therefore, if you need to fill and stroke the same
+    path, you must draw the path out twice.
 
 * __Opera__ will not obey ``stroke()`` for arc paths.
 
@@ -119,10 +119,9 @@ Quirks (Inline)
   ``text`` elements when inlined. Note that it does for Linux and Windows.
 
 * __Opera 9__ will refuse to draw an element if attribute ``filter``
-    is defined.
+  is defined.
 
-* __Internet Explorer 7b2p + ASV__ will not work with the Adobe SVG
- Viewer.
+* __Internet Explorer 7b2p + ASV__ will not work with the Adobe SVG Viewer.
 
 
 Disclaimer
