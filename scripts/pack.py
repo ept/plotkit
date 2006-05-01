@@ -13,7 +13,7 @@ mk = file('PlotKit/PlotKit.js').read()
 if len(sys.argv) > 1:
     outf = sys.stdout
 else:
-    outf = file('packed/PlotKit/PlotKit.js', 'w')
+    outf = file('PlotKit/PlotKit_Packed.js', 'w')
 VERSION = re.search(
     r"""(?mxs)PlotKit.PlotKit.VERSION\s*=\s*['"]([^'"]+)""",
     mk
@@ -25,7 +25,7 @@ else:
         r"""(?mxs)PlotKit.PlotKit.SUBMODULES\s*=\s*\[([^\]]+)""",
         mk
     ).group(1).replace(' ', '').replace('"', '').split(','))
-    SUBMODULES.append('PlotKit')
+
 alltext = '\n'.join(
     [file('PlotKit/%s.js' % m).read() for m in SUBMODULES])
 
