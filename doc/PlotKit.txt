@@ -64,11 +64,16 @@ Version History
 
 * Total rewrite from [CanvasGraph 0.7][CanvasGraph]
 
+###PlotKit 0.9 (in development)
+
+* Fixed some redraw issues with clear()
+* Replaced IECanvas.HTC with ExplorerCanvas
+* Added auto import and packed versions just like MochiKit.
+
 Road Map
 ========
 ###Version 0.9
 
-* Use ExplorerCanvas rather than the annoying HTC file.
 * AutoSelectRenderer, automatically choose Canvas or SVG by auto detecting browser support.
 
 ###Version 0.10
