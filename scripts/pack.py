@@ -29,7 +29,7 @@ else:
 alltext = '\n'.join(
     [file('PlotKit/%s.js' % m).read() for m in SUBMODULES])
 
-tf = file('packed/_scratch.js', 'w')
+tf = file('_scratch.js', 'w')
 tf.write(alltext)
 tf.flush()
 
