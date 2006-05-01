@@ -32,6 +32,7 @@ alltext = '\n'.join(
 tf = file('packed/_scratch.js', 'w')
 tf.write(alltext)
 tf.flush()
+
 p = subprocess.Popen(
     ['java', '-jar', 'scripts/custom_rhino.jar', '-c', tf.name],
     stdout=subprocess.PIPE,
