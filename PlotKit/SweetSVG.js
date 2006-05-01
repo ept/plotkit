@@ -194,3 +194,30 @@ PlotKit.SweetSVGRenderer.prototype._renderBackground = function() {
     }
     
 };
+
+// Namespace Iniitialisation
+
+PlotKit.SweetSVG = {}
+PlotKit.SweetSVG.SweetSVGRenderer = PlotKit.SweetSVGRenderer;
+
+PlotKit.SweetSVG.EXPORT = [
+    "SweetSVGRenderer"
+];
+
+PlotKit.SweetSVG.EXPORT_OK = [
+    "SweetSVGRenderer"
+];
+
+PlotKit.SweetSVG.__new__ = function() {
+    var m = MochiKit.Base;
+    
+    m.nameFunctions(this);
+    
+    this.EXPORT_TAGS = {
+        ":common": this.EXPORT,
+        ":all": m.concat(this.EXPORT, this.EXPORT_OK)
+    };
+};
+
+PlotKit.SweetSVG.__new__();
+MochiKit.Base._exportSymbols(this, PlotKit.SweetSVG);

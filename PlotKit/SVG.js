@@ -50,10 +50,6 @@ PlotKit.SVGRenderer.toString = function() {
     return this.__repr__();
 }
 
-PlotKit.SVGRenderer.isSupported = function() {
-    // TODO
-    return true;
-};
 
 PlotKit.SVGRenderer.prototype.__init__ = function(element, layout, options) {
     var isNil = MochiKit.Base.isUndefinedOrNull;
@@ -625,7 +621,7 @@ PlotKit.SVGRenderer.SVG = function(attrs) {
         var eid = attrs["id"] ? attrs["id"] : "notunique";
         
         var html = '<svg:svg width="' + width + '" height="' + height + '" ';
-        html += 'id="' + eid + '" version="1.1" baseProfile="full">';
+        html += 'id="' + eid + '" version="1.1" baseProfile="full" />';
 
         var canvas = document.createElement(html);
 
@@ -675,3 +671,31 @@ PlotKit.SVGRenderer.isSupported = function() {
     
     return false;
 };
+
+// Namespace Iniitialisation
+
+PlotKit.SVG = {}
+PlotKit.SVG.SVGRenderer = PlotKit.SVGRenderer;
+
+PlotKit.SVG.EXPORT = [
+    "SVGRenderer"
+];
+
+PlotKit.SVG.EXPORT_OK = [
+    "SVGRenderer"
+];
+
+PlotKit.SVG.__new__ = function() {
+    var m = MochiKit.Base;
+    
+    m.nameFunctions(this);
+    
+    this.EXPORT_TAGS = {
+        ":common": this.EXPORT,
+        ":all": m.concat(this.EXPORT, this.EXPORT_OK)
+    };
+};
+
+PlotKit.SVG.__new__();
+MochiKit.Base._exportSymbols(this, PlotKit.SVG);
+

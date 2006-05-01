@@ -283,3 +283,31 @@ PlotKit.SweetCanvasRenderer.prototype._renderBackground = function() {
         PlotKit.SweetCanvasRenderer.__super__._renderBackground.call(this);
     }
 };
+
+// Namespace Iniitialisation
+
+PlotKit.SweetCanvas = {}
+PlotKit.SweetCanvas.SweetCanvasRenderer = PlotKit.SweetCanvasRenderer;
+
+PlotKit.SweetCanvas.EXPORT = [
+    "SweetCanvasRenderer"
+];
+
+PlotKit.SweetCanvas.EXPORT_OK = [
+    "SweetCanvasRenderer"
+];
+
+PlotKit.SweetCanvas.__new__ = function() {
+    var m = MochiKit.Base;
+    
+    m.nameFunctions(this);
+    
+    this.EXPORT_TAGS = {
+        ":common": this.EXPORT,
+        ":all": m.concat(this.EXPORT, this.EXPORT_OK)
+    };
+};
+
+PlotKit.SweetCanvas.__new__();
+MochiKit.Base._exportSymbols(this, PlotKit.SweetCanvas);
+

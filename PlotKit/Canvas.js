@@ -1,6 +1,6 @@
 /* 
     PlotKit Canvas
-    --------------
+    ==============
     
     Provides HTML Canvas Renderer. This is supported under:
     
@@ -22,13 +22,14 @@
 // --------------------------------------------------------------------
 
 try {    
-    if (typeof(PlotKit.Layout) == 'undefined')
+    if ((typeof(PlotKit.Base) == 'undefined') ||
+        (typeof(PlotKit.Layout) == 'undefined'))
     {
         throw "";    
     }
 } 
 catch (e) {    
-    throw "PlotKit.Layout depends on MochiKit.{Base,Color,DOM,Format} and PlotKit.Base and PlotKit.Layout"
+    throw "PlotKit.Layout depends on MochiKit.{Base,Color,DOM,Format} and PlotKit.{Base,Layout}"
 }
 
 
@@ -93,7 +94,7 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     // Stuff relating to Canvas on IE support    
     this.isIE = PlotKit.Base.excanvasSupported();
 
-    if (this.isIE) {
+    if (this.isIE && !isNil(G_vmlCanvasManager)) {
         this.IEDelay = 0.5;
         this.maxTries = 5;
         this.renderDelay = null;
@@ -648,3 +649,31 @@ PlotKit.CanvasRenderer.isSupported = function(canvasName) {
     }
     return true;
 };
+
+// Namespace Iniitialisation
+
+PlotKit.Canvas = {}
+PlotKit.Canvas.CanvasRenderer = PlotKit.CanvasRenderer;
+
+PlotKit.Canvas.EXPORT = [
+    "CanvasRenderer"
+];
+
+PlotKit.Canvas.EXPORT_OK = [
+    "CanvasRenderer"
+];
+
+PlotKit.Canvas.__new__ = function() {
+    var m = MochiKit.Base;
+    
+    m.nameFunctions(this);
+    
+    this.EXPORT_TAGS = {
+        ":common": this.EXPORT,
+        ":all": m.concat(this.EXPORT, this.EXPORT_OK)
+    };
+};
+
+PlotKit.Canvas.__new__();
+MochiKit.Base._exportSymbols(this, PlotKit.Canvas);
+

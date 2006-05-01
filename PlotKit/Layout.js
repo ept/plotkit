@@ -1,6 +1,6 @@
 /* 
     PlotKit Layout
-    --------------
+    ==============
     
     Handles laying out data on to a virtual canvas square canvas between 0.0 
     and 1.0. If you want to add new chart/plot types such as point plots,
@@ -585,4 +585,31 @@ PlotKit.Layout.prototype._regenerateHitTestCache = function() {
 // --------------------------------------------------------------------
 // END Internal Functions
 // --------------------------------------------------------------------
+
+
+// Namespace Iniitialisation
+
+PlotKit.LayoutModule = {};
+PlotKit.LayoutModule.Layout = PlotKit.Layout;
+
+PlotKit.LayoutModule.EXPORT = [
+    "Layout"
+];
+
+PlotKit.LayoutModule.EXPORT_OK = [];
+
+PlotKit.LayoutModule.__new__ = function() {
+    var m = MochiKit.Base;
+    
+    m.nameFunctions(this);
+    
+    this.EXPORT_TAGS = {
+        ":common": this.EXPORT,
+        ":all": m.concat(this.EXPORT, this.EXPORT_OK)
+    };
+};
+
+PlotKit.LayoutModule.__new__();
+MochiKit.Base._exportSymbols(this, PlotKit.LayoutModule);
+
 
