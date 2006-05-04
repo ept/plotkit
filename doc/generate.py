@@ -2,6 +2,7 @@
 
 import sys
 import os
+import re
 sys.path.append('/home/al/sites')
 os.environ['DJANGO_SETTINGS_MODULE'] = '__main__'
 
@@ -13,16 +14,12 @@ INSTALLED_APPS = (
     'django.contrib.markup',
 )    
 
-TEMPLATE_LOADERS = (
-    'static.basic_loader.load_template_source',
-)
-
 TEMPLATE_DIRS = (
     '/home/al/sites/liquidx/templates',
+    '.'
 )
 
-from django.core.template import Template, Context
-from django.core.template import loader
+from django.template import Template, Context, loader
 
 def make(src, dst):
     print '%s -> %s' % (src, dst)
@@ -32,6 +29,8 @@ def make(src, dst):
     
 if __name__ == "__main__":
     for dirname, dirs, files in os.walk('.'):
+        if re.search('/\.svn', dirname):
+            continue
         for f in files:
             if f[-4:] == ".txt":
                 newname = f.replace('.txt', '.html')

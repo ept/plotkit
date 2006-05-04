@@ -1,4 +1,4 @@
-{% extends "base" %}
+{% extends "base.html" %}
 {% load markup %}
 {% block pageid %}code{% endblock %}
 {% block title %}PlotKit Documentation{% endblock %}
@@ -50,11 +50,17 @@ Renderers
 * [SweetSVGRenderer][]: Customised renderer that builds on SVGRenderer
    to provide nicer looking charts.
 
-Extra Documentation
-===================
+Getting Started
+===============
 
-* [PlotKit Quick Start][QuickStart]
-* [SVG/Canvas Browser Support Status][Browser].
+* [PlotKit Quick Start][QuickStart] - A thorough quick start to getting charts working for Safari, Mozilla, Firefox, Opera and IE.
+* [SVG/Canvas Browser Support Status][Browser] - Quirks about browser support that you should know about.
+* [Simple Canvas Demo][QuickstartCanvasDemo] - Very basic Canvas demo all contained in an HTML file.
+* [Simple SVG Demo][QuickstartSVGDemo] - Very basic SVG demo all contained in an HTML file.
+
+More Demos
+==========
+
 * Unit Tests [Canvas][CanvasTest], [SVG][SVGTest], [SweetCanvas][SCanvasTest], [SweetSVG][SSVGTest].
 
 Version History
@@ -99,6 +105,8 @@ Road Map
 [SVGTest]: http://media.liquidx.net/js/plotkit-tests/svg.html
 [SCanvasTest]: http://media.liquidx.net/js/plotkit-tests/sweet.html
 [SSVGTest]: http://media.liquidx.net/js/plotkit-tests/sweet-svg.html
+[QuickstartCanvasDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart.html
+[QuickstartSVGDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart-svg.html
 
 {% endfilter %}
 </div>

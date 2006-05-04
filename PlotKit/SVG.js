@@ -50,6 +50,7 @@ PlotKit.SVGRenderer.toString = function() {
     return this.__repr__();
 }
 
+PlotKit.SVGRenderer.SVGNS = 'http://www.w3.org/2000/svg';
 
 PlotKit.SVGRenderer.prototype.__init__ = function(element, layout, options) {
     var isNil = MochiKit.Base.isUndefinedOrNull;
@@ -582,17 +583,18 @@ PlotKit.SVGRenderer.prototype.clear = function() {
     this.ylabels = new Array();
 };
 
+
 PlotKit.SVGRenderer.prototype.createSVGElement = function(name, attrs) {
     var isNil = MochiKit.Base.isUndefinedOrNull;
     var elem;
     var doc = isNil(this.document) ? document : this.document;
 
     try {
-        elem = doc.createElementNS("http://www.w3.org/2000/svg", name);
+        elem = doc.createElementNS(PlotKit.SVGRenderer.SVGNS, name);
     }
     catch (e) {
         elem = doc.createElement(name);
-        elem.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        elem.setAttribute("xmlns", PlotKit.SVGRenderer.SVGNS);
     }
 
     if (attrs)
@@ -605,7 +607,6 @@ PlotKit.SVGRenderer.prototype.createSVGElement = function(name, attrs) {
 
 };
 
-PlotKit.SVGRenderer.SVGNS = 'http://www.w3.org/2000/svg';
 
 PlotKit.SVGRenderer.SVG = function(attrs) {
     // we have to do things differently for IE+AdobeSVG.
@@ -644,9 +645,11 @@ PlotKit.SVGRenderer.isSupported = function() {
     var safariVersion = navigator.userAgent.match(/AppleWebKit\/(\d+)/);
     var operaVersion = navigator.userAgent.match(/Opera\/(\d*\.\d*)/);
     var mozillaVersion = navigator.userAgent.match(/rv:(\d*\.\d*).*Gecko/);
-    
+    var svgFeature = "http://www.w3.org/TR/SVG11/feature#SVG";
 
     if (ieVersion && (ieVersion[1] >= 6) && !isOpera) {
+        return document.implementation.hasFeature(svgFeature,"1.1");
+        /*
         var dummysvg = document.createElement('<svg:svg width="1" height="1" baseProfile="full" version="1.1" id="dummy">');
         try {
             dummysvg.getSVGDocument();
@@ -656,6 +659,8 @@ PlotKit.SVGRenderer.isSupported = function() {
         catch (e) {
             return false;
         }
+        */
+        
     }
     
     /* support not really there yet. no text and paths are buggy
