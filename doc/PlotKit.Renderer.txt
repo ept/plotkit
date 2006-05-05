@@ -22,7 +22,7 @@ PlotKit Renderers should follow an informal protocol to allow users to plug and 
 
 PlotKit Renderer Protocol
 -------------------------
-* Constructor: ``new Renderer(element, layout, options = {})
+* Constructor: ``new Renderer(element, layout, options = {})``
 
   ``element`` is the element which this renderer will perform on, ``layout`` is the PlotKit.Layout object and ``options`` is an associative dictionary described below.
 

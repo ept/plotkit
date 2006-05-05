@@ -39,9 +39,10 @@ Base Classes
   including default styles.
 * [Layout][] : The default chart layout engine, supports bar, line and
                pie charts.
+* [Renderer][]: Customising the look of the output
 
-Renderers
----------
+Renderer Implementations
+------------------------
 
 * [CanvasRenderer][]: Basic renderer using an HTML Canvas.
 * [SVGRenderer][]: Basic renderer using SVG.
@@ -96,6 +97,7 @@ Road Map
 [Base]: PlotKit.Base.html
 [Styles]: PlotKit.Styles.html
 [Layout]: PlotKit.Layout.html
+[Renderer]: PlotKit.Renderer.html
 [CanvasRenderer]: PlotKit.Canvas.html
 [SVGRenderer]: PlotKit.SVG.html
 [SweetCanvasRenderer]: PlotKit.SweetCanvas.html
