@@ -52,6 +52,7 @@ PlotKit.Layout = function(style, options) {
     
     this.options = {
         "barWidthFillFraction": 0.75,
+        "barOrientation": "vertical",
         "xOriginIsZero": true,
         "yOriginIsZero": true,
         "xAxis": null, // [xmin, xmax]
@@ -154,7 +155,12 @@ PlotKit.Layout.prototype.evaluate = function() {
     this._evaluateLimits();
     this._evaluateScales();
     if (this.style == "bar") {
-        this._evaluateBarCharts();
+        if (this.options.barOrientation == "horizontal") {
+            this._evaluateHorizBarCharts();
+        }
+        else {
+            this._evaluateBarCharts();
+        }
         this._evaluateBarTicks();
     }
     else if (this.style == "line") {
@@ -372,6 +378,66 @@ PlotKit.Layout.prototype._evaluateBarCharts = function() {
     }
 };
 
+// Create the horizontal bars
+PlotKit.Layout.prototype._evaluateHorizBarCharts = function() {
+    var keys = MochiKit.Base.keys;
+    var items = MochiKit.Base.items;
+
+    var setCount = keys(this.datasets).length;
+
+    // work out how far separated values are
+    var xdelta = 10000000;
+    var xvalues = this._uniqueXValues();
+    for (var i = 1; i < xvalues.length; i++) {
+        xdelta = Math.min(Math.abs(xvalues[i] - xvalues[i-1]), xdelta);
+    }
+
+    var barWidth = 0;
+    var barWidthForSet = 0;
+    var barMargin = 0;
+    
+    // work out how far each far each bar is separated
+    if (xvalues.length == 1) {
+        // do something smarter if we only plot one value
+        xdelta = 1.0;
+        this.xscale = 1.0;
+        this.minxval = xvalues[0];
+        barWidth = 1.0 * this.options.barWidthFillFraction;
+        barWidthForSet = barWidth/setCount;
+        barMargin = (1.0 - this.options.barWidthFillFraction)/2;
+    }
+    else {
+        // readjust yscale to fix with bar charts
+        this.xscale = (1.0 - xdelta/this.xrange)/this.xrange;
+        barWidth = xdelta * this.xscale * this.options.barWidthFillFraction;
+        barWidthForSet = barWidth / setCount;
+        barMargin = xdelta * this.xscale * (1.0 - this.options.barWidthFillFraction)/2;
+    }
+
+    this.minxdelta = xdelta; // need this for tick positions
+
+    // add all the rects
+    this.bars = new Array();
+    var i = 0;
+    for (var setName in this.datasets) {
+        var dataset = this.datasets[setName];
+        for (var j = 0; j < dataset.length; j++) {
+            var item = dataset[j];
+            var rect = {
+                y: ((parseFloat(item[0]) - this.minxval) * this.xscale) + (i * barWidthForSet) + barMargin,
+                x: 0.0,
+                h: barWidthForSet,
+                w: ((parseFloat(item[1]) - this.minyval) * this.yscale),
+                xval: parseFloat(item[0]),
+                yval: parseFloat(item[1]),
+                name: setName
+            };
+            this.bars.push(rect);
+        }
+        i++;
+    }
+};
+
 
 // Create the line charts
 PlotKit.Layout.prototype._evaluateLineCharts = function() {
@@ -515,6 +581,19 @@ PlotKit.Layout.prototype._evaluateBarTicks = function() {
         return [tick[0] + (this.minxdelta * this.xscale)/2, tick[1]];
     };
     this.xticks = MochiKit.Base.map(bind(centerInBar, this), this.xticks);
+    
+    if (this.options.barOrientation == "horizontal") {
+        // swap scales
+        var tempticks = this.xticks;
+        this.xticks = this.yticks;
+        this.yticks = tempticks;
+
+        // we need to invert the "yaxis" (which is now the xaxis when drawn)
+        var invert = function(tick) {
+            return [1.0 - tick[0], tick[1]];
+        }
+        this.xticks = MochiKit.Base.map(invert, this.xticks);
+    }
 };
 
 PlotKit.Layout.prototype._evaluatePieTicks = function() {

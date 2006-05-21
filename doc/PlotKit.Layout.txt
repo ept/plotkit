@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "basex.html" %}
 {% load markup %}
 {% block pageid %}code{% endblock %}
 {% block headers %}
@@ -48,6 +48,13 @@ Bar and Line Chart layout options
 		<td>Real number</td>
 		<td>0.75</td>
 	</tr>
+	<tr>
+		<th>barOrientation</th>
+		<td>Orientation of a bar chart. <b>(PlotKit 0.9+ only)</b></td>
+		<td>String ("vertical", "horizontal")</td>
+		<td>vertical</td>
+	</tr>
+	
 	<tr>
 		<th>xAxis</th>
 		<td>Minimum and Maximum values on the X axis.</td>

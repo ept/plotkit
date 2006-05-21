@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "basex.html" %}
 {% load markup %}
 {% block pageid %}code{% endblock %}
 {% block title %}PlotKit Documentation{% endblock %}
@@ -41,8 +41,8 @@ Base Classes
                pie charts.
 * [Renderer][]: Customising the look of the output
 
-Renderer Implementations
-------------------------
+Renderer Specific Implementations
+---------------------------------
 
 * [CanvasRenderer][]: Basic renderer using an HTML Canvas.
 * [SVGRenderer][]: Basic renderer using SVG.

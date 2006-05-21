@@ -2,6 +2,7 @@
    color: #335577;
    padding-bottom: 5px;
    border-bottom: 1px solid #ccc;
+   display: block;
 }
 
 .doc h2 {

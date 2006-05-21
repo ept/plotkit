@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "basex.html" %}
 {% load markup %}
 {% block pageid %}code{% endblock %}
 {% block title %}SVG and Canvas Support Status in Various Browsers.{% endblock %}
