@@ -34,7 +34,8 @@ PlotKit.PlotKit.SUBMODULES = [
     "Canvas",
     "SVG",
     "SweetCanvas",
-    "SweetSVG"
+    "SweetSVG",
+    "EasyPlot"
 ];
 
 if (typeof(JSAN) != 'undefined' || typeof(dojo) != 'undefined') {

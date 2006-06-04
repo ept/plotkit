@@ -2026,5 +2026,103 @@ this.EXPORT_TAGS={":common":this.EXPORT,":all":m.concat(this.EXPORT,this.EXPORT_
 };
 PlotKit.SweetSVG.__new__();
 MochiKit.Base._exportSymbols(this,PlotKit.SweetSVG);
+try{
+if(typeof (PlotKit.CanvasRenderer)=="undefined"){
+throw "";
+}
+}
+catch(e){
+throw "PlotKit.EasyPlot depends on all of PlotKit's components";
+}
+if(typeof (PlotKit.EasyPlot)=="undefined"){
+PlotKit.EasyPlot={};
+}
+PlotKit.EasyPlot.NAME="PlotKit.EasyPlot";
+PlotKit.EasyPlot.VERSION=PlotKit.VERSION;
+PlotKit.EasyPlot.__repr__=function(){
+return "["+this.NAME+" "+this.VERSION+"]";
+};
+PlotKit.EasyPlot.toString=function(){
+return this.__repr__();
+};
+PlotKit.EasyPlot=function(_402,_403,_404,_405){
+this.layout=new Layout(_402,_403);
+this.divElem=_404;
+this.width=parseInt(_404.getAttribute("width"));
+this.height=parseInt(_404.getAttribute("height"));
+this.deferredCount=0;
+if(this.width<1){
+this.width=this.divElem.width?this.divElem.width:300;
+}
+if(this.height<1){
+this.height=this.divElem.height?this.divElem.height:300;
+}
+if(isArrayLike(_405)){
+for(var i=0;i<_405.length;i++){
+if(typeof (_405[i])=="string"){
+this.deferredCount++;
+var d=MochiKit.Async.doSimpleXMLHttpRequest(_405[i]);
+d.addCallback(MochiKit.Base.bind(PlotKit.EasyPlot.onDataLoaded,this));
+}else{
+if(isArrayLike(_405[i])){
+this.layout.addDataset("data-"+i,_405[i]);
+}
+}
+}
+}else{
+if(!isUndefinedOrNull(_405)){
+throw "Passed datasources are not Array like";
+}
+}
+if(CanvasRenderer.isSupported()){
+this.element=CANVAS({"id":this.divElem.getAttribute("id")+"-canvas","width":this.width,"height":this.height},"");
+this.divElem.appendChild(this.element);
+this.renderer=new SweetCanvasRenderer(this.element,this.layout,_403);
+}else{
+if(SVGRenderer.isSupported()){
+this.element=SVGRenderer.SVG({"id":this.divElem.getAttribute("id")+"-svg","width":this.width,"height":this.height,"version":"1.1","baseProfile":"full"},"");
+this.divElem.appendChild(this.element);
+this.renderer=new SweetSVGRenderer(this.element,this.layout,_403);
+}
+}
+if((this.deferredCount==0)&&(PlotKit.Base.keys(this.layout.datasets).length>0)){
+this.layout.evaluate();
+this.renderer.clear();
+this.renderer.render();
+}
+};
+PlotKit.EasyPlot.onDataLoaded=function(_407){
+var _408=new Array();
+var _409=_407.responseText.split("\n");
+for(var i=0;i<_409.length;i++){
+var _410=MochiKit.Format.strip(_409[i]);
+if((_410.length>1)&&(_410.charAt(0)!="#")){
+_408.push(_410.split(","));
+}
+}
+this.layout.addDataset("data-ajax-"+this.deferredCount,_408);
+this.deferredCount--;
+if((this.deferredCount==0)&&(PlotKit.Base.keys(this.layout.datasets).length>0)){
+this.layout.evaluate();
+this.renderer.clear();
+this.renderer.render();
+}
+};
+PlotKit.EasyPlot.prototype.reload=function(){
+this.layout.evaluate();
+this.renderer.clear();
+this.renderer.render();
+};
+PlotKit.EasyPlotModule={};
+PlotKit.EasyPlotModule.EasyPlot=PlotKit.EasyPlot;
+PlotKit.EasyPlotModule.EXPORT=["EasyPlot"];
+PlotKit.EasyPlotModule.EXPORT_OK=[];
+PlotKit.EasyPlotModule.__new__=function(){
+var m=MochiKit.Base;
+m.nameFunctions(this);
+this.EXPORT_TAGS={":common":this.EXPORT,":all":m.concat(this.EXPORT,this.EXPORT_OK)};
+};
+PlotKit.EasyPlotModule.__new__();
+MochiKit.Base._exportSymbols(this,PlotKit.EasyPlotModule);
 
 
