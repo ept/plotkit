@@ -85,6 +85,13 @@ PlotKit.Base.toString = function() {
     return this.__repr__();
 }
 
+
+// Detect whether we are using prototype.js
+PlotKit.Base.usingPrototype =  function() {
+    return (typeof(Object.extend) == 'function');
+}
+
+
 MochiKit.Base.update(PlotKit.Base, {
     roundInterval: function(range, intervals, precision) {
         // We want to make the interval look regular,
@@ -99,6 +106,12 @@ MochiKit.Base.update(PlotKit.Base, {
         for (var i = 0; i < lst.length; i++) {
             biggerList = m.concat(biggerList, lst[i]);
         }
+        if (PlotKit.Base.usingPrototype()) {
+            delete biggerList.extend;
+            delete biggerList.from;
+            delete biggerList.inspect;
+        }
+        
         return biggerList;
     },
     
@@ -190,14 +203,12 @@ MochiKit.Base.update(PlotKit.Base, {
 
     findPosX: function(obj) {
         var curleft = 0;
-        if (obj.offsetParent)
-            {
-                while (obj.offsetParent)
-                    {
-                        curleft += obj.offsetLeft
-                            obj = obj.offsetParent;
-                    }
+        if (obj.offsetParent) {
+            while (obj.offsetParent) {
+                    curleft += obj.offsetLeft
+                        obj = obj.offsetParent;
             }
+        }
         else if (obj.x)
             curleft += obj.x;
         return curleft;
@@ -205,19 +216,71 @@ MochiKit.Base.update(PlotKit.Base, {
                        
    findPosY: function(obj) {
        var curtop = 0;
-       if (obj.offsetParent)
-           {
-               while (obj.offsetParent)
-                   {
-                       curtop += obj.offsetTop
-                           obj = obj.offsetParent;
-                   }
+       if (obj.offsetParent) {
+           while (obj.offsetParent) {
+               curtop += obj.offsetTop
+               obj = obj.offsetParent;
            }
+       }
        else if (obj.y)
            curtop += obj.y;
        return curtop;
+   },
+   
+   isFuncLike: function(obj) {
+       return (typeof(obj) == 'function');
    }
 });    
+
+//
+// Prototype.js aware (crippled) versions of map and items.
+//
+
+PlotKit.Base.map = function(fn, lst) {
+    if (PlotKit.Base.usingPrototype()) {
+        var rval = [];
+        for (var x in lst) {
+            if (typeof(lst[x]) == 'function') continue;
+            rval.push(fn(lst[x]));
+        }
+        return rval;
+    }
+    else {
+        return MochiKit.Base.map(fn, lst);
+    }
+};
+
+PlotKit.Base.items = function(lst) {
+    if (PlotKit.Base.usingPrototype()) {
+        var rval = [];
+         for (var x in lst) {
+             if (typeof(lst[x]) == 'function') continue;
+             rval.push([x, lst[x]]);
+         }
+         return rval;
+    }
+    else {
+        return MochiKit.Base.items(lst);
+    }
+};
+
+PlotKit.Base.keys = function(lst) {
+    if (PlotKit.Base.usingPrototype()) {
+        var rval = [];
+         for (var x in lst) {
+             if (typeof(lst[x]) == 'function') continue;
+             rval.push(x);
+         }
+         return rval;
+    }
+    else {
+        return MochiKit.Base.items(lst);
+    }
+};
+
+// 
+// colour schemes
+//
 
 PlotKit.Base.baseColors = function () {
    var hexColor = MochiKit.Color.Color.fromHexString;
@@ -316,6 +379,7 @@ PlotKit.Base.EXPORT = [
    "officeBlack",
    "roundInterval",
    "uniq",
+   "isFuncLike",
    "excanvasSupported"
 ];
 

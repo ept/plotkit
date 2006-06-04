@@ -76,6 +76,8 @@ Version History
 * Fixed some redraw issues with clear()
 * Replaced IECanvas.HTC with ExplorerCanvas
 * Added auto import and packed versions just like MochiKit.
+* Added horizontal bar chart rendering mode.
+* Added awareness of prototype.js and workaround Array/Object mutilation issues with MochiKit.
 
 Road Map
 ========

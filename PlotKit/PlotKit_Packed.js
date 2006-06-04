@@ -48,6 +48,9 @@ return "["+this.NAME+" "+this.VERSION+"]";
 PlotKit.Base.toString=function(){
 return this.__repr__();
 };
+PlotKit.Base.usingPrototype=function(){
+return (typeof (Object.extend)=="function");
+};
 MochiKit.Base.update(PlotKit.Base,{roundInterval:function(_1,_2,_3){
 var _4=MochiKit.Format.roundToFixed;
 var _5=_1/_2;
@@ -57,6 +60,11 @@ var m=MochiKit.Base;
 var _8=new Array();
 for(var i=0;i<_6.length;i++){
 _8=m.concat(_8,_6[i]);
+}
+if(PlotKit.Base.usingPrototype()){
+delete _8.extend;
+delete _8.from;
+delete _8.inspect;
 }
 return _8;
 },uniq:function(_10){
@@ -143,10 +151,54 @@ _33+=obj.y;
 }
 }
 return _33;
+},isFuncLike:function(obj){
+return (typeof (obj)=="function");
 }});
+PlotKit.Base.map=function(fn,lst){
+if(PlotKit.Base.usingPrototype()){
+var _36=[];
+for(var x in lst){
+if(typeof (lst[x])=="function"){
+continue;
+}
+_36.push(fn(lst[x]));
+}
+return _36;
+}else{
+return MochiKit.Base.map(fn,lst);
+}
+};
+PlotKit.Base.items=function(lst){
+if(PlotKit.Base.usingPrototype()){
+var _38=[];
+for(var x in lst){
+if(typeof (lst[x])=="function"){
+continue;
+}
+_38.push([x,lst[x]]);
+}
+return _38;
+}else{
+return MochiKit.Base.items(lst);
+}
+};
+PlotKit.Base.keys=function(lst){
+if(PlotKit.Base.usingPrototype()){
+var _39=[];
+for(var x in lst){
+if(typeof (lst[x])=="function"){
+continue;
+}
+_39.push(x);
+}
+return _39;
+}else{
+return MochiKit.Base.items(lst);
+}
+};
 PlotKit.Base.baseColors=function(){
-var _34=MochiKit.Color.Color.fromHexString;
-return [_34("#476fb2"),_34("#be2c2b"),_34("#85b730"),_34("#734a99"),_34("#26a1c5"),_34("#fb8707"),_34("#000000")];
+var _40=MochiKit.Color.Color.fromHexString;
+return [_40("#476fb2"),_40("#be2c2b"),_40("#85b730"),_40("#734a99"),_40("#26a1c5"),_40("#fb8707"),_40("#000000")];
 };
 PlotKit.Base.officeBaseStyle={"axisLineWidth":2,"axisLabelColor":Color.grayColor(),"axisLineColor":Color.whiteColor(),"padding":{top:5,bottom:10,left:30,right:30}};
 MochiKit.Base.update(PlotKit.Base,{officeBlue:function(){
@@ -178,7 +230,7 @@ var r={"colorScheme":PlotKit.Base.palette(PlotKit.Base.baseColors()[6],0,0.6),"b
 MochiKit.Base.update(r,PlotKit.Base.officeBaseStyle);
 return r;
 }});
-PlotKit.Base.EXPORT=["baseColors","collapse","colorScheme","findPosX","findPosY","officeBaseStyle","officeBlue","officeRed","officeGreen","officePurple","officeCyan","officeOrange","officeBlack","roundInterval","uniq","excanvasSupported"];
+PlotKit.Base.EXPORT=["baseColors","collapse","colorScheme","findPosX","findPosY","officeBaseStyle","officeBlue","officeRed","officeGreen","officePurple","officeCyan","officeOrange","officeBlack","roundInterval","uniq","isFuncLike","excanvasSupported"];
 PlotKit.Base.EXPORT_OK=[];
 PlotKit.Base.__new__=function(){
 var m=MochiKit.Base;
@@ -207,10 +259,10 @@ PlotKit.Layout.toString=function(){
 return this.__repr__();
 };
 PlotKit.Layout.valid_styles=["bar","line","pie","point"];
-PlotKit.Layout=function(_36,_37){
+PlotKit.Layout=function(_42,_43){
 this.options={"barWidthFillFraction":0.75,"barOrientation":"vertical","xOriginIsZero":true,"yOriginIsZero":true,"xAxis":null,"yAxis":null,"xTicks":null,"yTicks":null,"xNumberOfTicks":10,"yNumberOfTicks":5,"xTickPrecision":1,"yTickPrecision":3,"pieRadius":0.4};
-this.style=_36;
-MochiKit.Base.update(this.options,_37?_37:{});
+this.style=_42;
+MochiKit.Base.update(this.options,_43?_43:{});
 if(!MochiKit.Base.isUndefinedOrNull(this.options.xAxis)){
 this.minxval=this.options.xAxis[0];
 this.maxxval=this.options.xAxis[1];
@@ -240,29 +292,29 @@ this.xrange=1;
 this.yrange=1;
 this.hitTestCache={x2maxy:null};
 };
-PlotKit.Layout.prototype.addDataset=function(_38,_39){
-this.datasets[_38]=_39;
+PlotKit.Layout.prototype.addDataset=function(_44,_45){
+this.datasets[_44]=_45;
 };
-PlotKit.Layout.prototype.removeDataset=function(_40,_41){
-this.datasets[_40]=null;
+PlotKit.Layout.prototype.removeDataset=function(_46,_47){
+this.datasets[_46]=null;
 };
-PlotKit.Layout.prototype.addDatasetFromTable=function(_42,_43,_44,_45){
-var _46=MochiKit.Base.isUndefinedOrNull;
-var _47=MochiKit.DOM.scrapeText;
-var _48=MochiKit.Format.strip;
-if(_46(_44)){
-_44=0;
+PlotKit.Layout.prototype.addDatasetFromTable=function(_48,_49,_50,_51){
+var _52=MochiKit.Base.isUndefinedOrNull;
+var _53=MochiKit.DOM.scrapeText;
+var _54=MochiKit.Format.strip;
+if(_52(_50)){
+_50=0;
 }
-if(_46(_45)){
-_45=1;
+if(_52(_51)){
+_51=1;
 }
-var _49=_43.tBodies[0].rows;
-var _50=new Array();
-if(!_46(_49)){
-for(var i=0;i<_49.length;i++){
-_50.push([parseFloat(_48(_47(_49[i].cells[_44]))),parseFloat(_48(_47(_49[i].cells[_45])))]);
+var _55=_49.tBodies[0].rows;
+var _56=new Array();
+if(!_52(_55)){
+for(var i=0;i<_55.length;i++){
+_56.push([parseFloat(_54(_53(_55[i].cells[_50]))),parseFloat(_54(_53(_55[i].cells[_51])))]);
 }
-this.addDataset(_42,_50);
+this.addDataset(_48,_56);
 return true;
 }
 return false;
@@ -303,39 +355,39 @@ if(this.style=="line"){
 if(this.hitTestCache.x2maxy==null){
 this._regenerateHitTestCache();
 }
-var _55=x/this.xscale;
-var _56=this.hitTestCache.xvalues;
-var _57=null;
-var _58=null;
-for(var i=1;i<_56.length;i++){
-if(_56[i]>_55){
-_57=_56[i-1];
-_58=_56[i];
+var _60=x/this.xscale;
+var _61=this.hitTestCache.xvalues;
+var _62=null;
+var _63=null;
+for(var i=1;i<_61.length;i++){
+if(_61[i]>_60){
+_62=_61[i-1];
+_63=_61[i];
 break;
 }
 }
-if((_57!=null)){
-var _59=this.hitTestCache.x2maxy[_57];
-var _60=this.hitTestCache.x2maxy[_58];
-var _61=(1-y)/this.yscale;
-var _62=(_60-_59)/(_58-_57);
-var _63=_59+_62*(_55-_57);
-if(_63>=_61){
-var obj={xval:_55,yval:_61,xafter:_58,yafter:_60,xbefore:_57,ybefore:_59,yprojected:_63};
+if((_62!=null)){
+var _64=this.hitTestCache.x2maxy[_62];
+var _65=this.hitTestCache.x2maxy[_63];
+var _66=(1-y)/this.yscale;
+var _67=(_65-_64)/(_63-_62);
+var _68=_64+_67*(_60-_62);
+if(_68>=_66){
+var obj={xval:_60,yval:_66,xafter:_63,yafter:_65,xbefore:_62,ybefore:_64,yprojected:_68};
 return obj;
 }
 }
 }else{
 if(this.style=="pie"){
-var _64=Math.sqrt((y-0.5)*(y-0.5)+(x-0.5)*(x-0.5));
-if(_64>this.options.pieRadius){
+var _69=Math.sqrt((y-0.5)*(y-0.5)+(x-0.5)*(x-0.5));
+if(_69>this.options.pieRadius){
 return null;
 }
-var _65=Math.atan2(y-0.5,x-0.5)-Math.PI/2;
+var _70=Math.atan2(y-0.5,x-0.5)-Math.PI/2;
 for(var i=0;i<this.slices.length;i++){
-var _66=this.slices[i];
-if(_66.startAngle<_65&&_66.endAngle>=_65){
-return _66;
+var _71=this.slices[i];
+if(_71.startAngle<_70&&_71.endAngle>=_70){
+return _71;
 }
 }
 }
@@ -350,33 +402,33 @@ PlotKit.Layout.prototype.angleRangeForX=function(x){
 return null;
 };
 PlotKit.Layout.prototype._evaluateLimits=function(){
-var map=MochiKit.Base.map;
-var _68=MochiKit.Base.items;
-var _69=MochiKit.Base.itemgetter;
-var _70=PlotKit.Base.collapse;
-var _71=MochiKit.Base.listMin;
-var _72=MochiKit.Base.listMax;
-var _73=MochiKit.Base.isUndefinedOrNull;
-var all=_70(map(_69(1),_68(this.datasets)));
-if(_73(this.options.xAxis)){
+var map=PlotKit.Base.map;
+var _73=PlotKit.Base.items;
+var _74=MochiKit.Base.itemgetter;
+var _75=PlotKit.Base.collapse;
+var _76=MochiKit.Base.listMin;
+var _77=MochiKit.Base.listMax;
+var _78=MochiKit.Base.isUndefinedOrNull;
+var all=_75(map(_74(1),_73(this.datasets)));
+if(_78(this.options.xAxis)){
 if(this.options.xOriginIsZero){
 this.minxval=0;
 }else{
-this.minxval=_71(map(parseFloat,map(_69(0),all)));
+this.minxval=_76(map(parseFloat,map(_74(0),all)));
 }
 }
-if(_73(this.options.yAxis)){
+if(_78(this.options.yAxis)){
 if(this.options.yOriginIsZero){
 this.minyval=0;
 }else{
-this.minyval=_71(map(parseFloat,map(_69(1),all)));
+this.minyval=_76(map(parseFloat,map(_74(1),all)));
 }
 }
-this.maxxval=_72(map(parseFloat,map(_69(0),all)));
-this.maxyval=_72(map(parseFloat,map(_69(1),all)));
+this.maxxval=_77(map(parseFloat,map(_74(0),all)));
+this.maxyval=_77(map(parseFloat,map(_74(1),all)));
 };
 PlotKit.Layout.prototype._evaluateScales=function(){
-var _75=MochiKit.Base.isUndefinedOrNull;
+var _80=MochiKit.Base.isUndefinedOrNull;
 this.xrange=this.maxxval-this.minxval;
 if(this.xrange==0){
 this.xscale=1;
@@ -391,156 +443,163 @@ this.yscale=1/this.yrange;
 }
 };
 PlotKit.Layout.prototype._uniqueXValues=function(){
-var _76=PlotKit.Base.collapse;
-var map=MochiKit.Base.map;
-var _77=PlotKit.Base.uniq;
-var _78=MochiKit.Base.itemgetter;
-var _79=map(parseFloat,map(_78(0),_76(map(_78(1),items(this.datasets)))));
-_79.sort(MochiKit.Base.compare);
-return _77(_79);
+var _81=PlotKit.Base.collapse;
+var map=PlotKit.Base.map;
+var _82=PlotKit.Base.uniq;
+var _83=MochiKit.Base.itemgetter;
+var _84=PlotKit.Base.items;
+var _85=map(parseFloat,map(_83(0),_81(map(_83(1),_84(this.datasets)))));
+_85.sort(MochiKit.Base.compare);
+return _82(_85);
 };
 PlotKit.Layout.prototype._evaluateBarCharts=function(){
-var _80=MochiKit.Base.keys;
-var _81=MochiKit.Base.items;
-var _82=_80(this.datasets).length;
-var _83=10000000;
-var _84=this._uniqueXValues();
-for(var i=1;i<_84.length;i++){
-_83=Math.min(Math.abs(_84[i]-_84[i-1]),_83);
+var _86=PlotKit.Base.items;
+var _87=_86(this.datasets).length;
+var _88=10000000;
+var _89=this._uniqueXValues();
+for(var i=1;i<_89.length;i++){
+_88=Math.min(Math.abs(_89[i]-_89[i-1]),_88);
 }
-var _85=0;
-var _86=0;
-var _87=0;
-if(_84.length==1){
-_83=1;
+var _90=0;
+var _91=0;
+var _92=0;
+if(_89.length==1){
+_88=1;
 this.xscale=1;
-this.minxval=_84[0];
-_85=1*this.options.barWidthFillFraction;
-_86=_85/_82;
-_87=(1-this.options.barWidthFillFraction)/2;
+this.minxval=_89[0];
+_90=1*this.options.barWidthFillFraction;
+_91=_90/_87;
+_92=(1-this.options.barWidthFillFraction)/2;
 }else{
-this.xscale=(1-_83/this.xrange)/this.xrange;
-_85=_83*this.xscale*this.options.barWidthFillFraction;
-_86=_85/_82;
-_87=_83*this.xscale*(1-this.options.barWidthFillFraction)/2;
+this.xscale=(1-_88/this.xrange)/this.xrange;
+_90=_88*this.xscale*this.options.barWidthFillFraction;
+_91=_90/_87;
+_92=_88*this.xscale*(1-this.options.barWidthFillFraction)/2;
 }
-this.minxdelta=_83;
+this.minxdelta=_88;
 this.bars=new Array();
 var i=0;
-for(var _88 in this.datasets){
-var _89=this.datasets[_88];
-for(var j=0;j<_89.length;j++){
-var _91=_89[j];
-var _92={x:((parseFloat(_91[0])-this.minxval)*this.xscale)+(i*_86)+_87,y:1-((parseFloat(_91[1])-this.minyval)*this.yscale),w:_86,h:((parseFloat(_91[1])-this.minyval)*this.yscale),xval:parseFloat(_91[0]),yval:parseFloat(_91[1]),name:_88};
-this.bars.push(_92);
+for(var _93 in this.datasets){
+var _94=this.datasets[_93];
+if(PlotKit.Base.isFuncLike(_94)){
+continue;
+}
+for(var j=0;j<_94.length;j++){
+var _96=_94[j];
+var _97={x:((parseFloat(_96[0])-this.minxval)*this.xscale)+(i*_91)+_92,y:1-((parseFloat(_96[1])-this.minyval)*this.yscale),w:_91,h:((parseFloat(_96[1])-this.minyval)*this.yscale),xval:parseFloat(_96[0]),yval:parseFloat(_96[1]),name:_93};
+this.bars.push(_97);
 }
 i++;
 }
 };
 PlotKit.Layout.prototype._evaluateHorizBarCharts=function(){
-var _93=MochiKit.Base.keys;
-var _94=MochiKit.Base.items;
-var _95=_93(this.datasets).length;
-var _96=10000000;
-var _97=this._uniqueXValues();
-for(var i=1;i<_97.length;i++){
-_96=Math.min(Math.abs(_97[i]-_97[i-1]),_96);
+var _98=PlotKit.Base.items;
+var _99=_98(this.datasets).length;
+var _100=10000000;
+var _101=this._uniqueXValues();
+for(var i=1;i<_101.length;i++){
+_100=Math.min(Math.abs(_101[i]-_101[i-1]),_100);
 }
-var _98=0;
-var _99=0;
-var _100=0;
-if(_97.length==1){
-_96=1;
+var _102=0;
+var _103=0;
+var _104=0;
+if(_101.length==1){
+_100=1;
 this.xscale=1;
-this.minxval=_97[0];
-_98=1*this.options.barWidthFillFraction;
-_99=_98/_95;
-_100=(1-this.options.barWidthFillFraction)/2;
+this.minxval=_101[0];
+_102=1*this.options.barWidthFillFraction;
+_103=_102/_99;
+_104=(1-this.options.barWidthFillFraction)/2;
 }else{
-this.xscale=(1-_96/this.xrange)/this.xrange;
-_98=_96*this.xscale*this.options.barWidthFillFraction;
-_99=_98/_95;
-_100=_96*this.xscale*(1-this.options.barWidthFillFraction)/2;
+this.xscale=(1-_100/this.xrange)/this.xrange;
+_102=_100*this.xscale*this.options.barWidthFillFraction;
+_103=_102/_99;
+_104=_100*this.xscale*(1-this.options.barWidthFillFraction)/2;
 }
-this.minxdelta=_96;
+this.minxdelta=_100;
 this.bars=new Array();
 var i=0;
-for(var _101 in this.datasets){
-var _102=this.datasets[_101];
-for(var j=0;j<_102.length;j++){
-var item=_102[j];
-var rect={y:((parseFloat(item[0])-this.minxval)*this.xscale)+(i*_99)+_100,x:0,h:_99,w:((parseFloat(item[1])-this.minyval)*this.yscale),xval:parseFloat(item[0]),yval:parseFloat(item[1]),name:_101};
+for(var _105 in this.datasets){
+var _106=this.datasets[_105];
+if(PlotKit.Base.isFuncLike(_106)){
+continue;
+}
+for(var j=0;j<_106.length;j++){
+var item=_106[j];
+var rect={y:((parseFloat(item[0])-this.minxval)*this.xscale)+(i*_103)+_104,x:0,h:_103,w:((parseFloat(item[1])-this.minyval)*this.yscale),xval:parseFloat(item[0]),yval:parseFloat(item[1]),name:_105};
 this.bars.push(rect);
 }
 i++;
 }
 };
 PlotKit.Layout.prototype._evaluateLineCharts=function(){
-var keys=MochiKit.Base.keys;
-var _106=MochiKit.Base.items;
-var _107=keys(this.datasets).length;
+var _109=PlotKit.Base.items;
+var _110=_109(this.datasets).length;
 this.points=new Array();
 var i=0;
-for(var _108 in this.datasets){
-var _109=this.datasets[_108];
-_109.sort(function(a,b){
+for(var _111 in this.datasets){
+var _112=this.datasets[_111];
+if(PlotKit.Base.isFuncLike(_112)){
+continue;
+}
+_112.sort(function(a,b){
 return compare(parseFloat(a[0]),parseFloat(b[0]));
 });
-for(var j=0;j<_109.length;j++){
-var item=_109[j];
-var _112={x:((parseFloat(item[0])-this.minxval)*this.xscale),y:1-((parseFloat(item[1])-this.minyval)*this.yscale),xval:parseFloat(item[0]),yval:parseFloat(item[1]),name:_108};
-this.points.push(_112);
+for(var j=0;j<_112.length;j++){
+var item=_112[j];
+var _115={x:((parseFloat(item[0])-this.minxval)*this.xscale),y:1-((parseFloat(item[1])-this.minyval)*this.yscale),xval:parseFloat(item[0]),yval:parseFloat(item[1]),name:_111};
+this.points.push(_115);
 }
 i++;
 }
 };
 PlotKit.Layout.prototype._evaluatePieCharts=function(){
-var _113=MochiKit.Base.items;
+var _116=PlotKit.Base.items;
 var sum=MochiKit.Iter.sum;
-var _115=MochiKit.Base.itemgetter;
-var _116=keys(this.datasets).length;
-var _117=_113(this.datasets)[0][1];
-var _118=sum(map(_115(1),_117));
+var _118=MochiKit.Base.itemgetter;
+var _119=_116(this.datasets).length;
+var _120=_116(this.datasets)[0][1];
+var _121=sum(map(_118(1),_120));
 this.slices=new Array();
-var _119=0;
-for(var i=0;i<_117.length;i++){
-var _120=_117[i][1]/_118;
-var _121=_119*Math.PI*2;
-var _122=(_119+_120)*Math.PI*2;
-var _123={fraction:_120,xval:_117[i][0],yval:_117[i][1],startAngle:_121,endAngle:_122};
-this.slices.push(_123);
-_119+=_120;
+var _122=0;
+for(var i=0;i<_120.length;i++){
+var _123=_120[i][1]/_121;
+var _124=_122*Math.PI*2;
+var _125=(_122+_123)*Math.PI*2;
+var _126={fraction:_123,xval:_120[i][0],yval:_120[i][1],startAngle:_124,endAngle:_125};
+this.slices.push(_126);
+_122+=_123;
 }
 };
 PlotKit.Layout.prototype._evaluateLineTicksForXAxis=function(){
-var _124=MochiKit.Base.isUndefinedOrNull;
+var _127=MochiKit.Base.isUndefinedOrNull;
 if(this.options.xTicks){
 this.xticks=new Array();
-var _125=function(tick){
-var _127=tick.label;
-if(_124(_127)){
-_127=tick.v.toString();
+var _128=function(tick){
+var _130=tick.label;
+if(_127(_130)){
+_130=tick.v.toString();
 }
 var pos=this.xscale*(tick.v-this.minxval);
-this.xticks.push([pos,_127]);
+this.xticks.push([pos,_130]);
 };
-MochiKit.Iter.forEach(this.options.xTicks,bind(_125,this));
+MochiKit.Iter.forEach(this.options.xTicks,bind(_128,this));
 }else{
 if(this.options.xNumberOfTicks){
-var _129=this._uniqueXValues();
-var _130=this.xrange/this.options.xNumberOfTicks;
-var _131=0;
+var _132=this._uniqueXValues();
+var _133=this.xrange/this.options.xNumberOfTicks;
+var _134=0;
 this.xticks=new Array();
-for(var i=0;i<=_129.length;i++){
-if(_129[i]>=(_131)*_130){
-var pos=this.xscale*(_129[i]-this.minxval);
+for(var i=0;i<=_132.length;i++){
+if(_132[i]>=(_134)*_133){
+var pos=this.xscale*(_132[i]-this.minxval);
 if((pos>1)||(pos<0)){
 return;
 }
-this.xticks.push([pos,_129[i]]);
-_131++;
+this.xticks.push([pos,_132[i]]);
+_134++;
 }
-if(_131>this.options.xNumberOfTicks){
+if(_134>this.options.xNumberOfTicks){
 break;
 }
 }
@@ -548,29 +607,29 @@ break;
 }
 };
 PlotKit.Layout.prototype._evaluateLineTicksForYAxis=function(){
-var _132=MochiKit.Base.isUndefinedOrNull;
+var _135=MochiKit.Base.isUndefinedOrNull;
 if(this.options.yTicks){
 this.yticks=new Array();
-var _133=function(tick){
-var _134=tick.label;
-if(_132(_134)){
-_134=tick.v.toString();
+var _136=function(tick){
+var _137=tick.label;
+if(_135(_137)){
+_137=tick.v.toString();
 }
 var pos=1-(this.yscale*(tick.v+this.minxval));
 if((pos<0)||(pos>1)){
 return;
 }
-this.yticks.push([pos,_134]);
+this.yticks.push([pos,_137]);
 };
-MochiKit.Iter.forEach(this.options.yTicks,bind(_133,this));
+MochiKit.Iter.forEach(this.options.yTicks,bind(_136,this));
 }else{
 if(this.options.yNumberOfTicks){
 this.yticks=new Array();
-var _135=PlotKit.Base.roundInterval;
+var _138=PlotKit.Base.roundInterval;
 var prec=this.options.yTickPrecision;
-var _137=_135(this.yrange,this.options.yNumberOfTicks,this.options.yTickPrecision);
+var _140=_138(this.yrange,this.options.yNumberOfTicks,this.options.yTickPrecision);
 for(var i=0;i<=this.options.yNumberOfTicks;i++){
-var yval=this.minyval+(i*_137);
+var yval=this.minyval+(i*_140);
 var pos=1-((yval-this.minyval)*this.yscale);
 this.yticks.push([pos,MochiKit.Format.roundToFixed(yval,1)]);
 }
@@ -583,46 +642,46 @@ this._evaluateLineTicksForYAxis();
 };
 PlotKit.Layout.prototype._evaluateBarTicks=function(){
 this._evaluateLineTicks();
-var _139=function(tick){
+var _142=function(tick){
 return [tick[0]+(this.minxdelta*this.xscale)/2,tick[1]];
 };
-this.xticks=MochiKit.Base.map(bind(_139,this),this.xticks);
+this.xticks=MochiKit.Base.map(bind(_142,this),this.xticks);
 if(this.options.barOrientation=="horizontal"){
-var _140=this.xticks;
+var _143=this.xticks;
 this.xticks=this.yticks;
-this.yticks=_140;
-var _141=function(tick){
+this.yticks=_143;
+var _144=function(tick){
 return [1-tick[0],tick[1]];
 };
-this.xticks=MochiKit.Base.map(_141,this.xticks);
+this.xticks=MochiKit.Base.map(_144,this.xticks);
 }
 };
 PlotKit.Layout.prototype._evaluatePieTicks=function(){
-var _142=MochiKit.Base.isUndefinedOrNull;
-var _143=MochiKit.Format.numberFormatter("#%");
+var _145=MochiKit.Base.isUndefinedOrNull;
+var _146=MochiKit.Format.numberFormatter("#%");
 this.xticks=new Array();
 if(this.options.xTicks){
-var _144=new Array();
+var _147=new Array();
 for(var i=0;i<this.slices.length;i++){
-_144[this.slices[i].xval]=this.slices[i];
+_147[this.slices[i].xval]=this.slices[i];
 }
 for(var i=0;i<this.options.xTicks.length;i++){
 var tick=this.options.xTicks[i];
-var _145=_144[tick.v];
-var _146=tick.label;
-if(_145){
-if(_142(_146)){
-_146=tick.v.toString();
+var _148=_147[tick.v];
+var _149=tick.label;
+if(_148){
+if(_145(_149)){
+_149=tick.v.toString();
 }
-_146+=" ("+_143(_145.fraction)+")";
-this.xticks.push([tick.v,_146]);
+_149+=" ("+_146(_148.fraction)+")";
+this.xticks.push([tick.v,_149]);
 }
 }
 }else{
 for(var i=0;i<this.slices.length;i++){
-var _145=this.slices[i];
-var _146=_145.xval+" ("+_143(_145.fraction)+")";
-this.xticks.push([_145.xval,_146]);
+var _148=this.slices[i];
+var _149=_148.xval+" ("+_146(_148.fraction)+")";
+this.xticks.push([_148.xval,_149]);
 }
 }
 };
@@ -630,25 +689,25 @@ PlotKit.Layout.prototype._regenerateHitTestCache=function(){
 this.hitTestCache.xvalues=this._uniqueXValues();
 this.hitTestCache.xlookup=new Array();
 this.hitTestCache.x2maxy=new Array();
-var _147=MochiKit.Base.listMax;
-var _148=MochiKit.Base.itemgetter;
+var _150=MochiKit.Base.listMax;
+var _151=MochiKit.Base.itemgetter;
 var map=MochiKit.Base.map;
-var _149=keys(this.datasets);
-for(var i=0;i<_149.length;i++){
-var _150=this.datasets[_149[i]];
-for(var j=0;j<_150.length;j++){
-var xval=_150[j][0];
-var yval=_150[j][1];
+var _152=keys(this.datasets);
+for(var i=0;i<_152.length;i++){
+var _153=this.datasets[_152[i]];
+for(var j=0;j<_153.length;j++){
+var xval=_153[j][0];
+var yval=_153[j][1];
 if(this.hitTestCache.xlookup[xval]){
-this.hitTestCache.xlookup[xval].push([yval,_149[i]]);
+this.hitTestCache.xlookup[xval].push([yval,_152[i]]);
 }else{
-this.hitTestCache.xlookup[xval]=[[yval,_149[i]]];
+this.hitTestCache.xlookup[xval]=[[yval,_152[i]]];
 }
 }
 }
 for(var x in this.hitTestCache.xlookup){
-var _152=this.hitTestCache.xlookup[x];
-this.hitTestCache.x2maxy[x]=_147(map(_148(0),_152));
+var _155=this.hitTestCache.xlookup[x];
+this.hitTestCache.x2maxy[x]=_150(map(_151(0),_155));
 }
 };
 PlotKit.LayoutModule={};
@@ -681,22 +740,22 @@ return "["+this.NAME+" "+this.VERSION+"]";
 PlotKit.CanvasRenderer.toString=function(){
 return this.__repr__();
 };
-PlotKit.CanvasRenderer=function(_153,_154,_155){
+PlotKit.CanvasRenderer=function(_156,_157,_158){
 if(arguments.length>0){
-this.__init__(_153,_154,_155);
+this.__init__(_156,_157,_158);
 }
 };
-PlotKit.CanvasRenderer.prototype.__init__=function(_156,_157,_158){
-var _159=MochiKit.Base.isUndefinedOrNull;
-var _160=MochiKit.Color.Color;
-this.options={"drawBackground":true,"backgroundColor":_160.whiteColor(),"padding":{left:30,right:30,top:5,bottom:10},"colorScheme":PlotKit.Base.palette(PlotKit.Base.baseColors()[0]),"strokeColor":_160.whiteColor(),"strokeColorTransform":"asStrokeColor","strokeWidth":0.5,"shouldFill":true,"shouldStroke":true,"drawXAxis":true,"drawYAxis":true,"axisLineColor":_160.blackColor(),"axisLineWidth":0.5,"axisTickSize":3,"axisLabelColor":_160.blackColor(),"axisLabelFont":"Arial","axisLabelFontSize":9,"axisLabelWidth":50,"pieRadius":0.4,"enableEvents":true};
-MochiKit.Base.update(this.options,_158?_158:{});
-this.layout=_157;
-this.style=_157.style;
-this.element=_156;
+PlotKit.CanvasRenderer.prototype.__init__=function(_159,_160,_161){
+var _162=MochiKit.Base.isUndefinedOrNull;
+var _163=MochiKit.Color.Color;
+this.options={"drawBackground":true,"backgroundColor":_163.whiteColor(),"padding":{left:30,right:30,top:5,bottom:10},"colorScheme":PlotKit.Base.palette(PlotKit.Base.baseColors()[0]),"strokeColor":_163.whiteColor(),"strokeColorTransform":"asStrokeColor","strokeWidth":0.5,"shouldFill":true,"shouldStroke":true,"drawXAxis":true,"drawYAxis":true,"axisLineColor":_163.blackColor(),"axisLineWidth":0.5,"axisTickSize":3,"axisLabelColor":_163.blackColor(),"axisLabelFont":"Arial","axisLabelFontSize":9,"axisLabelWidth":50,"pieRadius":0.4,"enableEvents":true};
+MochiKit.Base.update(this.options,_161?_161:{});
+this.layout=_160;
+this.style=_160.style;
+this.element=_159;
 this.container=this.element.parentNode;
 this.isIE=PlotKit.Base.excanvasSupported();
-if(this.isIE&&!_159(G_vmlCanvasManager)){
+if(this.isIE&&!_162(G_vmlCanvasManager)){
 this.IEDelay=0.5;
 this.maxTries=5;
 this.renderDelay=null;
@@ -705,13 +764,13 @@ this.element=G_vmlCanvasManager.initElement(this.element);
 }
 this.height=this.element.height;
 this.width=this.element.width;
-if(_159(this.element)){
+if(_162(this.element)){
 throw "CanvasRenderer() - passed canvas is not found";
 }
 if(!this.isIE&&!(PlotKit.CanvasRenderer.isSupported(this.element))){
 throw "CanvasRenderer() - Canvas is not supported.";
 }
-if(_159(this.container)||(this.container.nodeName.toLowerCase()!="div")){
+if(_162(this.container)||(this.container.nodeName.toLowerCase()!="div")){
 throw "CanvasRenderer() - <canvas> needs to be enclosed in <div>";
 }
 this.xlabels=new Array();
@@ -735,7 +794,7 @@ if(this.renderDelay){
 this.renderDelay.cancel();
 this.renderDelay=null;
 }
-var _161=this.element.getContext("2d");
+var _164=this.element.getContext("2d");
 }
 catch(e){
 this.isFirstRender=false;
@@ -764,37 +823,37 @@ this._renderLineAxis();
 }
 }
 };
-PlotKit.CanvasRenderer.prototype._renderBarChartWrap=function(data,_163){
-var _164=this.element.getContext("2d");
-var _165=this.options.colorScheme.length;
-var _166=this.options.colorScheme;
-var _167=MochiKit.Base.keys(this.layout.datasets);
-var _168=_167.length;
-for(var i=0;i<_168;i++){
-var _169=_167[i];
-var _170=_166[i%_165];
-_164.save();
-_164.fillStyle=_170.toRGBString();
+PlotKit.CanvasRenderer.prototype._renderBarChartWrap=function(data,_166){
+var _167=this.element.getContext("2d");
+var _168=this.options.colorScheme.length;
+var _169=this.options.colorScheme;
+var _170=MochiKit.Base.keys(this.layout.datasets);
+var _171=_170.length;
+for(var i=0;i<_171;i++){
+var _172=_170[i];
+var _173=_169[i%_168];
+_167.save();
+_167.fillStyle=_173.toRGBString();
 if(this.options.strokeColor){
-_164.strokeStyle=this.options.strokeColor.toRGBString();
+_167.strokeStyle=this.options.strokeColor.toRGBString();
 }else{
 if(this.options.strokeColorTransform){
-_164.strokeStyle=_170[this.options.strokeColorTransform]().toRGBString();
+_167.strokeStyle=_173[this.options.strokeColorTransform]().toRGBString();
 }
 }
-_164.lineWidth=this.options.strokeWidth;
-var _171=function(obj){
-if(obj.name==_169){
-_163(_164,obj);
+_167.lineWidth=this.options.strokeWidth;
+var _174=function(obj){
+if(obj.name==_172){
+_166(_167,obj);
 }
 };
-MochiKit.Iter.forEach(data,bind(_171,this));
-_164.restore();
+MochiKit.Iter.forEach(data,bind(_174,this));
+_167.restore();
 }
 };
 PlotKit.CanvasRenderer.prototype._renderBarChart=function(){
 var bind=MochiKit.Base.bind;
-var _173=function(_174,bar){
+var _176=function(_177,bar){
 var x=this.area.w*bar.x+this.area.x;
 var y=this.area.h*bar.y+this.area.y;
 var w=this.area.w*bar.w;
@@ -803,102 +862,102 @@ if((w<1)||(h<1)){
 return;
 }
 if(this.options.shouldFill){
-_174.fillRect(x,y,w,h);
+_177.fillRect(x,y,w,h);
 }
 if(this.options.shouldStroke){
-_174.strokeRect(x,y,w,h);
+_177.strokeRect(x,y,w,h);
 }
 };
-this._renderBarChartWrap(this.layout.bars,bind(_173,this));
+this._renderBarChartWrap(this.layout.bars,bind(_176,this));
 };
 PlotKit.CanvasRenderer.prototype._renderLineChart=function(){
-var _177=this.element.getContext("2d");
-var _178=this.options.colorScheme.length;
-var _179=this.options.colorScheme;
-var _180=MochiKit.Base.keys(this.layout.datasets);
-var _181=_180.length;
+var _180=this.element.getContext("2d");
+var _181=this.options.colorScheme.length;
+var _182=this.options.colorScheme;
+var _183=MochiKit.Base.keys(this.layout.datasets);
+var _184=_183.length;
 var bind=MochiKit.Base.bind;
-var _182=MochiKit.Base.partial;
-for(var i=0;i<_181;i++){
-var _183=_180[i];
-var _184=_179[i%_178];
-var _185=this.options.strokeColorTransform;
-_177.save();
-_177.fillStyle=_184.toRGBString();
+var _185=MochiKit.Base.partial;
+for(var i=0;i<_184;i++){
+var _186=_183[i];
+var _187=_182[i%_181];
+var _188=this.options.strokeColorTransform;
+_180.save();
+_180.fillStyle=_187.toRGBString();
 if(this.options.strokeColor){
-_177.strokeStyle=this.options.strokeColor.toRGBString();
+_180.strokeStyle=this.options.strokeColor.toRGBString();
 }else{
 if(this.options.strokeColorTransform){
-_177.strokeStyle=_184[_185]().toRGBString();
+_180.strokeStyle=_187[_188]().toRGBString();
 }
 }
-_177.lineWidth=this.options.strokeWidth;
-var _186=function(ctx){
+_180.lineWidth=this.options.strokeWidth;
+var _189=function(ctx){
 ctx.beginPath();
 ctx.moveTo(this.area.x,this.area.y+this.area.h);
-var _188=function(ctx_,_190){
-if(_190.name==_183){
-ctx_.lineTo(this.area.w*_190.x+this.area.x,this.area.h*_190.y+this.area.y);
+var _191=function(ctx_,_193){
+if(_193.name==_186){
+ctx_.lineTo(this.area.w*_193.x+this.area.x,this.area.h*_193.y+this.area.y);
 }
 };
-MochiKit.Iter.forEach(this.layout.points,_182(_188,ctx),this);
+MochiKit.Iter.forEach(this.layout.points,_185(_191,ctx),this);
 ctx.lineTo(this.area.w+this.area.x,this.area.h+this.area.y);
 ctx.lineTo(this.area.x,this.area.y+this.area.h);
 ctx.closePath();
 };
 if(this.options.shouldFill){
-bind(_186,this)(_177);
-_177.fill();
+bind(_189,this)(_180);
+_180.fill();
 }
 if(this.options.shouldStroke){
-bind(_186,this)(_177);
-_177.stroke();
+bind(_189,this)(_180);
+_180.stroke();
 }
-_177.restore();
+_180.restore();
 }
 };
 PlotKit.CanvasRenderer.prototype._renderPieChart=function(){
-var _191=this.element.getContext("2d");
-var _192=this.options.colorScheme.length;
-var _193=this.layout.slices;
-var _194=this.area.x+this.area.w*0.5;
-var _195=this.area.y+this.area.h*0.5;
-var _196=Math.min(this.area.w*this.options.pieRadius,this.area.h*this.options.pieRadius);
+var _194=this.element.getContext("2d");
+var _195=this.options.colorScheme.length;
+var _196=this.layout.slices;
+var _197=this.area.x+this.area.w*0.5;
+var _198=this.area.y+this.area.h*0.5;
+var _199=Math.min(this.area.w*this.options.pieRadius,this.area.h*this.options.pieRadius);
 if(this.isIE){
-_194=parseInt(_194);
-_195=parseInt(_195);
-_196=parseInt(_196);
+_197=parseInt(_197);
+_198=parseInt(_198);
+_199=parseInt(_199);
 }
-for(var i=0;i<_193.length;i++){
-var _197=this.options.colorScheme[i%_192];
-_191.save();
-_191.fillStyle=_197.toRGBString();
-var _198=function(){
-_191.beginPath();
-_191.moveTo(_194,_195);
-_191.arc(_194,_195,_196,_193[i].startAngle-Math.PI/2,_193[i].endAngle-Math.PI/2,false);
-_191.lineTo(_194,_195);
-_191.closePath();
+for(var i=0;i<_196.length;i++){
+var _200=this.options.colorScheme[i%_195];
+_194.save();
+_194.fillStyle=_200.toRGBString();
+var _201=function(){
+_194.beginPath();
+_194.moveTo(_197,_198);
+_194.arc(_197,_198,_199,_196[i].startAngle-Math.PI/2,_196[i].endAngle-Math.PI/2,false);
+_194.lineTo(_197,_198);
+_194.closePath();
 };
-if(Math.abs(_193[i].startAngle-_193[i].endAngle)>0.001){
+if(Math.abs(_196[i].startAngle-_196[i].endAngle)>0.001){
 if(this.options.shouldFill){
-_198();
-_191.fill();
+_201();
+_194.fill();
 }
 if(this.options.shouldStroke){
-_198();
-_191.lineWidth=this.options.strokeWidth;
+_201();
+_194.lineWidth=this.options.strokeWidth;
 if(this.options.strokeColor){
-_191.strokeStyle=this.options.strokeColor.toRGBString();
+_194.strokeStyle=this.options.strokeColor.toRGBString();
 }else{
 if(this.options.strokeColorTransform){
-_191.strokeStyle=_197[this.options.strokeColorTransform]().toRGBString();
+_194.strokeStyle=_200[this.options.strokeColorTransform]().toRGBString();
 }
 }
-_191.stroke();
+_194.stroke();
 }
 }
-_191.restore();
+_194.restore();
 }
 };
 PlotKit.CanvasRenderer.prototype._renderBarAxis=function(){
@@ -911,132 +970,138 @@ PlotKit.CanvasRenderer.prototype._renderAxis=function(){
 if(!this.options.drawXAxis&&!this.options.drawYAxis){
 return;
 }
-var _199=this.element.getContext("2d");
-var _200={"style":{"position":"absolute","fontSize":this.options.axisLabelFontSize+"px","zIndex":10,"color":this.options.axisLabelColor.toRGBString(),"width":this.options.axisLabelWidth+"px","overflow":"hidden"}};
-_199.save();
-_199.strokeStyle=this.options.axisLineColor.toRGBString();
-_199.lineWidth=this.options.axisLineWidth;
+var _202=this.element.getContext("2d");
+var _203={"style":{"position":"absolute","fontSize":this.options.axisLabelFontSize+"px","zIndex":10,"color":this.options.axisLabelColor.toRGBString(),"width":this.options.axisLabelWidth+"px","overflow":"hidden"}};
+_202.save();
+_202.strokeStyle=this.options.axisLineColor.toRGBString();
+_202.lineWidth=this.options.axisLineWidth;
 if(this.options.drawYAxis){
 if(this.layout.yticks){
-var _201=function(tick){
+var _204=function(tick){
+if(typeof (tick)=="function"){
+return;
+}
 var x=this.area.x;
 var y=this.area.y+tick[0]*this.area.h;
-_199.beginPath();
-_199.moveTo(x,y);
-_199.lineTo(x-this.options.axisTickSize,y);
-_199.closePath();
-_199.stroke();
-var _202=DIV(_200,tick[1]);
-_202.style.top=(y-this.options.axisLabelFontSize)+"px";
-_202.style.left=(x-this.options.padding.left-this.options.axisTickSize)+"px";
-_202.style.textAlign="right";
-_202.style.width=(this.options.padding.left-this.options.axisTickSize*2)+"px";
-MochiKit.DOM.appendChildNodes(this.container,_202);
-this.ylabels.push(_202);
+_202.beginPath();
+_202.moveTo(x,y);
+_202.lineTo(x-this.options.axisTickSize,y);
+_202.closePath();
+_202.stroke();
+var _205=DIV(_203,tick[1]);
+_205.style.top=(y-this.options.axisLabelFontSize)+"px";
+_205.style.left=(x-this.options.padding.left-this.options.axisTickSize)+"px";
+_205.style.textAlign="right";
+_205.style.width=(this.options.padding.left-this.options.axisTickSize*2)+"px";
+MochiKit.DOM.appendChildNodes(this.container,_205);
+this.ylabels.push(_205);
 };
-MochiKit.Iter.forEach(this.layout.yticks,bind(_201,this));
+MochiKit.Iter.forEach(this.layout.yticks,bind(_204,this));
 }
-_199.beginPath();
-_199.moveTo(this.area.x,this.area.y);
-_199.lineTo(this.area.x,this.area.y+this.area.h);
-_199.closePath();
-_199.stroke();
+_202.beginPath();
+_202.moveTo(this.area.x,this.area.y);
+_202.lineTo(this.area.x,this.area.y+this.area.h);
+_202.closePath();
+_202.stroke();
 }
 if(this.options.drawXAxis){
 if(this.layout.xticks){
-var _201=function(tick){
+var _204=function(tick){
+if(typeof (dataset)=="function"){
+return;
+}
 var x=this.area.x+tick[0]*this.area.w;
 var y=this.area.y+this.area.h;
-_199.beginPath();
-_199.moveTo(x,y);
-_199.lineTo(x,y+this.options.axisTickSize);
-_199.closePath();
-_199.stroke();
-var _203=DIV(_200,tick[1]);
-_203.style.top=(y+this.options.axisTickSize)+"px";
-_203.style.left=(x-this.options.axisLabelWidth/2)+"px";
-_203.style.textAlign="center";
-_203.style.width=this.options.axisLabelWidth+"px";
-MochiKit.DOM.appendChildNodes(this.container,_203);
-this.xlabels.push(_203);
+_202.beginPath();
+_202.moveTo(x,y);
+_202.lineTo(x,y+this.options.axisTickSize);
+_202.closePath();
+_202.stroke();
+var _206=DIV(_203,tick[1]);
+_206.style.top=(y+this.options.axisTickSize)+"px";
+_206.style.left=(x-this.options.axisLabelWidth/2)+"px";
+_206.style.textAlign="center";
+_206.style.width=this.options.axisLabelWidth+"px";
+MochiKit.DOM.appendChildNodes(this.container,_206);
+this.xlabels.push(_206);
 };
-MochiKit.Iter.forEach(this.layout.xticks,bind(_201,this));
+MochiKit.Iter.forEach(this.layout.xticks,bind(_204,this));
 }
-_199.beginPath();
-_199.moveTo(this.area.x,this.area.y+this.area.h);
-_199.lineTo(this.area.x+this.area.w,this.area.y+this.area.h);
-_199.closePath();
-_199.stroke();
+_202.beginPath();
+_202.moveTo(this.area.x,this.area.y+this.area.h);
+_202.lineTo(this.area.x+this.area.w,this.area.y+this.area.h);
+_202.closePath();
+_202.stroke();
 }
-_199.restore();
+_202.restore();
 };
 PlotKit.CanvasRenderer.prototype._renderPieAxis=function(){
 if(!this.options.drawXAxis){
 return;
 }
 if(this.layout.xticks){
-var _204=new Array();
+var _207=new Array();
 for(var i=0;i<this.layout.slices.length;i++){
-_204[this.layout.slices[i].xval]=this.layout.slices[i];
+_207[this.layout.slices[i].xval]=this.layout.slices[i];
 }
-var _205=this.area.x+this.area.w*0.5;
-var _206=this.area.y+this.area.h*0.5;
-var _207=Math.min(this.area.w*this.options.pieRadius,this.area.h*this.options.pieRadius);
-var _208=this.options.axisLabelWidth;
+var _208=this.area.x+this.area.w*0.5;
+var _209=this.area.y+this.area.h*0.5;
+var _210=Math.min(this.area.w*this.options.pieRadius,this.area.h*this.options.pieRadius);
+var _211=this.options.axisLabelWidth;
 for(var i=0;i<this.layout.xticks.length;i++){
-var _209=_204[this.layout.xticks[i][0]];
-if(MochiKit.Base.isUndefinedOrNull(_209)){
+var _212=_207[this.layout.xticks[i][0]];
+if(MochiKit.Base.isUndefinedOrNull(_212)){
 continue;
 }
-var _210=(_209.startAngle+_209.endAngle)/2;
-var _211=_210;
-if(_211>Math.PI*2){
-_211=_211-Math.PI*2;
+var _213=(_212.startAngle+_212.endAngle)/2;
+var _214=_213;
+if(_214>Math.PI*2){
+_214=_214-Math.PI*2;
 }else{
-if(_211<0){
-_211=_211+Math.PI*2;
+if(_214<0){
+_214=_214+Math.PI*2;
 }
 }
-var _212=_205+Math.sin(_211)*(_207+10);
-var _213=_206-Math.cos(_211)*(_207+10);
-var _214={"position":"absolute","zIndex":11,"width":_208+"px","fontSize":this.options.axisLabelFontSize+"px","overflow":"hidden","color":this.options.axisLabelColor.toHexString()};
-if(_211<=Math.PI*0.5){
-_214["textAlign"]="left";
-_214["verticalAlign"]="top";
-_214["left"]=_212+"px";
-_214["top"]=(_213-this.options.axisLabelFontSize)+"px";
+var _215=_208+Math.sin(_214)*(_210+10);
+var _216=_209-Math.cos(_214)*(_210+10);
+var _217={"position":"absolute","zIndex":11,"width":_211+"px","fontSize":this.options.axisLabelFontSize+"px","overflow":"hidden","color":this.options.axisLabelColor.toHexString()};
+if(_214<=Math.PI*0.5){
+_217["textAlign"]="left";
+_217["verticalAlign"]="top";
+_217["left"]=_215+"px";
+_217["top"]=(_216-this.options.axisLabelFontSize)+"px";
 }else{
-if((_211>Math.PI*0.5)&&(_211<=Math.PI)){
-_214["textAlign"]="left";
-_214["verticalAlign"]="bottom";
-_214["left"]=_212+"px";
-_214["top"]=_213+"px";
+if((_214>Math.PI*0.5)&&(_214<=Math.PI)){
+_217["textAlign"]="left";
+_217["verticalAlign"]="bottom";
+_217["left"]=_215+"px";
+_217["top"]=_216+"px";
 }else{
-if((_211>Math.PI)&&(_211<=Math.PI*1.5)){
-_214["textAlign"]="right";
-_214["verticalAlign"]="bottom";
-_214["left"]=(_212-_208)+"px";
-_214["top"]=_213+"px";
+if((_214>Math.PI)&&(_214<=Math.PI*1.5)){
+_217["textAlign"]="right";
+_217["verticalAlign"]="bottom";
+_217["left"]=(_215-_211)+"px";
+_217["top"]=_216+"px";
 }else{
-_214["textAlign"]="right";
-_214["verticalAlign"]="bottom";
-_214["left"]=(_212-_208)+"px";
-_214["top"]=(_213-this.options.axisLabelFontSize)+"px";
+_217["textAlign"]="right";
+_217["verticalAlign"]="bottom";
+_217["left"]=(_215-_211)+"px";
+_217["top"]=(_216-this.options.axisLabelFontSize)+"px";
 }
 }
 }
-var _215=DIV({"style":_214},this.layout.xticks[i][1]);
-this.xlabels.push(_215);
-MochiKit.DOM.appendChildNodes(this.container,_215);
+var _218=DIV({"style":_217},this.layout.xticks[i][1]);
+this.xlabels.push(_218);
+MochiKit.DOM.appendChildNodes(this.container,_218);
 }
 }
 };
 PlotKit.CanvasRenderer.prototype._renderBackground=function(){
-var _216=this.element.getContext("2d");
-_216.save();
-_216.fillStyle=this.options.backgroundColor.toRGBString();
-_216.fillRect(0,0,this.width,this.height);
-_216.restore();
+var _219=this.element.getContext("2d");
+_219.save();
+_219.fillStyle=this.options.backgroundColor.toRGBString();
+_219.fillRect(0,0,this.width,this.height);
+_219.restore();
 };
 PlotKit.CanvasRenderer.prototype.clear=function(){
 if(this.isIE){
@@ -1045,7 +1110,7 @@ if(this.clearDelay){
 this.clearDelay.cancel();
 this.clearDelay=null;
 }
-var _217=this.element.getContext("2d");
+var _220=this.element.getContext("2d");
 }
 catch(e){
 this.isFirstRender=false;
@@ -1054,89 +1119,89 @@ this.clearDelay.addCallback(bind(this.clear,this));
 return;
 }
 }
-var _217=this.element.getContext("2d");
-_217.clearRect(0,0,this.width,this.height);
+var _220=this.element.getContext("2d");
+_220.clearRect(0,0,this.width,this.height);
 MochiKit.Iter.forEach(this.xlabels,MochiKit.DOM.removeElement);
 MochiKit.Iter.forEach(this.ylabels,MochiKit.DOM.removeElement);
 this.xlabels=new Array();
 this.ylabels=new Array();
 };
 PlotKit.CanvasRenderer.prototype._initialiseEvents=function(){
-var _218=MochiKit.Signal.connect;
+var _221=MochiKit.Signal.connect;
 var bind=MochiKit.Base.bind;
 MochiKit.Signal.registerSignals(this,["onmouseover","onclick","onmouseout","onmousemove"]);
-_218(this.element,"onclick",bind(this.onclick,this));
+_221(this.element,"onclick",bind(this.onclick,this));
 };
 PlotKit.CanvasRenderer.prototype._resolveObject=function(e){
 var x=(e.mouse().page.x-PlotKit.Base.findPosX(this.element)-this.area.x)/this.area.w;
 var y=(e.mouse().page.y-PlotKit.Base.findPosY(this.element)-this.area.y)/this.area.h;
-var _220=this.layout.hitTest(x,y);
-if(_220){
-return _220;
+var _223=this.layout.hitTest(x,y);
+if(_223){
+return _223;
 }
 return null;
 };
-PlotKit.CanvasRenderer.prototype._createEventObject=function(_221,e){
-if(_221==null){
+PlotKit.CanvasRenderer.prototype._createEventObject=function(_224,e){
+if(_224==null){
 return null;
 }
-e.chart=_221;
+e.chart=_224;
 return e;
 };
 PlotKit.CanvasRenderer.prototype.onclick=function(e){
-var _222=this._resolveObject(e);
-var _223=this._createEventObject(_222,e);
-if(_223!=null){
-MochiKit.Signal.signal(this,"onclick",_223);
+var _225=this._resolveObject(e);
+var _226=this._createEventObject(_225,e);
+if(_226!=null){
+MochiKit.Signal.signal(this,"onclick",_226);
 }
 };
 PlotKit.CanvasRenderer.prototype.onmouseover=function(e){
-var _224=this._resolveObject(e);
-var _225=this._createEventObject(_224,e);
-if(_225!=null){
-signal(this,"onmouseover",_225);
+var _227=this._resolveObject(e);
+var _228=this._createEventObject(_227,e);
+if(_228!=null){
+signal(this,"onmouseover",_228);
 }
 };
 PlotKit.CanvasRenderer.prototype.onmouseout=function(e){
-var _226=this._resolveObject(e);
-var _227=this._createEventObject(_226,e);
-if(_227==null){
+var _229=this._resolveObject(e);
+var _230=this._createEventObject(_229,e);
+if(_230==null){
 signal(this,"onmouseout",e);
 }else{
-signal(this,"onmouseout",_227);
+signal(this,"onmouseout",_230);
 }
 };
 PlotKit.CanvasRenderer.prototype.onmousemove=function(e){
-var _228=this._resolveObject(e);
-var _229=this._createEventObject(_228,e);
-if((_228==null)&&(this.event_isinside==null)){
+var _231=this._resolveObject(e);
+var _232=this._createEventObject(_231,e);
+if((_231==null)&&(this.event_isinside==null)){
 return;
 }
-if((_228!=null)&&(this.event_isinside==null)){
-signal(this,"onmouseover",_229);
+if((_231!=null)&&(this.event_isinside==null)){
+signal(this,"onmouseover",_232);
 }
-if((_228==null)&&(this.event_isinside!=null)){
-signal(this,"onmouseout",_229);
+if((_231==null)&&(this.event_isinside!=null)){
+signal(this,"onmouseout",_232);
 }
-if((_228!=null)&&(this.event_isinside!=null)){
-signal(this,"onmousemove",_229);
+if((_231!=null)&&(this.event_isinside!=null)){
+signal(this,"onmousemove",_232);
 }
-this.event_isinside=_228;
+this.event_isinside=_231;
 };
-PlotKit.CanvasRenderer.isSupported=function(_230){
-var _231=null;
+PlotKit.CanvasRenderer.isSupported=function(_233){
+var _234=null;
 try{
-if(MochiKit.Base.isUndefinedOrNull(_230)){
-_231=MochiKit.DOM.CANVAS({});
+if(MochiKit.Base.isUndefinedOrNull(_233)){
+_234=MochiKit.DOM.CANVAS({});
 }else{
-_231=MochiKit.DOM.getElement(_230);
+_234=MochiKit.DOM.getElement(_233);
 }
-var _232=_231.getContext("2d");
+var _235=_234.getContext("2d");
 }
 catch(e){
 var ie=navigator.appVersion.match(/MSIE (\d\.\d)/);
-var _234=(navigator.userAgent.toLowerCase().indexOf("opera")!=-1);
-if((!ie)||(ie[1]<6)||(_234)){
+var _237=(navigator.userAgent.toLowerCase().indexOf("opera")!=-1);
+if((!ie)||(ie[1]<6)||(_237)){
 return false;
 }
 return true;
@@ -1162,9 +1227,9 @@ throw "";
 catch(e){
 throw "PlotKit depends on MochiKit.{Base,Color,DOM,Format} and PlotKit.Layout";
 }
-PlotKit.SVGRenderer=function(_235,_236,_237){
+PlotKit.SVGRenderer=function(_238,_239,_240){
 if(arguments.length>0){
-this.__init__(_235,_236,_237);
+this.__init__(_238,_239,_240);
 }
 };
 PlotKit.SVGRenderer.NAME="PlotKit.SVGRenderer";
@@ -1176,13 +1241,13 @@ PlotKit.SVGRenderer.toString=function(){
 return this.__repr__();
 };
 PlotKit.SVGRenderer.SVGNS="http://www.w3.org/2000/svg";
-PlotKit.SVGRenderer.prototype.__init__=function(_238,_239,_240){
-var _241=MochiKit.Base.isUndefinedOrNull;
+PlotKit.SVGRenderer.prototype.__init__=function(_241,_242,_243){
+var _244=MochiKit.Base.isUndefinedOrNull;
 this.options={"drawBackground":true,"backgroundColor":Color.whiteColor(),"padding":{left:30,right:30,top:5,bottom:10},"colorScheme":PlotKit.Base.palette(PlotKit.Base.baseColors()[1]),"strokeColor":Color.whiteColor(),"strokeColorTransform":"asStrokeColor","strokeWidth":0.5,"shouldFill":true,"shouldStroke":true,"drawXAxis":true,"drawYAxis":true,"axisLineColor":Color.blackColor(),"axisLineWidth":0.5,"axisTickSize":3,"axisLabelColor":Color.blackColor(),"axisLabelFont":"Arial","axisLabelFontSize":9,"axisLabelWidth":50,"axisLabelUseDiv":true,"pieRadius":0.4,"enableEvents":true};
-MochiKit.Base.update(this.options,_240?_240:{});
-this.layout=_239;
-this.style=_239.style;
-this.element=MochiKit.DOM.getElement(_238);
+MochiKit.Base.update(this.options,_243?_243:{});
+this.layout=_242;
+this.style=_242.style;
+this.element=MochiKit.DOM.getElement(_241);
 this.container=this.element.parentNode;
 this.height=parseInt(this.element.getAttribute("height"));
 this.width=parseInt(this.element.getAttribute("width"));
@@ -1190,15 +1255,15 @@ this.document=document;
 this.root=this.element;
 try{
 this.document=this.element.getSVGDocument();
-this.root=_241(this.document.documentElement)?this.element:this.document.documentElement;
+this.root=_244(this.document.documentElement)?this.element:this.document.documentElement;
 }
 catch(e){
 }
 this.element.style.zIndex=1;
-if(_241(this.element)){
+if(_244(this.element)){
 throw "SVGRenderer() - passed SVG object is not found";
 }
-if(_241(this.container)||this.container.nodeName.toLowerCase()!="div"){
+if(_244(this.container)||this.container.nodeName.toLowerCase()!="div"){
 throw "SVGRenderer() - No DIV's around the SVG.";
 }
 this.xlabels=new Array();
@@ -1226,132 +1291,132 @@ this._renderLineAxis();
 }
 }
 };
-PlotKit.SVGRenderer.prototype._renderBarOrLine=function(data,_242,_243,_244){
-var _245=this.options.colorScheme.length;
-var _246=this.options.colorScheme;
-var _247=MochiKit.Base.keys(this.layout.datasets);
-var _248=_247.length;
-for(var i=0;i<_248;i++){
-var _249=_247[i];
-var _250=new Array();
-var _251=_246[i%_245];
+PlotKit.SVGRenderer.prototype._renderBarOrLine=function(data,_245,_246,_247){
+var _248=this.options.colorScheme.length;
+var _249=this.options.colorScheme;
+var _250=MochiKit.Base.keys(this.layout.datasets);
+var _251=_250.length;
+for(var i=0;i<_251;i++){
+var _252=_250[i];
+var _253=new Array();
+var _254=_249[i%_248];
 if(this.options.shouldFill){
-_250["fill"]=_251.toRGBString();
+_253["fill"]=_254.toRGBString();
 }else{
-_250["fill"]="none";
+_253["fill"]="none";
 }
 if(this.options.shouldStroke&&(this.options.strokeColor||this.options.strokeColorTransform)){
 if(this.options.strokeColor){
-_250["stroke"]=this.options.strokeColor.toRGBString();
+_253["stroke"]=this.options.strokeColor.toRGBString();
 }else{
 if(this.options.strokeColorTransform){
-_250["stroke"]=_251[this.options.strokeColorTransform]().toRGBString();
+_253["stroke"]=_254[this.options.strokeColorTransform]().toRGBString();
 }
 }
-_250["strokeWidth"]=this.options.strokeWidth;
+_253["strokeWidth"]=this.options.strokeWidth;
 }
-if(_243){
-_243(_250);
+if(_246){
+_246(_253);
 }
-var _252=function(obj){
-if(obj.name==_249){
-_242(_250,obj);
+var _255=function(obj){
+if(obj.name==_252){
+_245(_253,obj);
 }
 };
-MochiKit.Iter.forEach(data,bind(_252,this));
-if(_244){
-_244(_250);
+MochiKit.Iter.forEach(data,bind(_255,this));
+if(_247){
+_247(_253);
 }
 }
 };
 PlotKit.SVGRenderer.prototype._renderBarChart=function(){
 var bind=MochiKit.Base.bind;
-var _253=function(_254,bar){
+var _256=function(_257,bar){
 var x=this.area.w*bar.x+this.area.x;
 var y=this.area.h*bar.y+this.area.y;
 var w=this.area.w*bar.w;
 var h=this.area.h*bar.h;
-this._drawRect(x,y,w,h,_254);
+this._drawRect(x,y,w,h,_257);
 };
-this._renderBarOrLine(this.layout.bars,bind(_253,this));
+this._renderBarOrLine(this.layout.bars,bind(_256,this));
 };
 PlotKit.SVGRenderer.prototype._renderLineChart=function(){
 var bind=MochiKit.Base.bind;
-var _255=function(_256,_257){
-this._tempPointsBuffer+=(this.area.w*_257.x+this.area.x)+","+(this.area.h*_257.y+this.area.y)+" ";
+var _258=function(_259,_260){
+this._tempPointsBuffer+=(this.area.w*_260.x+this.area.x)+","+(this.area.h*_260.y+this.area.y)+" ";
 };
-var _258=function(_259){
+var _261=function(_262){
 this._tempPointsBuffer="";
 this._tempPointsBuffer+=(this.area.x)+","+(this.area.y+this.area.h)+" ";
 };
-var _260=function(_261){
+var _263=function(_264){
 this._tempPointsBuffer+=(this.area.w+this.area.x)+","+(this.area.h+this.area.y);
-_261["points"]=this._tempPointsBuffer;
-var elem=this.createSVGElement("polygon",_261);
+_264["points"]=this._tempPointsBuffer;
+var elem=this.createSVGElement("polygon",_264);
 this.root.appendChild(elem);
 };
-this._renderBarOrLine(this.layout.points,bind(_255,this),bind(_258,this),bind(_260,this));
+this._renderBarOrLine(this.layout.points,bind(_258,this),bind(_261,this),bind(_263,this));
 };
 PlotKit.SVGRenderer.prototype._renderPieChart=function(){
-var _263=this.options.colorScheme.length;
-var _264=this.layout.slices;
-var _265=this.area.x+this.area.w*0.5;
-var _266=this.area.y+this.area.h*0.5;
-var _267=Math.min(this.area.w*this.options.pieRadius,this.area.h*this.options.pieRadius);
-if(_264.length==1&&(Math.abs(_264[0].startAngle)-Math.abs(_264[0].endAngle)<0.1)){
-var _268={"cx":_265,"cy":_266,"r":_267};
-var _269=this.options.colorScheme[0];
+var _266=this.options.colorScheme.length;
+var _267=this.layout.slices;
+var _268=this.area.x+this.area.w*0.5;
+var _269=this.area.y+this.area.h*0.5;
+var _270=Math.min(this.area.w*this.options.pieRadius,this.area.h*this.options.pieRadius);
+if(_267.length==1&&(Math.abs(_267[0].startAngle)-Math.abs(_267[0].endAngle)<0.1)){
+var _271={"cx":_268,"cy":_269,"r":_270};
+var _272=this.options.colorScheme[0];
 if(this.options.shouldFill){
-_268["fill"]=_269.toRGBString();
+_271["fill"]=_272.toRGBString();
 }else{
-_268["fill"]="none";
+_271["fill"]="none";
 }
 if(this.options.shouldStroke&&(this.options.strokeColor||this.options.strokeColorTransform)){
 if(this.options.strokeColor){
-_268["stroke"]=this.options.strokeColor.toRGBString();
+_271["stroke"]=this.options.strokeColor.toRGBString();
 }else{
 if(this.options.strokeColorTransform){
-_268["stroke"]=_269[this.options.strokeColorTransform]().toRGBString();
+_271["stroke"]=_272[this.options.strokeColorTransform]().toRGBString();
 }
 }
-_268["style"]="stroke-width: "+this.options.strokeWidth;
+_271["style"]="stroke-width: "+this.options.strokeWidth;
 }
-this.root.appendChild(this.createSVGElement("circle",_268));
+this.root.appendChild(this.createSVGElement("circle",_271));
 return;
 }
-for(var i=0;i<_264.length;i++){
-var _268=new Array();
-var _269=this.options.colorScheme[i%_263];
+for(var i=0;i<_267.length;i++){
+var _271=new Array();
+var _272=this.options.colorScheme[i%_266];
 if(this.options.shouldFill){
-_268["fill"]=_269.toRGBString();
+_271["fill"]=_272.toRGBString();
 }else{
-_268["fill"]="none";
+_271["fill"]="none";
 }
 if(this.options.shouldStroke&&(this.options.strokeColor||this.options.strokeColorTransform)){
 if(this.options.strokeColor){
-_268["stroke"]=this.options.strokeColor.toRGBString();
+_271["stroke"]=this.options.strokeColor.toRGBString();
 }else{
 if(this.options.strokeColorTransform){
-_268["stroke"]=_269[this.options.strokeColorTransform]().toRGBString();
+_271["stroke"]=_272[this.options.strokeColorTransform]().toRGBString();
 }
 }
-_268["style"]="stroke-width:"+this.options.strokeWidth;
+_271["style"]="stroke-width:"+this.options.strokeWidth;
 }
-var _270=0;
-if(Math.abs(_264[i].endAngle-_264[i].startAngle)>Math.PI){
-_270=1;
+var _273=0;
+if(Math.abs(_267[i].endAngle-_267[i].startAngle)>Math.PI){
+_273=1;
 }
-var x1=Math.cos(_264[i].startAngle-Math.PI/2)*_267;
-var y1=Math.sin(_264[i].startAngle-Math.PI/2)*_267;
-var x2=Math.cos(_264[i].endAngle-Math.PI/2)*_267;
-var y2=Math.sin(_264[i].endAngle-Math.PI/2)*_267;
+var x1=Math.cos(_267[i].startAngle-Math.PI/2)*_270;
+var y1=Math.sin(_267[i].startAngle-Math.PI/2)*_270;
+var x2=Math.cos(_267[i].endAngle-Math.PI/2)*_270;
+var y2=Math.sin(_267[i].endAngle-Math.PI/2)*_270;
 var rx=x2-x1;
 var ry=y2-y1;
-var _277="M"+_265+","+_266+" ";
-_277+="l"+x1+","+y1+" ";
-_277+="a"+_267+","+_267+" 0 "+_270+",1 "+rx+","+ry+" z";
-_268["d"]=_277;
-var elem=this.createSVGElement("path",_268);
+var _280="M"+_268+","+_269+" ";
+_280+="l"+x1+","+y1+" ";
+_280+="a"+_270+","+_270+" 0 "+_273+",1 "+rx+","+ry+" z";
+_271["d"]=_280;
+var elem=this.createSVGElement("path",_271);
 this.root.appendChild(elem);
 }
 };
@@ -1365,112 +1430,112 @@ PlotKit.SVGRenderer.prototype._renderAxis=function(){
 if(!this.options.drawXAxis&&!this.options.drawYAxis){
 return;
 }
-var _278={"style":{"position":"absolute","textAlign":"center","fontSize":this.options.axisLabelFontSize+"px","zIndex":10,"color":this.options.axisLabelColor.toRGBString(),"width":this.options.axisLabelWidth+"px","overflow":"hidden"}};
-var _279={"stroke":this.options.axisLineColor.toRGBString(),"strokeWidth":this.options.axisLineWidth};
+var _281={"style":{"position":"absolute","textAlign":"center","fontSize":this.options.axisLabelFontSize+"px","zIndex":10,"color":this.options.axisLabelColor.toRGBString(),"width":this.options.axisLabelWidth+"px","overflow":"hidden"}};
+var _282={"stroke":this.options.axisLineColor.toRGBString(),"strokeWidth":this.options.axisLineWidth};
 if(this.options.drawYAxis){
 if(this.layout.yticks){
-var _280=function(tick){
+var _283=function(tick){
 var x=this.area.x;
 var y=this.area.y+tick[0]*this.area.h;
-this._drawLine(x,y,x-3,y,_279);
+this._drawLine(x,y,x-3,y,_282);
 if(this.options.axisLabelUseDiv){
-var _281=DIV(_278,tick[1]);
-_281.style.top=(y-this.options.axisLabelFontSize)+"px";
-_281.style.left=(x-this.options.padding.left+this.options.axisTickSize)+"px";
-_281.style.textAlign="left";
-_281.style.width=(this.options.padding.left-3)+"px";
-MochiKit.DOM.appendChildNodes(this.container,_281);
-this.ylabels.push(_281);
+var _284=DIV(_281,tick[1]);
+_284.style.top=(y-this.options.axisLabelFontSize)+"px";
+_284.style.left=(x-this.options.padding.left+this.options.axisTickSize)+"px";
+_284.style.textAlign="left";
+_284.style.width=(this.options.padding.left-3)+"px";
+MochiKit.DOM.appendChildNodes(this.container,_284);
+this.ylabels.push(_284);
 }else{
-var _282={y:y+3,x:(x-this.options.padding.left+3),width:(this.options.padding.left-this.options.axisTickSize)+"px",height:(this.options.axisLabelFontSize+3)+"px",fontFamily:"Arial",fontSize:this.options.axisLabelFontSize+"px",fill:this.options.axisLabelColor.toRGBString()};
-var _281=this.createSVGElement("text",_282);
-_281.appendChild(this.document.createTextNode(tick[1]));
-this.root.appendChild(_281);
+var _285={y:y+3,x:(x-this.options.padding.left+3),width:(this.options.padding.left-this.options.axisTickSize)+"px",height:(this.options.axisLabelFontSize+3)+"px",fontFamily:"Arial",fontSize:this.options.axisLabelFontSize+"px",fill:this.options.axisLabelColor.toRGBString()};
+var _284=this.createSVGElement("text",_285);
+_284.appendChild(this.document.createTextNode(tick[1]));
+this.root.appendChild(_284);
 }
 };
-MochiKit.Iter.forEach(this.layout.yticks,bind(_280,this));
+MochiKit.Iter.forEach(this.layout.yticks,bind(_283,this));
 }
-this._drawLine(this.area.x,this.area.y,this.area.x,this.area.y+this.area.h,_279);
+this._drawLine(this.area.x,this.area.y,this.area.x,this.area.y+this.area.h,_282);
 }
 if(this.options.drawXAxis){
 if(this.layout.xticks){
-var _280=function(tick){
+var _283=function(tick){
 var x=this.area.x+tick[0]*this.area.w;
 var y=this.area.y+this.area.h;
-this._drawLine(x,y,x,y+this.options.axisTickSize,_279);
+this._drawLine(x,y,x,y+this.options.axisTickSize,_282);
 if(this.options.axisLabelUseDiv){
-var _283=DIV(_278,tick[1]);
-_283.style.top=(y+this.options.axisTickSize)+"px";
-_283.style.left=(x-this.options.axisLabelWidth/2)+"px";
-_283.style.textAlign="center";
-_283.style.width=this.options.axisLabelWidth+"px";
-MochiKit.DOM.appendChildNodes(this.container,_283);
-this.xlabels.push(_283);
+var _286=DIV(_281,tick[1]);
+_286.style.top=(y+this.options.axisTickSize)+"px";
+_286.style.left=(x-this.options.axisLabelWidth/2)+"px";
+_286.style.textAlign="center";
+_286.style.width=this.options.axisLabelWidth+"px";
+MochiKit.DOM.appendChildNodes(this.container,_286);
+this.xlabels.push(_286);
 }else{
-var _284={y:(y+this.options.axisTickSize+this.options.axisLabelFontSize),x:x-3,width:this.options.axisLabelWidth+"px",height:(this.options.axisLabelFontSize+3)+"px",fontFamily:"Arial",fontSize:this.options.axisLabelFontSize+"px",fill:this.options.axisLabelColor.toRGBString(),textAnchor:"middle"};
-var _283=this.createSVGElement("text",_284);
-_283.appendChild(this.document.createTextNode(tick[1]));
-this.root.appendChild(_283);
+var _287={y:(y+this.options.axisTickSize+this.options.axisLabelFontSize),x:x-3,width:this.options.axisLabelWidth+"px",height:(this.options.axisLabelFontSize+3)+"px",fontFamily:"Arial",fontSize:this.options.axisLabelFontSize+"px",fill:this.options.axisLabelColor.toRGBString(),textAnchor:"middle"};
+var _286=this.createSVGElement("text",_287);
+_286.appendChild(this.document.createTextNode(tick[1]));
+this.root.appendChild(_286);
 }
 };
-MochiKit.Iter.forEach(this.layout.xticks,bind(_280,this));
+MochiKit.Iter.forEach(this.layout.xticks,bind(_283,this));
 }
-this._drawLine(this.area.x,this.area.y+this.area.h,this.area.x+this.area.w,this.area.y+this.area.h,_279);
+this._drawLine(this.area.x,this.area.y+this.area.h,this.area.x+this.area.w,this.area.y+this.area.h,_282);
 }
 };
 PlotKit.SVGRenderer.prototype._renderPieAxis=function(){
 if(this.layout.xticks){
-var _285=new Array();
+var _288=new Array();
 for(var i=0;i<this.layout.slices.length;i++){
-_285[this.layout.slices[i].xval]=this.layout.slices[i];
+_288[this.layout.slices[i].xval]=this.layout.slices[i];
 }
-var _286=this.area.x+this.area.w*0.5;
-var _287=this.area.y+this.area.h*0.5;
-var _288=Math.min(this.area.w*this.options.pieRadius+10,this.area.h*this.options.pieRadius+10);
-var _289=this.options.axisLabelWidth;
+var _289=this.area.x+this.area.w*0.5;
+var _290=this.area.y+this.area.h*0.5;
+var _291=Math.min(this.area.w*this.options.pieRadius+10,this.area.h*this.options.pieRadius+10);
+var _292=this.options.axisLabelWidth;
 for(var i=0;i<this.layout.xticks.length;i++){
-var _290=_285[this.layout.xticks[i][0]];
-if(MochiKit.Base.isUndefinedOrNull(_290)){
+var _293=_288[this.layout.xticks[i][0]];
+if(MochiKit.Base.isUndefinedOrNull(_293)){
 continue;
 }
-var _291=(_290.startAngle+_290.endAngle)/2;
-var _292=_291;
-if(_292>Math.PI*2){
-_292=_292-Math.PI*2;
+var _294=(_293.startAngle+_293.endAngle)/2;
+var _295=_294;
+if(_295>Math.PI*2){
+_295=_295-Math.PI*2;
 }else{
-if(_292<0){
-_292=_292+Math.PI*2;
+if(_295<0){
+_295=_295+Math.PI*2;
 }
 }
-var _293=_286+Math.sin(_292)*(_288+10);
-var _294=_287-Math.cos(_292)*(_288+10);
-var _295={"position":"absolute","zIndex":11,"width":_289+"px","fontSize":this.options.axisLabelFontSize+"px","overflow":"hidden","color":this.options.axisLabelColor.toHexString()};
-var _296={"width":_289+"px","fontSize":this.options.axisLabelFontSize+"px","height":(this.options.axisLabelFontSize+3)+"px","fill":this.options.axisLabelColor.toRGBString()};
-if(_292<=Math.PI*0.5){
-MochiKit.Base.update(_295,{"textAlign":"left","verticalAlign":"top","left":_293+"px","top":(_294-this.options.axisLabelFontSize)+"px"});
-MochiKit.Base.update(_296,{"x":_293,"y":(_294-this.options.axisLabelFontSize),"textAnchor":"left"});
+var _296=_289+Math.sin(_295)*(_291+10);
+var _297=_290-Math.cos(_295)*(_291+10);
+var _298={"position":"absolute","zIndex":11,"width":_292+"px","fontSize":this.options.axisLabelFontSize+"px","overflow":"hidden","color":this.options.axisLabelColor.toHexString()};
+var _299={"width":_292+"px","fontSize":this.options.axisLabelFontSize+"px","height":(this.options.axisLabelFontSize+3)+"px","fill":this.options.axisLabelColor.toRGBString()};
+if(_295<=Math.PI*0.5){
+MochiKit.Base.update(_298,{"textAlign":"left","verticalAlign":"top","left":_296+"px","top":(_297-this.options.axisLabelFontSize)+"px"});
+MochiKit.Base.update(_299,{"x":_296,"y":(_297-this.options.axisLabelFontSize),"textAnchor":"left"});
 }else{
-if((_292>Math.PI*0.5)&&(_292<=Math.PI)){
-MochiKit.Base.update(_295,{"textAlign":"left","verticalAlign":"bottom","left":_293+"px","top":_294+"px"});
-MochiKit.Base.update(_296,{"textAnchor":"left","x":_293,"y":_294});
+if((_295>Math.PI*0.5)&&(_295<=Math.PI)){
+MochiKit.Base.update(_298,{"textAlign":"left","verticalAlign":"bottom","left":_296+"px","top":_297+"px"});
+MochiKit.Base.update(_299,{"textAnchor":"left","x":_296,"y":_297});
 }else{
-if((_292>Math.PI)&&(_292<=Math.PI*1.5)){
-MochiKit.Base.update(_295,{"textAlign":"right","verticalAlign":"bottom","left":_293+"px","top":_294+"px"});
-MochiKit.Base.update(_296,{"textAnchor":"right","x":_293-_289,"y":_294});
+if((_295>Math.PI)&&(_295<=Math.PI*1.5)){
+MochiKit.Base.update(_298,{"textAlign":"right","verticalAlign":"bottom","left":_296+"px","top":_297+"px"});
+MochiKit.Base.update(_299,{"textAnchor":"right","x":_296-_292,"y":_297});
 }else{
-MochiKit.Base.update(_295,{"textAlign":"left","verticalAlign":"bottom","left":_293+"px","top":_294+"px"});
-MochiKit.Base.update(_296,{"textAnchor":"left","x":_293-_289,"y":_294-this.options.axisLabelFontSize});
+MochiKit.Base.update(_298,{"textAlign":"left","verticalAlign":"bottom","left":_296+"px","top":_297+"px"});
+MochiKit.Base.update(_299,{"textAnchor":"left","x":_296-_292,"y":_297-this.options.axisLabelFontSize});
 }
 }
 }
 if(this.options.axisLabelUseDiv){
-var _297=DIV({"style":_295},this.layout.xticks[i][1]);
-this.xlabels.push(_297);
-MochiKit.DOM.appendChildNodes(this.container,_297);
+var _300=DIV({"style":_298},this.layout.xticks[i][1]);
+this.xlabels.push(_300);
+MochiKit.DOM.appendChildNodes(this.container,_300);
 }else{
-var _297=this.createSVGElement("text",_296);
-_297.appendChild(this.document.createTextNode(this.layout.xticks[i][1]));
-this.root.appendChild(_297);
+var _300=this.createSVGElement("text",_299);
+_300.appendChild(this.document.createTextNode(this.layout.xticks[i][1]));
+this.root.appendChild(_300);
 }
 }
 }
@@ -1479,20 +1544,20 @@ PlotKit.SVGRenderer.prototype._renderBackground=function(){
 var opts={"stroke":"none","fill":this.options.backgroundColor.toRGBString()};
 this._drawRect(0,0,this.width,this.height,opts);
 };
-PlotKit.SVGRenderer.prototype._drawRect=function(x,y,w,h,_299){
-var _300={x:x+"px",y:y+"px",width:w+"px",height:h+"px"};
-if(_299){
-MochiKit.Base.update(_300,_299);
+PlotKit.SVGRenderer.prototype._drawRect=function(x,y,w,h,_302){
+var _303={x:x+"px",y:y+"px",width:w+"px",height:h+"px"};
+if(_302){
+MochiKit.Base.update(_303,_302);
 }
-var elem=this.createSVGElement("rect",_300);
+var elem=this.createSVGElement("rect",_303);
 this.root.appendChild(elem);
 };
-PlotKit.SVGRenderer.prototype._drawLine=function(x1,y1,x2,y2,_301){
-var _302={x1:x1+"px",y1:y1+"px",x2:x2+"px",y2:y2+"px"};
-if(_301){
-MochiKit.Base.update(_302,_301);
+PlotKit.SVGRenderer.prototype._drawLine=function(x1,y1,x2,y2,_304){
+var _305={x1:x1+"px",y1:y1+"px",x2:x2+"px",y2:y2+"px"};
+if(_304){
+MochiKit.Base.update(_305,_304);
 }
-var elem=this.createSVGElement("line",_302);
+var elem=this.createSVGElement("line",_305);
 this.root.appendChild(elem);
 };
 PlotKit.SVGRenderer.prototype.clear=function(){
@@ -1510,10 +1575,10 @@ MochiKit.DOM.removeElement(this.ylabels[i]);
 this.xlabels=new Array();
 this.ylabels=new Array();
 };
-PlotKit.SVGRenderer.prototype.createSVGElement=function(name,_304){
-var _305=MochiKit.Base.isUndefinedOrNull;
+PlotKit.SVGRenderer.prototype.createSVGElement=function(name,_307){
+var _308=MochiKit.Base.isUndefinedOrNull;
 var elem;
-var doc=_305(this.document)?document:this.document;
+var doc=_308(this.document)?document:this.document;
 try{
 elem=doc.createElementNS(PlotKit.SVGRenderer.SVGNS,name);
 }
@@ -1521,44 +1586,44 @@ catch(e){
 elem=doc.createElement(name);
 elem.setAttribute("xmlns",PlotKit.SVGRenderer.SVGNS);
 }
-if(_304){
-MochiKit.DOM.updateNodeAttributes(elem,_304);
+if(_307){
+MochiKit.DOM.updateNodeAttributes(elem,_307);
 }
 return elem;
 };
-PlotKit.SVGRenderer.SVG=function(_307){
+PlotKit.SVGRenderer.SVG=function(_310){
 var ie=navigator.appVersion.match(/MSIE (\d\.\d)/);
-var _308=(navigator.userAgent.toLowerCase().indexOf("opera")!=-1);
-if(ie&&(ie[1]>=6)&&(!_308)){
-var _309=_307["width"]?_307["width"]:"100";
-var _310=_307["height"]?_307["height"]:"100";
-var eid=_307["id"]?_307["id"]:"notunique";
-var html="<svg:svg width=\""+_309+"\" height=\""+_310+"\" ";
+var _311=(navigator.userAgent.toLowerCase().indexOf("opera")!=-1);
+if(ie&&(ie[1]>=6)&&(!_311)){
+var _312=_310["width"]?_310["width"]:"100";
+var _313=_310["height"]?_310["height"]:"100";
+var eid=_310["id"]?_310["id"]:"notunique";
+var html="<svg:svg width=\""+_312+"\" height=\""+_313+"\" ";
 html+="id=\""+eid+"\" version=\"1.1\" baseProfile=\"full\" />";
-var _313=document.createElement(html);
-var _314=_313.getSVGDocument().createElementNS(PlotKit.SVGRenderer.SVGNS,"svg");
-_314.setAttribute("width",_309);
-_314.setAttribute("height",_310);
-_313.getSVGDocument().appendChild(_314);
-return _313;
+var _316=document.createElement(html);
+var _317=_316.getSVGDocument().createElementNS(PlotKit.SVGRenderer.SVGNS,"svg");
+_317.setAttribute("width",_312);
+_317.setAttribute("height",_313);
+_316.getSVGDocument().appendChild(_317);
+return _316;
 }else{
-return PlotKit.SVGRenderer.prototype.createSVGElement("svg",_307);
+return PlotKit.SVGRenderer.prototype.createSVGElement("svg",_310);
 }
 };
 PlotKit.SVGRenderer.isSupported=function(){
-var _315=(navigator.userAgent.toLowerCase().indexOf("opera")!=-1);
-var _316=navigator.appVersion.match(/MSIE (\d\.\d)/);
-var _317=navigator.userAgent.match(/AppleWebKit\/(\d+)/);
-var _318=navigator.userAgent.match(/Opera\/(\d*\.\d*)/);
-var _319=navigator.userAgent.match(/rv:(\d*\.\d*).*Gecko/);
-var _320="http://www.w3.org/TR/SVG11/feature#SVG";
-if(_316&&(_316[1]>=6)&&!_315){
-return document.implementation.hasFeature(_320,"1.1");
+var _318=(navigator.userAgent.toLowerCase().indexOf("opera")!=-1);
+var _319=navigator.appVersion.match(/MSIE (\d\.\d)/);
+var _320=navigator.userAgent.match(/AppleWebKit\/(\d+)/);
+var _321=navigator.userAgent.match(/Opera\/(\d*\.\d*)/);
+var _322=navigator.userAgent.match(/rv:(\d*\.\d*).*Gecko/);
+var _323="http://www.w3.org/TR/SVG11/feature#SVG";
+if(_319&&(_319[1]>=6)&&!_318){
+return document.implementation.hasFeature(_323,"1.1");
 }
-if(_318&&(_318[1]>8.9)){
+if(_321&&(_321[1]>8.9)){
 return true;
 }
-if(_319&&(_319>1.7)){
+if(_322&&(_322>1.7)){
 return true;
 }
 return false;
@@ -1585,9 +1650,9 @@ throw "SweetCanvas depends on MochiKit.{Base,Color,DOM,Format} and PlotKit.{Layo
 if(typeof (PlotKit.SweetCanvasRenderer)=="undefined"){
 PlotKit.SweetCanvasRenderer={};
 }
-PlotKit.SweetCanvasRenderer=function(_321,_322,_323){
+PlotKit.SweetCanvasRenderer=function(_324,_325,_326){
 if(arguments.length>0){
-this.__init__(_321,_322,_323);
+this.__init__(_324,_325,_326);
 }
 };
 PlotKit.SweetCanvasRenderer.NAME="PlotKit.SweetCanvasRenderer";
@@ -1601,33 +1666,33 @@ return this.__repr__();
 PlotKit.SweetCanvasRenderer.prototype=new PlotKit.CanvasRenderer();
 PlotKit.SweetCanvasRenderer.prototype.constructor=PlotKit.SweetCanvasRenderer;
 PlotKit.SweetCanvasRenderer.__super__=PlotKit.CanvasRenderer.prototype;
-PlotKit.SweetCanvasRenderer.prototype.__init__=function(el,_325,opts){
-var _326=PlotKit.Base.officeBlue();
-MochiKit.Base.update(_326,opts);
-PlotKit.SweetCanvasRenderer.__super__.__init__.call(this,el,_325,_326);
+PlotKit.SweetCanvasRenderer.prototype.__init__=function(el,_328,opts){
+var _329=PlotKit.Base.officeBlue();
+MochiKit.Base.update(_329,opts);
+PlotKit.SweetCanvasRenderer.__super__.__init__.call(this,el,_328,_329);
 };
 PlotKit.SweetCanvasRenderer.prototype._renderBarChart=function(){
 var bind=MochiKit.Base.bind;
-var _327=Color.blackColor().colorWithAlpha(0.1).toRGBString();
-var _328=function(_329,x,y,w,h){
-_329.fillStyle=_327;
-_329.fillRect(x-2,y-2,w+4,h+2);
-_329.fillStyle=_327;
-_329.fillRect(x-1,y-1,w+2,h+1);
+var _330=Color.blackColor().colorWithAlpha(0.1).toRGBString();
+var _331=function(_332,x,y,w,h){
+_332.fillStyle=_330;
+_332.fillRect(x-2,y-2,w+4,h+2);
+_332.fillStyle=_330;
+_332.fillRect(x-1,y-1,w+2,h+1);
 };
-var _330=this.options.colorScheme.length;
-var _331=this.options.colorScheme;
-var _332=MochiKit.Base.keys(this.layout.datasets);
-var _333=_332.length;
-var _334=function(name){
-for(var i=0;i<_333;i++){
-if(name==_332[i]){
-return _331[i%_330];
+var _333=this.options.colorScheme.length;
+var _334=this.options.colorScheme;
+var _335=PlotKit.Base.keys(this.layout.datasets);
+var _336=_335.length;
+var _337=function(name){
+for(var i=0;i<_336;i++){
+if(name==_335[i]){
+return _334[i%_333];
 }
 }
-return _331[0];
+return _334[0];
 };
-var _335=function(_336,bar){
+var _338=function(_339,bar){
 var x=this.area.w*bar.x+this.area.x;
 var y=this.area.h*bar.y+this.area.y;
 var w=this.area.w*bar.w;
@@ -1635,165 +1700,165 @@ var h=this.area.h*bar.h;
 if((w<1)||(h<1)){
 return;
 }
-_336.save();
-_336.shadowBlur=5;
-_336.shadowColor=Color.fromHexString("#888888").toRGBString();
+_339.save();
+_339.shadowBlur=5;
+_339.shadowColor=Color.fromHexString("#888888").toRGBString();
 if(this.isIE){
-_336.save();
-_336.fillStyle="#cccccc";
-_336.fillRect(x-2,y-2,w+4,h+2);
-_336.restore();
+_339.save();
+_339.fillStyle="#cccccc";
+_339.fillRect(x-2,y-2,w+4,h+2);
+_339.restore();
 }else{
-_328(_336,x,y,w,h);
+_331(_339,x,y,w,h);
 }
-_336.fillStyle=_334(bar.name).toRGBString();
-_336.fillRect(x,y,w,h);
-_336.shadowBlur=0;
-_336.strokeStyle=Color.whiteColor().toRGBString();
-_336.lineWidth=2;
-_336.strokeRect(x,y,w,h);
-_336.restore();
+_339.fillStyle=_337(bar.name).toRGBString();
+_339.fillRect(x,y,w,h);
+_339.shadowBlur=0;
+_339.strokeStyle=Color.whiteColor().toRGBString();
+_339.lineWidth=2;
+_339.strokeRect(x,y,w,h);
+_339.restore();
 };
-this._renderBarChartWrap(this.layout.bars,bind(_335,this));
+this._renderBarChartWrap(this.layout.bars,bind(_338,this));
 };
 PlotKit.CanvasRenderer.prototype._renderLineChart=function(){
-var _337=this.element.getContext("2d");
-var _338=this.options.colorScheme.length;
-var _339=this.options.colorScheme;
-var _340=MochiKit.Base.keys(this.layout.datasets);
-var _341=_340.length;
+var _340=this.element.getContext("2d");
+var _341=this.options.colorScheme.length;
+var _342=this.options.colorScheme;
+var _343=PlotKit.Base.keys(this.layout.datasets);
+var _344=_343.length;
 var bind=MochiKit.Base.bind;
-for(var i=0;i<_341;i++){
-var _342=_340[i];
-var _343=_339[i%_338];
-var _344=this.options.strokeColorTransform;
-_337.save();
-var _345=function(ctx){
+for(var i=0;i<_344;i++){
+var _345=_343[i];
+var _346=_342[i%_341];
+var _347=this.options.strokeColorTransform;
+_340.save();
+var _348=function(ctx){
 ctx.beginPath();
 ctx.moveTo(this.area.x,this.area.y+this.area.h);
-var _346=function(ctx_,_347){
-if(_347.name==_342){
-ctx_.lineTo(this.area.w*_347.x+this.area.x,this.area.h*_347.y+this.area.y);
+var _349=function(ctx_,_350){
+if(_350.name==_345){
+ctx_.lineTo(this.area.w*_350.x+this.area.x,this.area.h*_350.y+this.area.y);
 }
 };
-MochiKit.Iter.forEach(this.layout.points,partial(_346,ctx),this);
+MochiKit.Iter.forEach(this.layout.points,partial(_349,ctx),this);
 ctx.lineTo(this.area.w+this.area.x,this.area.h+this.area.y);
 ctx.lineTo(this.area.x,this.area.y+this.area.h);
 ctx.closePath();
 };
 if(this.options.shouldFill){
-_337.save();
+_340.save();
 if(this.isIE){
-_337.fillStyle="#cccccc";
+_340.fillStyle="#cccccc";
 }else{
-_337.fillStyle=Color.blackColor().colorWithAlpha(0.2).toRGBString();
+_340.fillStyle=Color.blackColor().colorWithAlpha(0.2).toRGBString();
 }
-_337.translate(-1,-2);
-bind(_345,this)(_337);
-_337.fill();
+_340.translate(-1,-2);
+bind(_348,this)(_340);
+_340.fill();
 }
-_337.restore();
-_337.shadowBlur=5;
-_337.shadowColor=Color.fromHexString("#888888").toRGBString();
-_337.fillStyle=_343.toRGBString();
-_337.lineWidth=2;
-_337.strokeStyle=Color.whiteColor().toRGBString();
+_340.restore();
+_340.shadowBlur=5;
+_340.shadowColor=Color.fromHexString("#888888").toRGBString();
+_340.fillStyle=_346.toRGBString();
+_340.lineWidth=2;
+_340.strokeStyle=Color.whiteColor().toRGBString();
 if(this.options.shouldFill){
-bind(_345,this)(_337);
-_337.fill();
+bind(_348,this)(_340);
+_340.fill();
 }
 if(this.options.shouldStroke){
-bind(_345,this)(_337);
-_337.stroke();
+bind(_348,this)(_340);
+_340.stroke();
 }
-_337.restore();
+_340.restore();
 }
 };
 PlotKit.CanvasRenderer.prototype._renderPieChart=function(){
-var _348=this.element.getContext("2d");
-var _349=this.options.colorScheme.length;
-var _350=this.layout.slices;
-var _351=this.area.x+this.area.w*0.5;
-var _352=this.area.y+this.area.h*0.5;
-var _353=Math.min(this.area.w*this.options.pieRadius,this.area.h*this.options.pieRadius);
+var _351=this.element.getContext("2d");
+var _352=this.options.colorScheme.length;
+var _353=this.layout.slices;
+var _354=this.area.x+this.area.w*0.5;
+var _355=this.area.y+this.area.h*0.5;
+var _356=Math.min(this.area.w*this.options.pieRadius,this.area.h*this.options.pieRadius);
 if(this.isIE){
-_351=parseInt(_351);
-_352=parseInt(_352);
-_353=parseInt(_353);
+_354=parseInt(_354);
+_355=parseInt(_355);
+_356=parseInt(_356);
 }
 if(!this.isIE){
-_348.save();
-var _354=Color.blackColor().colorWithAlpha(0.2);
-_348.fillStyle=_354.toRGBString();
-_348.shadowBlur=5;
-_348.shadowColor=Color.fromHexString("#888888").toRGBString();
-_348.translate(1,1);
-_348.beginPath();
-_348.moveTo(_351,_352);
-_348.arc(_351,_352,_353+2,0,Math.PI*2,false);
-_348.closePath();
-_348.fill();
-_348.restore();
+_351.save();
+var _357=Color.blackColor().colorWithAlpha(0.2);
+_351.fillStyle=_357.toRGBString();
+_351.shadowBlur=5;
+_351.shadowColor=Color.fromHexString("#888888").toRGBString();
+_351.translate(1,1);
+_351.beginPath();
+_351.moveTo(_354,_355);
+_351.arc(_354,_355,_356+2,0,Math.PI*2,false);
+_351.closePath();
+_351.fill();
+_351.restore();
 }
-_348.save();
-_348.strokeStyle=Color.whiteColor().toRGBString();
-_348.lineWidth=2;
-for(var i=0;i<_350.length;i++){
-var _355=this.options.colorScheme[i%_349];
-_348.fillStyle=_355.toRGBString();
-var _356=function(){
-_348.beginPath();
-_348.moveTo(_351,_352);
-_348.arc(_351,_352,_353,_350[i].startAngle-Math.PI/2,_350[i].endAngle-Math.PI/2,false);
-_348.lineTo(_351,_352);
-_348.closePath();
+_351.save();
+_351.strokeStyle=Color.whiteColor().toRGBString();
+_351.lineWidth=2;
+for(var i=0;i<_353.length;i++){
+var _358=this.options.colorScheme[i%_352];
+_351.fillStyle=_358.toRGBString();
+var _359=function(){
+_351.beginPath();
+_351.moveTo(_354,_355);
+_351.arc(_354,_355,_356,_353[i].startAngle-Math.PI/2,_353[i].endAngle-Math.PI/2,false);
+_351.lineTo(_354,_355);
+_351.closePath();
 };
-if(Math.abs(_350[i].startAngle-_350[i].endAngle)>0.0001){
-_356();
-_348.fill();
-_356();
-_348.stroke();
+if(Math.abs(_353[i].startAngle-_353[i].endAngle)>0.0001){
+_359();
+_351.fill();
+_359();
+_351.stroke();
 }
 }
-_348.restore();
+_351.restore();
 };
 PlotKit.SweetCanvasRenderer.prototype._renderBackground=function(){
-var _357=this.element.getContext("2d");
+var _360=this.element.getContext("2d");
 if(this.layout.style=="bar"||this.layout.style=="line"){
-_357.save();
-_357.fillStyle=this.options.backgroundColor.toRGBString();
-_357.fillRect(this.area.x,this.area.y,this.area.w,this.area.h);
-_357.strokeStyle=Color.whiteColor().toRGBString();
-_357.lineWidth=1;
-var _358=this.layout.yticks;
-var _359=false;
+_360.save();
+_360.fillStyle=this.options.backgroundColor.toRGBString();
+_360.fillRect(this.area.x,this.area.y,this.area.w,this.area.h);
+_360.strokeStyle=Color.whiteColor().toRGBString();
+_360.lineWidth=1;
+var _361=this.layout.yticks;
+var _362=false;
 if(this.layout.style=="bar"&&this.layout.options.barOrientation=="horizontal"){
-_358=this.layout.xticks;
-_359=true;
+_361=this.layout.xticks;
+_362=true;
 }
-for(var i=0;i<_358.length;i++){
+for(var i=0;i<_361.length;i++){
 var x1=0;
 var y1=0;
 var x2=0;
 var y2=0;
-if(_359){
-x1=_358[i][0]*this.area.w+this.area.x;
+if(_362){
+x1=_361[i][0]*this.area.w+this.area.x;
 y1=this.area.y;
 x2=x1;
 y2=y1+this.area.h;
 }else{
 x1=this.area.x;
-y1=_358[i][0]*this.area.h+this.area.y;
+y1=_361[i][0]*this.area.h+this.area.y;
 x2=x1+this.area.w;
 y2=y1;
 }
-_357.beginPath();
-_357.moveTo(x1,y1);
-_357.lineTo(x2,y2);
-_357.closePath();
-_357.stroke();
+_360.beginPath();
+_360.moveTo(x1,y1);
+_360.lineTo(x2,y2);
+_360.closePath();
+_360.stroke();
 }
-_357.restore();
+_360.restore();
 }else{
 PlotKit.SweetCanvasRenderer.__super__._renderBackground.call(this);
 }
@@ -1820,9 +1885,9 @@ throw "SweetSVG depends on MochiKit.{Base,Color,DOM,Format} and PlotKit.{Layout,
 if(typeof (PlotKit.SweetSVGRenderer)=="undefined"){
 PlotKit.SweetSVGRenderer={};
 }
-PlotKit.SweetSVGRenderer=function(_360,_361,_362){
+PlotKit.SweetSVGRenderer=function(_363,_364,_365){
 if(arguments.length>0){
-this.__init__(_360,_361,_362);
+this.__init__(_363,_364,_365);
 }
 };
 PlotKit.SweetSVGRenderer.NAME="PlotKit.SweetSVGRenderer";
@@ -1836,33 +1901,33 @@ return this.__repr__();
 PlotKit.SweetSVGRenderer.prototype=new PlotKit.SVGRenderer();
 PlotKit.SweetSVGRenderer.prototype.constructor=PlotKit.SweetSVGRenderer;
 PlotKit.SweetSVGRenderer.__super__=PlotKit.SVGRenderer.prototype;
-PlotKit.SweetSVGRenderer.prototype.__init__=function(_363,_364,_365){
-var _366=PlotKit.Base.officeBlue();
-MochiKit.Base.update(_366,_365);
-PlotKit.SweetSVGRenderer.__super__.__init__.call(this,_363,_364,_366);
+PlotKit.SweetSVGRenderer.prototype.__init__=function(_366,_367,_368){
+var _369=PlotKit.Base.officeBlue();
+MochiKit.Base.update(_369,_368);
+PlotKit.SweetSVGRenderer.__super__.__init__.call(this,_366,_367,_369);
 };
 PlotKit.SweetSVGRenderer.prototype._addDropShadowFilter=function(){
-var _367=this.createSVGElement("filter",{x:0,y:0,"id":"dropShadow"});
-var _368=this.createSVGElement("feOffset",{"in":"SourceGraphic","dx":0,"dy":0,"result":"topCopy"});
+var _370=this.createSVGElement("filter",{x:0,y:0,"id":"dropShadow"});
+var _371=this.createSVGElement("feOffset",{"in":"SourceGraphic","dx":0,"dy":0,"result":"topCopy"});
 var blur=this.createSVGElement("feGaussianBlur",{"in":"SourceAlpha","StdDeviation":2,"result":"shadow"});
-var _370=this.createSVGElement("feOffset",{"in":"shadow","dx":-1,"dy":-2,"result":"movedShadow"});
-var _371=this.createSVGElement("feMerge");
-var _372=this.createSVGElement("feMergeNode",{"in":"topCopy"});
-var _373=this.createSVGElement("feMergeNode",{"in":"movedShadow"});
-_371.appendChild(_372);
-_371.appendChild(_373);
-_367.appendChild(_368);
-_367.appendChild(blur);
-_367.appendChild(_370);
-_367.appendChild(_371);
-this.defs.appendChild(_367);
+var _373=this.createSVGElement("feOffset",{"in":"shadow","dx":-1,"dy":-2,"result":"movedShadow"});
+var _374=this.createSVGElement("feMerge");
+var _375=this.createSVGElement("feMergeNode",{"in":"topCopy"});
+var _376=this.createSVGElement("feMergeNode",{"in":"movedShadow"});
+_374.appendChild(_375);
+_374.appendChild(_376);
+_370.appendChild(_371);
+_370.appendChild(blur);
+_370.appendChild(_373);
+_370.appendChild(_374);
+this.defs.appendChild(_370);
 };
 PlotKit.SweetSVGRenderer.prototype._renderBarChart=function(){
 var bind=MochiKit.Base.bind;
-var _374=Color.blackColor().toRGBString();
-var _375="fill:"+_374+";fill-opacity:0.15";
-var _376="stroke-width: 2.0; stroke:"+Color.whiteColor().toRGBString();
-var _377=function(_378,bar){
+var _377=Color.blackColor().toRGBString();
+var _378="fill:"+_377+";fill-opacity:0.15";
+var _379="stroke-width: 2.0; stroke:"+Color.whiteColor().toRGBString();
+var _380=function(_381,bar){
 var x=this.area.w*bar.x+this.area.x;
 var y=this.area.h*bar.y+this.area.y;
 var w=this.area.w*bar.w;
@@ -1870,72 +1935,72 @@ var h=this.area.h*bar.h;
 if((w<1)||(h<1)){
 return;
 }
-_378["style"]=_376;
-this._drawRect(x-2,y-1,w+4,h+2,{"style":_375});
-this._drawRect(x,y,w,h,_378);
+_381["style"]=_379;
+this._drawRect(x-2,y-1,w+4,h+2,{"style":_378});
+this._drawRect(x,y,w,h,_381);
 };
-this._renderBarOrLine(this.layout.bars,bind(_377,this));
+this._renderBarOrLine(this.layout.bars,bind(_380,this));
 };
 PlotKit.SweetSVGRenderer.prototype._renderLineChart=function(){
 var bind=MochiKit.Base.bind;
-var _379=Color.blackColor().toRGBString();
-var _380="fill:"+_379+";fill-opacity:0.15";
-var _381="stroke-width: 2.0; stroke:"+Color.whiteColor().toRGBString();
-var _382=function(_383,_384){
-this._tempPointsBuffer+=(this.area.w*_384.x+this.area.x)+","+(this.area.h*_384.y+this.area.y)+" ";
+var _382=Color.blackColor().toRGBString();
+var _383="fill:"+_382+";fill-opacity:0.15";
+var _384="stroke-width: 2.0; stroke:"+Color.whiteColor().toRGBString();
+var _385=function(_386,_387){
+this._tempPointsBuffer+=(this.area.w*_387.x+this.area.x)+","+(this.area.h*_387.y+this.area.y)+" ";
 };
-var _385=function(_386){
+var _388=function(_389){
 this._tempPointsBuffer="";
 this._tempPointsBuffer+=(this.area.x)+","+(this.area.y+this.area.h)+" ";
 };
-var _387=function(_388){
+var _390=function(_391){
 this._tempPointsBuffer+=(this.area.w+this.area.x)+","+(this.area.h+this.area.y);
-_388["points"]=this._tempPointsBuffer;
-_388["stroke"]="none";
-_388["transform"]="translate(-2, -1)";
-_388["style"]=_380;
-var _389=this.createSVGElement("polygon",_388);
-this.root.appendChild(_389);
-_388["transform"]="";
-_388["style"]=_381;
-var elem=this.createSVGElement("polygon",_388);
+_391["points"]=this._tempPointsBuffer;
+_391["stroke"]="none";
+_391["transform"]="translate(-2, -1)";
+_391["style"]=_383;
+var _392=this.createSVGElement("polygon",_391);
+this.root.appendChild(_392);
+_391["transform"]="";
+_391["style"]=_384;
+var elem=this.createSVGElement("polygon",_391);
 this.root.appendChild(elem);
 };
-this._renderBarOrLine(this.layout.points,bind(_382,this),bind(_385,this),bind(_387,this));
+this._renderBarOrLine(this.layout.points,bind(_385,this),bind(_388,this),bind(_390,this));
 };
 PlotKit.SweetSVGRenderer.prototype._renderPieChart=function(){
-var _390=this.area.x+this.area.w*0.5;
-var _391=this.area.y+this.area.h*0.5;
-var _392=Color.blackColor().toRGBString();
-var _393=Math.min(this.area.w*this.options.pieRadius,this.area.h*this.options.pieRadius);
-var _394="fill:"+_392+";fill-opacity:0.15";
-var _395=this.createSVGElement("circle",{"style":_394,"cx":_390+1,"cy":_391+1,"r":_393+1});
-this.root.appendChild(_395);
+var _393=this.area.x+this.area.w*0.5;
+var _394=this.area.y+this.area.h*0.5;
+var _395=Color.blackColor().toRGBString();
+var _396=Math.min(this.area.w*this.options.pieRadius,this.area.h*this.options.pieRadius);
+var _397="fill:"+_395+";fill-opacity:0.15";
+var _398=this.createSVGElement("circle",{"style":_397,"cx":_393+1,"cy":_394+1,"r":_396+1});
+this.root.appendChild(_398);
 PlotKit.SweetSVGRenderer.__super__._renderPieChart.call(this);
 };
 PlotKit.SweetSVGRenderer.prototype._renderBackground=function(){
-var _396={"fill":this.options.backgroundColor.toRGBString(),"stroke":"none"};
+var _399={"fill":this.options.backgroundColor.toRGBString(),"stroke":"none"};
 if(this.layout.style=="bar"||this.layout.style=="line"){
-this._drawRect(this.area.x,this.area.y,this.area.w,this.area.h,_396);
-var _397=this.layout.yticks;
-var _398=false;
+this._drawRect(this.area.x,this.area.y,this.area.w,this.area.h,_399);
+var _400=this.layout.yticks;
+var _401=false;
 if(this.layout.style=="bar"&&this.layout.options.barOrientation=="horizontal"){
-_397=this.layout.xticks;
-_398=true;
+_400=this.layout.xticks;
+_401=true;
 }
-for(var i=0;i<_397.length;i++){
+for(var i=0;i<_400.length;i++){
 var x=0;
 var y=0;
 var w=0;
 var h=0;
-if(_398){
-x=_397[i][0]*this.area.w+this.area.x;
+if(_401){
+x=_400[i][0]*this.area.w+this.area.x;
 y=this.area.y;
 w=1;
 h=this.area.w;
 }else{
 x=this.area.x;
-y=_397[i][0]*this.area.h+this.area.y;
+y=_400[i][0]*this.area.h+this.area.y;
 w=this.area.w;
 h=1;
 }

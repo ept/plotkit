@@ -4,7 +4,6 @@
 
     User friendly wrapper around the common plotting functions.
 
-    
     Copyright
     ---------
     Copyright 2005,2006 (c) Alastair Tse <alastair^liquidx.net>
@@ -61,7 +60,6 @@ PlotKit.EasyPlot = function(style, options, divElem, datasources) {
         this.height = this.divElem.height ? this.divElem.height : 300;
     }
     
-
     // load data sources
     if (isArrayLike(datasources)) {
         for (var i = 0; i < datasources.length; i++) {
@@ -76,7 +74,9 @@ PlotKit.EasyPlot = function(style, options, divElem, datasources) {
             }
         }
     }
-
+    else if (!isUndefinedOrNull(datasources)) {
+        throw "Passed datasources are not Array like";
+    }
 
     // setup canvas to render
     
@@ -97,7 +97,7 @@ PlotKit.EasyPlot = function(style, options, divElem, datasources) {
         this.renderer = new SweetSVGRenderer(this.element, this.layout, options);
     }
     
-    if (this.deferredCount == 0) {
+    if ((this.deferredCount == 0) && (this.layout.datasets.length > 0)) {
         this.layout.evaluate();
         this.renderer.clear();
         this.renderer.render();    
@@ -120,7 +120,7 @@ PlotKit.EasyPlot.onDataLoaded = function(request) {
     this.layout.addDataset("data-ajax-" + this.deferredCount, table);
     this.deferredCount--;
     
-    if (this.deferredCount == 0) {
+    if ((this.deferredCount == 0) && (this.layout.datasets.length > 0)) {
         this.layout.evaluate();
         this.renderer.clear();
         this.renderer.render();

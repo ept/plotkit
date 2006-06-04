@@ -255,9 +255,9 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
             ctx.beginPath();
             ctx.moveTo(this.area.x, this.area.y + this.area.h);
             var addPoint = function(ctx_, point) {
-            if (point.name == setName)
-                ctx_.lineTo(this.area.w * point.x + this.area.x,
-                            this.area.h * point.y + this.area.y);
+                if (point.name == setName)
+                    ctx_.lineTo(this.area.w * point.x + this.area.x,
+                                this.area.h * point.y + this.area.y);
             };
             MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
             ctx.lineTo(this.area.w + this.area.x,
@@ -369,6 +369,7 @@ PlotKit.CanvasRenderer.prototype._renderAxis = function() {
     if (this.options.drawYAxis) {
         if (this.layout.yticks) {
             var drawTick = function(tick) {
+                if (typeof(tick) == "function") return;
                 var x = this.area.x;
                 var y = this.area.y + tick[0] * this.area.h;
                 context.beginPath();
@@ -399,6 +400,8 @@ PlotKit.CanvasRenderer.prototype._renderAxis = function() {
     if (this.options.drawXAxis) {
         if (this.layout.xticks) {
             var drawTick = function(tick) {
+                if (typeof(dataset) == "function") return;
+                
                 var x = this.area.x + tick[0] * this.area.w;
                 var y = this.area.y + this.area.h;
                 context.beginPath();

@@ -265,16 +265,16 @@ PlotKit.Layout.prototype.angleRangeForX = function(x) {
 
 PlotKit.Layout.prototype._evaluateLimits = function() {
     // take all values from all datasets and find max and min
-    var map = MochiKit.Base.map;
-    var items = MochiKit.Base.items;
+    var map = PlotKit.Base.map;
+    var items = PlotKit.Base.items;
     var itemgetter = MochiKit.Base.itemgetter;
     var collapse = PlotKit.Base.collapse;
     var listMin = MochiKit.Base.listMin;
     var listMax = MochiKit.Base.listMax;
     var isNil = MochiKit.Base.isUndefinedOrNull;
 
-    var all = collapse(map(itemgetter(1), items(this.datasets)));
 
+    var all = collapse(map(itemgetter(1), items(this.datasets)));
     if (isNil(this.options.xAxis)) {
         if (this.options.xOriginIsZero)
             this.minxval = 0;
@@ -291,6 +291,7 @@ PlotKit.Layout.prototype._evaluateLimits = function() {
 
     this.maxxval = listMax(map(parseFloat, map(itemgetter(0), all)));
     this.maxyval = listMax(map(parseFloat, map(itemgetter(1), all)));
+    
 };
 
 PlotKit.Layout.prototype._evaluateScales = function() {
@@ -311,10 +312,11 @@ PlotKit.Layout.prototype._evaluateScales = function() {
 
 PlotKit.Layout.prototype._uniqueXValues = function() {
     var collapse = PlotKit.Base.collapse;
-    var map = MochiKit.Base.map;
+    var map = PlotKit.Base.map;
     var uniq = PlotKit.Base.uniq;
     var getter = MochiKit.Base.itemgetter;
-
+    var items = PlotKit.Base.items;
+    
     var xvalues = map(parseFloat, map(getter(0), collapse(map(getter(1), items(this.datasets)))));
     xvalues.sort(MochiKit.Base.compare);
     return uniq(xvalues);
@@ -322,10 +324,9 @@ PlotKit.Layout.prototype._uniqueXValues = function() {
 
 // Create the bars
 PlotKit.Layout.prototype._evaluateBarCharts = function() {
-    var keys = MochiKit.Base.keys;
-    var items = MochiKit.Base.items;
+    var items = PlotKit.Base.items;
 
-    var setCount = keys(this.datasets).length;
+    var setCount = items(this.datasets).length;
 
     // work out how far separated values are
     var xdelta = 10000000;
@@ -353,7 +354,7 @@ PlotKit.Layout.prototype._evaluateBarCharts = function() {
         barWidthForSet = barWidth / setCount;
         barMargin = xdelta * this.xscale * (1.0 - this.options.barWidthFillFraction)/2;
     }
-
+    
     this.minxdelta = xdelta; // need this for tick positions
 
     // add all the rects
@@ -361,6 +362,7 @@ PlotKit.Layout.prototype._evaluateBarCharts = function() {
     var i = 0;
     for (var setName in this.datasets) {
         var dataset = this.datasets[setName];
+        if (PlotKit.Base.isFuncLike(dataset)) continue;
         for (var j = 0; j < dataset.length; j++) {
             var item = dataset[j];
             var rect = {
@@ -380,10 +382,9 @@ PlotKit.Layout.prototype._evaluateBarCharts = function() {
 
 // Create the horizontal bars
 PlotKit.Layout.prototype._evaluateHorizBarCharts = function() {
-    var keys = MochiKit.Base.keys;
-    var items = MochiKit.Base.items;
+    var items = PlotKit.Base.items;
 
-    var setCount = keys(this.datasets).length;
+    var setCount = items(this.datasets).length;
 
     // work out how far separated values are
     var xdelta = 10000000;
@@ -421,6 +422,7 @@ PlotKit.Layout.prototype._evaluateHorizBarCharts = function() {
     var i = 0;
     for (var setName in this.datasets) {
         var dataset = this.datasets[setName];
+        if (PlotKit.Base.isFuncLike(dataset)) continue;
         for (var j = 0; j < dataset.length; j++) {
             var item = dataset[j];
             var rect = {
@@ -441,16 +443,16 @@ PlotKit.Layout.prototype._evaluateHorizBarCharts = function() {
 
 // Create the line charts
 PlotKit.Layout.prototype._evaluateLineCharts = function() {
-    var keys = MochiKit.Base.keys;
-    var items = MochiKit.Base.items;
+    var items = PlotKit.Base.items;
 
-    var setCount = keys(this.datasets).length;
+    var setCount = items(this.datasets).length;
 
     // add all the rects
     this.points = new Array();
     var i = 0;
     for (var setName in this.datasets) {
         var dataset = this.datasets[setName];
+        if (PlotKit.Base.isFuncLike(dataset)) continue;
         dataset.sort(function(a, b) { return compare(parseFloat(a[0]), parseFloat(b[0])); });
         for (var j = 0; j < dataset.length; j++) {
             var item = dataset[j];
@@ -469,11 +471,11 @@ PlotKit.Layout.prototype._evaluateLineCharts = function() {
 
 // Create the pie charts
 PlotKit.Layout.prototype._evaluatePieCharts = function() {
-    var items = MochiKit.Base.items;
+    var items = PlotKit.Base.items;
     var sum = MochiKit.Iter.sum;
     var getter = MochiKit.Base.itemgetter;
 
-    var setCount = keys(this.datasets).length;
+    var setCount = items(this.datasets).length;
 
     // we plot the y values of the first dataset
     var dataset = items(this.datasets)[0][1];
