@@ -179,12 +179,36 @@ PlotKit.SweetSVGRenderer.prototype._renderBackground = function() {
 
     if (this.layout.style == "bar" || this.layout.style == "line") {
         this._drawRect(this.area.x, this.area.y, 
-                       this.area.w, this.area.h, attrs);                
-        for (var i = 0; i < this.layout.yticks.length; i++) {
-            this._drawRect(this.area.x,
-                           this.layout.yticks[i][0] * this.area.h + this.area.y,
-                           this.area.w,
-                           1,
+                       this.area.w, this.area.h, attrs);
+                       
+        var ticks = this.layout.yticks;
+        var horiz = false;
+        if (this.layout.style == "bar" && 
+            this.layout.options.barOrientation == "horizontal") {
+                ticks = this.layout.xticks;
+                horiz = true;
+        }
+        
+        for (var i = 0; i < ticks.length; i++) {
+            var x = 0;
+            var y = 0;
+            var w = 0;
+            var h = 0;
+            
+            if (horiz) {
+                x = ticks[i][0] * this.area.w + this.area.x;
+                y = this.area.y;
+                w = 1;
+                h = this.area.w;
+            }
+            else {
+                x = this.area.x;
+                y = ticks[i][0] * this.area.h + this.area.y;
+                w = this.area.w;
+                h = 1;
+            }
+            
+            this._drawRect(x, y, w, h,
                            {"fill": Color.whiteColor().toRGBString()});
         }
     }

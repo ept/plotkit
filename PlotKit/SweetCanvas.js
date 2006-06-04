@@ -268,12 +268,37 @@ PlotKit.SweetCanvasRenderer.prototype._renderBackground = function() {
         context.fillRect(this.area.x, this.area.y, this.area.w, this.area.h);
         context.strokeStyle = Color.whiteColor().toRGBString();
         context.lineWidth = 1.0;
-        for (var i = 0; i < this.layout.yticks.length; i++) {
-            var y = this.layout.yticks[i][0] * this.area.h + this.area.y;
-            var x = this.area.x;
+        
+        var ticks = this.layout.yticks;
+        var horiz = false;
+        if (this.layout.style == "bar" && 
+            this.layout.options.barOrientation == "horizontal") {
+                ticks = this.layout.xticks;
+                horiz = true;
+        }
+        
+        for (var i = 0; i < ticks.length; i++) {
+            var x1 = 0;
+            var y1 = 0;
+            var x2 = 0;
+            var y2 = 0;
+            
+            if (horiz) {
+                x1 = ticks[i][0] * this.area.w + this.area.x;
+                y1 = this.area.y;
+                x2 = x1;
+                y2 = y1 + this.area.h;
+            }
+            else {
+                x1 = this.area.x;
+                y1 = ticks[i][0] * this.area.h + this.area.y;
+                x2 = x1 + this.area.w;
+                y2 = y1;
+            }
+            
             context.beginPath();
-            context.moveTo(x, y);
-            context.lineTo(x + this.area.w, y);
+            context.moveTo(x1, y1);
+            context.lineTo(x2, y2);
             context.closePath();
             context.stroke();
         }
