@@ -9,7 +9,7 @@
 {% block content %}
 <div class="page doc">
 {% filter markdown %}
-[PlotKit Home](PlotKit.html) | [<<](PlotKit.SweetCanvas.html)
+[PlotKit Home](PlotKit.html) | [<<](PlotKit.SweetCanvas.html) | [>>](PlotKit.EasyPlot.html)
 
 PlotKit Sweet SVG Renderer
 =============================

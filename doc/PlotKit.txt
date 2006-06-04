@@ -46,10 +46,13 @@ Renderer Specific Implementations
 
 * [CanvasRenderer][]: Basic renderer using an HTML Canvas.
 * [SVGRenderer][]: Basic renderer using SVG.
-* [SweetCanvasRenderer][]: Customised Renderer that builds on
-   CanvasRenderer to provide nicer looking charts.
-* [SweetSVGRenderer][]: Customised renderer that builds on SVGRenderer
-   to provide nicer looking charts.
+* [SweetCanvasRenderer][]: Customised Renderer that builds on CanvasRenderer to provide nicer looking charts.
+* [SweetSVGRenderer][]: Customised renderer that builds on SVGRenderer to provide nicer looking charts.
+   
+Utility Classes
+---------------
+
+* [EasyPlot][]: Simple Wrapper around classes to provide one-line plotting.
 
 Getting Started
 ===============
@@ -104,6 +107,7 @@ Road Map
 [SVGRenderer]: PlotKit.SVG.html
 [SweetCanvasRenderer]: PlotKit.SweetCanvas.html
 [SweetSVGRenderer]: PlotKit.SweetSVG.html
+[EasyPlot]: PlotKit.EasyPlot.html
 [Browser]: SVGCanvasCompat.html
 [CanvasTest]: http://media.liquidx.net/js/plotkit-tests/basic.html
 [SVGTest]: http://media.liquidx.net/js/plotkit-tests/svg.html
@@ -111,6 +115,7 @@ Road Map
 [SSVGTest]: http://media.liquidx.net/js/plotkit-tests/sweet-svg.html
 [QuickstartCanvasDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart.html
 [QuickstartSVGDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart-svg.html
+[QuickstartEasyDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart-easy.html
 
 {% endfilter %}
 </div>
