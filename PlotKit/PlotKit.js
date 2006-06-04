@@ -82,10 +82,14 @@ if (typeof(JSAN) != 'undefined' || typeof(dojo) != 'undefined') {
     }());
     
 } else {
-    if (typeof(MochiKit.__compat__) == 'undefined') {
-        MochiKit.__compat__ = true;
+    if (typeof(PlotKit.__compat__) == 'undefined') {
+        PlotKit.__compat__ = true;
     }
     (function () {
+        if (typeof(document) == "undefined") {
+              return;
+        }
+        
         var scripts = document.getElementsByTagName("script");
         var kXULNSURI = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
         var base = null;
@@ -104,12 +108,13 @@ if (typeof(JSAN) != 'undefined' || typeof(dojo) != 'undefined') {
             }
 
         }
+
         if (base === null) {
             return;
         }
         var modules = PlotKit.PlotKit.SUBMODULES;
         for (var i = 0; i < modules.length; i++) {
-            if (MochiKit[modules[i]]) {
+            if (PlotKit[modules[i]]) {
                 continue;
             }
             var uri = base + modules[i] + '.js';

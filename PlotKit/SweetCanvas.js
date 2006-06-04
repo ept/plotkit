@@ -148,19 +148,19 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
         context.save();
         
         // create paths
-        var makePath = function() {
-            context.beginPath();
-            context.moveTo(this.area.x, this.area.y + this.area.h);
-            var addPoint = function(context, point) {
+        var makePath = function(ctx) {
+            ctx.beginPath();
+            ctx.moveTo(this.area.x, this.area.y + this.area.h);
+            var addPoint = function(ctx_, point) {
             if (point.name == setName)
-                context.lineTo(this.area.w * point.x + this.area.x,
-                               this.area.h * point.y + this.area.y);
+                ctx_.lineTo(this.area.w * point.x + this.area.x,
+                            this.area.h * point.y + this.area.y);
             };
-            MochiKit.Iter.forEach(this.layout.points, partial(addPoint, context), this);
-            context.lineTo(this.area.w + this.area.x,
+            MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
+            ctx.lineTo(this.area.w + this.area.x,
                            this.area.h + this.area.y);
-            context.lineTo(this.area.x, this.area.y + this.area.h);
-            context.closePath();
+            ctx.lineTo(this.area.x, this.area.y + this.area.h);
+            ctx.closePath();
         };
 
         // faux shadow for firefox
@@ -173,7 +173,7 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
                 context.fillStyle = Color.blackColor().colorWithAlpha(0.2).toRGBString();
             }
             context.translate(-1, -2);
-            bind(makePath, this)();        
+            bind(makePath, this)(context);        
             context.fill();
         }
         context.restore();
@@ -185,11 +185,11 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
         context.strokeStyle = Color.whiteColor().toRGBString();
 
         if (this.options.shouldFill) {
-            bind(makePath, this)();
+            bind(makePath, this)(context);
             context.fill();
         }
         if (this.options.shouldStroke) {
-            bind(makePath, this)();
+            bind(makePath, this)(context);
             context.stroke();
         }
         context.restore();
