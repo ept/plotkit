@@ -130,7 +130,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderBarChart = function() {
     this._renderBarChartWrap(this.layout.bars, bind(drawRect, this));
 };
 
-PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
+PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
     var context = this.element.getContext("2d");
     var colorCount = this.options.colorScheme.length;
     var colorScheme = this.options.colorScheme;
@@ -196,7 +196,7 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
     }
 };
 
-PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
+PlotKit.SweetCanvasRenderer.prototype._renderPieChart = function() {
     var context = this.element.getContext("2d");
 
     var colorCount = this.options.colorScheme.length;

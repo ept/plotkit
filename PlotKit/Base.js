@@ -88,7 +88,12 @@ PlotKit.Base.toString = function() {
 
 // Detect whether we are using prototype.js
 PlotKit.Base.usingPrototype =  function() {
-    return (typeof(Object.extend) == 'function');
+    try {
+        return (typeof(Object.extend) == 'function');
+    }
+    catch (e) {
+        return false;
+    }
 }
 
 
@@ -274,7 +279,7 @@ PlotKit.Base.keys = function(lst) {
          return rval;
     }
     else {
-        return MochiKit.Base.items(lst);
+        return MochiKit.Base.keys(lst);
     }
 };
 

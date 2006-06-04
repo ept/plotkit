@@ -49,7 +49,12 @@ PlotKit.Base.toString=function(){
 return this.__repr__();
 };
 PlotKit.Base.usingPrototype=function(){
+try{
 return (typeof (Object.extend)=="function");
+}
+catch(e){
+return false;
+}
 };
 MochiKit.Base.update(PlotKit.Base,{roundInterval:function(_1,_2,_3){
 var _4=MochiKit.Format.roundToFixed;
@@ -193,7 +198,7 @@ _39.push(x);
 }
 return _39;
 }else{
-return MochiKit.Base.items(lst);
+return MochiKit.Base.keys(lst);
 }
 };
 PlotKit.Base.baseColors=function(){
@@ -1721,7 +1726,7 @@ _339.restore();
 };
 this._renderBarChartWrap(this.layout.bars,bind(_338,this));
 };
-PlotKit.CanvasRenderer.prototype._renderLineChart=function(){
+PlotKit.SweetCanvasRenderer.prototype._renderLineChart=function(){
 var _340=this.element.getContext("2d");
 var _341=this.options.colorScheme.length;
 var _342=this.options.colorScheme;
@@ -1774,7 +1779,7 @@ _340.stroke();
 _340.restore();
 }
 };
-PlotKit.CanvasRenderer.prototype._renderPieChart=function(){
+PlotKit.SweetCanvasRenderer.prototype._renderPieChart=function(){
 var _351=this.element.getContext("2d");
 var _352=this.options.colorScheme.length;
 var _353=this.layout.slices;

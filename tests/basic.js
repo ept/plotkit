@@ -122,7 +122,7 @@ function generateTests() {
     "bar", ""));
     tests.appendChild(generateUnitTest(11, dualDataSet, dualData, 
     "line", ""));
-/*
+
     tests.appendChild(H2(null, "Drawing and Clearing"));
     tests.appendChild(generateUnitTest(12, genericTest, floatData1,
 "bar", ""));    
@@ -137,7 +137,6 @@ function generateTests() {
 
     tests.appendChild(generateUnitTest(16, genericTest, ninety,
     "pie", ""));
-    */
 
 }
 

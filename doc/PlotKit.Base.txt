@@ -45,23 +45,23 @@ PlotKit.Base Functions
 
   Acts like the UNIX uniq, takes a sorted array and returns a new array that only contains uniq elements.
   
-* ``isFuncLike(obj)``
+* ``isFuncLike(obj)`` (PlotKit 0.9+)
 
   Returns true if it is of type ``function``.
 
-* ``usingPrototype()``
+* ``usingPrototype()``  (PlotKit 0.9+)
 
   Checks whether the javascript runtime is polluted by prototype.js
   
-* ``items(lst)``
+* ``items(lst)``  (PlotKit 0.9+)
 
   A version of ``MochiKit.Base.items()`` that is aware of prototype.js
 
-* ``keys(lst)``
+* ``keys(lst)``  (PlotKit 0.9+)
 
   A version of ``MochiKit.Base.keys()`` that is aware of prototype.js
 
-* ``map(fn, lst)``
+* ``map(fn, lst)``  (PlotKit 0.9+)
 
   A version of ``MochiKit.Base.map()`` that is aware of prototype.js
 
