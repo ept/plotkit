@@ -175,8 +175,8 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
             context.translate(-1, -2);
             bind(makePath, this)(context);        
             context.fill();
+            context.restore();
         }
-        context.restore();
 
         context.shadowBlur = 5.0;
         context.shadowColor = Color.fromHexString("#888888").toRGBString();
