@@ -87,8 +87,7 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     MochiKit.Base.update(this.options, options ? options : {});
 
     this.layout = layout;
-    this.style = layout.style;
-    this.element = element;
+    this.element = MochiKit.DOM.getElement(element);
     this.container = this.element.parentNode;
 
     // Stuff relating to Canvas on IE support    
@@ -166,15 +165,15 @@ PlotKit.CanvasRenderer.prototype.render = function() {
     if (this.options.drawBackground)
         this._renderBackground();
 
-    if (this.style == "bar") {
+    if (this.layout.style == "bar") {
         this._renderBarChart();
 		this._renderBarAxis(); 
 	}
-    else if (this.style == "pie") {
+    else if (this.layout.style == "pie") {
         this._renderPieChart();
 		this._renderPieAxis();
 	}
-    else if (this.style == "line") {
+    else if (this.layout.style == "line") {
         this._renderLineChart();
 		this._renderLineAxis();
 	}
