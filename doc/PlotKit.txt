@@ -75,13 +75,15 @@ Version History
 
 * Total rewrite from [CanvasGraph 0.7][CanvasGraph]
 
-###PlotKit 0.9 (in development)
+###PlotKit 0.9
 
 * Fixed some redraw issues with clear()
 * Replaced IECanvas.HTC with ExplorerCanvas
 * Added auto import and packed versions just like MochiKit.
 * Added horizontal bar chart rendering mode.
 * Added awareness of prototype.js and workaround Array/Object mutilation issues with MochiKit.
+* Added EasyPlot for single line plotting with Ajax support.
+* More tests, [dynamic charting][DynamicTest] and quickstart demos.
 
 Road Map
 ========
