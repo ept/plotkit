@@ -66,6 +66,7 @@ More Demos
 ==========
 
 * Unit Tests [Canvas][CanvasTest], [SVG][SVGTest], [SweetCanvas][SCanvasTest], [SweetSVG][SSVGTest].
+* [Dynamic Charting][DynamicTest].
 
 Version History
 ===============
@@ -116,6 +117,7 @@ Road Map
 [QuickstartCanvasDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart.html
 [QuickstartSVGDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart-svg.html
 [QuickstartEasyDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart-easy.html
+[DynamicTest]: http://media.liquidx.net/js/plotkit-tests/dynamic.html
 
 {% endfilter %}
 </div>
