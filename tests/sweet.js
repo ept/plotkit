@@ -1,7 +1,6 @@
 /* actual tests */
 
 var opts = {
-    "IECanvasHTC": "../plotkit/iecanvas.htc",
     "enableEvents": false
 };
 

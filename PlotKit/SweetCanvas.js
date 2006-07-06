@@ -123,8 +123,10 @@ PlotKit.SweetCanvasRenderer.prototype._renderBarChart = function() {
         context.shadowBlur = 0;
         context.strokeStyle = Color.whiteColor().toRGBString();
         context.lineWidth = 2.0;
-
-        context.strokeRect(x, y, w, h);                
+        
+        if (this.options.shouldStroke) {
+            context.strokeRect(x, y, w, h);                
+        }
 
         context.restore();
 
@@ -258,8 +260,10 @@ PlotKit.SweetCanvasRenderer.prototype._renderPieChart = function() {
                 makePath();
                 context.fill();
             }
-            makePath();
-            context.stroke();
+            if (this.options.shouldStroke) {
+                makePath();
+                context.stroke();
+            }
         }
     }
     context.restore();
