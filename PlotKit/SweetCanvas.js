@@ -115,8 +115,10 @@ PlotKit.SweetCanvasRenderer.prototype._renderBarChart = function() {
             prepareFakeShadow(context, x, y, w, h);
         }
 
-        context.fillStyle = chooseColor(bar.name).toRGBString();
-        context.fillRect(x, y, w, h);
+        if (this.options.shouldFill) {
+            context.fillStyle = chooseColor(bar.name).toRGBString();
+            context.fillRect(x, y, w, h);
+        }
 
         context.shadowBlur = 0;
         context.strokeStyle = Color.whiteColor().toRGBString();
@@ -173,8 +175,10 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
                 context.fillStyle = Color.blackColor().colorWithAlpha(0.2).toRGBString();
             }
             context.translate(-1, -2);
-            bind(makePath, this)(context);        
-            context.fill();
+            bind(makePath, this)(context);
+            if (this.options.shouldFill) {
+                context.fill();
+            }
             context.restore();
         }
 
@@ -250,8 +254,10 @@ PlotKit.SweetCanvasRenderer.prototype._renderPieChart = function() {
         };
 
         if (Math.abs(slices[i].startAngle - slices[i].endAngle) > 0.0001) {
-            makePath();
-            context.fill();
+            if (this.options.shouldFill) {
+                makePath();
+                context.fill();
+            }
             makePath();
             context.stroke();
         }

@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+   <title>PlotKit: Debug</title>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <link href="/css/page.css" media="screen" rel="Stylesheet"
+   type="text/css" />
+   <link href="tests.css" media="screen" rel="Stylesheet" type="text/css" />
+   <script src="/js/mochi/MochiKit.js" type="text/javascript"></script>
+   <script src="/js/plotkit-svn/excanvas.js" type="text/javascript"></script>
+   <script src="/js/plotkit-svn/Base.js" type="text/javascript"></script>
+   <script src="/js/plotkit-svn/Layout.js" type="text/javascript"></script>
+   <script src="/js/plotkit-svn/Canvas.js" type="text/javascript"></script>
+   <script src="/js/plotkit-svn/SweetCanvas.js" type="text/javascript"></script>
+   
+</head>
+
+
+<body>
+    <div id="body">
+    <h2>Debug</h2>
+
+    <div style="margin: 0 auto 0 auto; width: 500px;">
+    <div><canvas id="chart" width="500" height="300"></canvas></div>
+    
+    <script type="text/javascript">
+        var optionsPKChart1373 = officeRed();
+        MochiKit.Base.update(optionsPKChart1373, {padding:{left: 90, right:20, top: 10, bottom: 10}, barOrientation:'horizontal',xTicks:[{label:'boundary0',v:0},{label:'boundary1',v:1},{label:'boundary2',v:2},{label:'cellBarred',v:3},{label:'powerControlIndicator',v:4},{label:'thresholdCCCHLoadIndication',v:5},{label:'uRxLevDLP',v:6},{label:'boundary3',v:7},{label:'egprsServices',v:8},{label:'lRxLevULP',v:9}]});
+        var layoutPKChart1373 = new PlotKit.Layout('bar', optionsPKChart1373);
+        layoutPKChart1373.addDataset('UP_NY', [[0,90.0], [1,90.0], [2,90.0], [3,1896.0], [4,1896.0], [5,1896.0], [6,4.0], [7,90.0], [8,1218.0], [9, 222.0]]);
+        layoutPKChart1373.addDataset('PHILADELPHIA', [[0,1781.0], [1,1781.0], [2,1781.0], [3,1781.0], [4,1781.0], [5,1781.0], [6,4.0], [7,1781.0], [8,1299.0], [9,838.0]]);
+        layoutPKChart1373.addDataset('NEW_JERSEY', [[0, 6553.0], [1,6553.0], [2,6553.0], [3,6553.0], [4,6553.0], [5,6553.0], [6,6553.0], [7,6553.0], [8,6165.0], [9,6144.0]]);
+        layoutPKChart1373.addDataset('CONNECTICUT', [[0,1113.0], [1,1113.0], [2,1113.0], [3,1113.0], [4, 1113.0], [5,1113.0], [6,1113.0], [7,1113.0], [8,600.0], [9,820.0]]);
+        layoutPKChart1373.evaluate();
+        var canvasPKChart1373 = MochiKit.DOM.getElement('chart');
+        var plotterPKChart1373 = new PlotKit.SweetCanvasRenderer (canvasPKChart1373, layoutPKChart1373, optionsPKChart1373);
+        plotterPKChart1373.render();
+
+    </script>
+    </div>
+    
+    <div class="footer"><a href="http://www.liquidx.net/plotkit/">PlotKit</a></div>    
+</div>
+</body></html>

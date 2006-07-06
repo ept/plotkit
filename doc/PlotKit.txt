@@ -67,9 +67,12 @@ More Demos
 
 * Unit Tests [Canvas][CanvasTest], [SVG][SVGTest], [SweetCanvas][SCanvasTest], [SweetSVG][SSVGTest].
 * [Dynamic Charting][DynamicTest].
+* [Labels Example][]. Thanks to Christopher Armstrong.
 
 Version History
 ===============
+
+* Make Sweet{Canvas/SVG}Renderers respect shouldFill.
 
 ###PlotKit 0.8
 
@@ -120,6 +123,7 @@ Road Map
 [QuickstartSVGDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart-svg.html
 [QuickstartEasyDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart-easy.html
 [DynamicTest]: http://media.liquidx.net/js/plotkit-tests/dynamic.html
+[Labels Example]: http://media.liquidx.net/js/plotkit-tests/labels.html
 
 {% endfilter %}
 </div>
