@@ -101,7 +101,7 @@ Road Map
 * Animation support.
 
 [QuickStart]: PlotKit.QuickStart.html
-[CanvasGraph]: http://www.liquidx.net/canvasgraph/
+[CanvasGraph]: http://www.liquidx.net/canvasgraphjs/
 [PlotKit]: http://www.liquidx.net/plotkit/
 [MochiKit]: http://mochikit.com/
 [IECanvas]: http://me.eae.net/archive/2005/12/29/canvas-in-ie/
