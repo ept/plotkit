@@ -121,7 +121,7 @@ PlotKit.Layout.prototype.addDataset = function(setname, set_xy) {
 };
 
 PlotKit.Layout.prototype.removeDataset = function(setname, set_xy) {
-    this.datasets[setname] = null;
+    delete this.datasets[setname];
 };
 
 PlotKit.Layout.prototype.addDatasetFromTable = function(name, tableElement, xcol, ycol) {
