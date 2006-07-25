@@ -77,9 +77,9 @@ Version History
 * Make Sweet{Canvas/SVG}Renderers respect shouldFill.
 * Fixed ignoring of maximum x and y values when setting xAxis/yAxis.
 * Fixed typo for calculating yrange in Layout.js (thanks to
-  HubrisSonic).
+    HubrisSonic).
 * Changed SweetCanvasRenderer to use axisLineColor for drawing lines over 
-  background (thanks to HubrisSonic).
+    background (thanks to HubrisSonic).
 
 ###PlotKit 0.8
 
@@ -131,8 +131,8 @@ Road Map
 [QuickstartEasyDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart-easy.html
 [DynamicTest]: http://media.liquidx.net/js/plotkit-tests/dynamic.html
 [Labels Example]: http://media.liquidx.net/js/plotkit-tests/labels.html
-[Label with Images]: http://media.liquidx.net/js/plotkit-tests/labels-img.html
-[Axis Restriction]: http://media.liquidx.net/js/plotkit-tests/axis.html
+[Labels with Images]: http://media.liquidx.net/js/plotkit-tests/labels-img.html
+[Axis Restrictions]: http://media.liquidx.net/js/plotkit-tests/axis.html
 
 {% endfilter %}
 </div>
