@@ -49,7 +49,7 @@ PlotKit.Layout.valid_styles = ["bar", "line", "pie", "point"];
 // --------------------------------------------------------------------
 
 PlotKit.Layout = function(style, options) {
-    
+  
     this.options = {
         "barWidthFillFraction": 0.75,
         "barOrientation": "vertical",
@@ -62,7 +62,7 @@ PlotKit.Layout = function(style, options) {
         "xNumberOfTicks": 10,
         "yNumberOfTicks": 5,
         "xTickPrecision": 1,
-        "yTickPrecision": 3,
+        "yTickPrecision": 1,
         "pieRadius": 0.4
     };
 
@@ -86,7 +86,7 @@ PlotKit.Layout = function(style, options) {
     if (!MochiKit.Base.isUndefinedOrNull(this.options.yAxis)) {
         this.minyval = this.options.yAxis[0];
         this.maxyval = this.options.yAxis[1];
-        this.yscale = this.maxyval - this.maxymin;
+        this.yscale = this.maxyval - this.minyval;
     }
     else {
         this.minyval = 0;
@@ -280,6 +280,8 @@ PlotKit.Layout.prototype._evaluateLimits = function() {
             this.minxval = 0;
         else
             this.minxval = listMin(map(parseFloat, map(itemgetter(0), all)));
+
+        this.maxxval = listMax(map(parseFloat, map(itemgetter(0), all)));
     }
     
     if (isNil(this.options.yAxis)) {
@@ -287,11 +289,9 @@ PlotKit.Layout.prototype._evaluateLimits = function() {
             this.minyval = 0;
         else
             this.minyval = listMin(map(parseFloat, map(itemgetter(1), all)));
-    }
 
-    this.maxxval = listMax(map(parseFloat, map(itemgetter(0), all)));
-    this.maxyval = listMax(map(parseFloat, map(itemgetter(1), all)));
-    
+        this.maxyval = listMax(map(parseFloat, map(itemgetter(1), all)));
+    }
 };
 
 PlotKit.Layout.prototype._evaluateScales = function() {
@@ -374,7 +374,10 @@ PlotKit.Layout.prototype._evaluateBarCharts = function() {
                 yval: parseFloat(item[1]),
                 name: setName
             };
-            this.bars.push(rect);
+            if ((rect.x >= 0.0) && (rect.x <= 1.0) && 
+                (rect.y >= 0.0) && (rect.y <= 1.0)) {
+                this.bars.push(rect);
+            }
         }
         i++;
     }
@@ -434,7 +437,17 @@ PlotKit.Layout.prototype._evaluateHorizBarCharts = function() {
                 yval: parseFloat(item[1]),
                 name: setName
             };
-            this.bars.push(rect);
+
+            // limit the x, y values so they do not overdraw
+            if (rect.y <= 0.0) {
+                rect.y = 0.0;
+            }
+            if (rect.y >= 1.0) {
+                rect.y = 1.0;
+            }
+            if ((rect.x >= 0.0) && (rect.x <= 1.0)) {
+                this.bars.push(rect);
+            }
         }
         i++;
     }
@@ -463,7 +476,17 @@ PlotKit.Layout.prototype._evaluateLineCharts = function() {
                 yval: parseFloat(item[1]),
                 name: setName
             };
-            this.points.push(point);
+
+            // limit the x, y values so they do not overdraw
+            if (point.y <= 0.0) {
+                point.y = 0.0;
+            }
+            if (point.y >= 1.0) {
+                point.y = 1.0;
+            }
+            if ((point.x >= 0.0) && (point.x <= 1.0)) {
+                this.points.push(point);
+            }
         }
         i++;
     }
@@ -526,7 +549,7 @@ PlotKit.Layout.prototype._evaluateLineTicksForXAxis = function() {
             if (xvalues[i] >= (tickCount) * roughSeparation) {
                 var pos = this.xscale * (xvalues[i] - this.minxval);
                 if ((pos > 1.0) || (pos < 0.0))
-                    return;
+                    continue;
                 this.xticks.push([pos, xvalues[i]]);
                 tickCount++;
             }
@@ -561,13 +584,14 @@ PlotKit.Layout.prototype._evaluateLineTicksForYAxis = function() {
         var roundInt = PlotKit.Base.roundInterval;
         var prec = this.options.yTickPrecision;
         var roughSeparation = roundInt(this.yrange, 
-                                       this.options.yNumberOfTicks,
-                                       this.options.yTickPrecision);
+                                       this.options.yNumberOfTicks, prec);
 
+        // round off each value of the y-axis to the precision
+        // eg. 1.3333 at precision 1 -> 1.3
         for (var i = 0; i <= this.options.yNumberOfTicks; i++) {
             var yval = this.minyval + (i * roughSeparation);
             var pos = 1.0 - ((yval - this.minyval) * this.yscale);
-            this.yticks.push([pos, MochiKit.Format.roundToFixed(yval, 1)]);
+            this.yticks.push([pos, MochiKit.Format.roundToFixed(yval, prec)]);
         }
     }
 };

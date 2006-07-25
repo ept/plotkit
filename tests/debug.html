@@ -25,21 +25,13 @@
     
     <script type="text/javascript">
     var options = {
-       "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[5]),
        "padding": {left: 20, right: 0, top: 10, bottom: 30},
-
-       "xTicks": [{v:0, label:"Jan"}, 
-              {v:1, label:"Feb"}, 
-              {v:2, label:"Mar"},
-              {v:3, label:"Apr"},
-              {v:4, label:"May"}]
-    };
+       "yAxis": [0, 60]
+    }
 
     function drawGraph() {
-        var layout = new PlotKit.Layout("bar", options);
-        layout.addDataset("bar1", [[0, 5], [1, 1], [2, 1.414], [3, 1.73], [4, 2]]);
-        layout.addDataset("bar2", [[0, 3], [1, 1], [2, 1.414], [3, 1.73], [4, 2]]);
-        layout.addDataset("bar3", [[0, 2], [1, 1], [2, 1.414], [3, 1.73], [4, 2]]);
+        var layout = new PlotKit.Layout("line", options);
+        layout.addDataset("bar1", [[0, 5], [30, 10], [50, 10]]);
         layout.evaluate();
         var canvas = MochiKit.DOM.getElement("chart");
         var plotter = new PlotKit.SweetCanvasRenderer(canvas, layout, options);

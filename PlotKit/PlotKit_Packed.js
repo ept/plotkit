@@ -265,7 +265,7 @@ return this.__repr__();
 };
 PlotKit.Layout.valid_styles=["bar","line","pie","point"];
 PlotKit.Layout=function(_42,_43){
-this.options={"barWidthFillFraction":0.75,"barOrientation":"vertical","xOriginIsZero":true,"yOriginIsZero":true,"xAxis":null,"yAxis":null,"xTicks":null,"yTicks":null,"xNumberOfTicks":10,"yNumberOfTicks":5,"xTickPrecision":1,"yTickPrecision":3,"pieRadius":0.4};
+this.options={"barWidthFillFraction":0.75,"barOrientation":"vertical","xOriginIsZero":true,"yOriginIsZero":true,"xAxis":null,"yAxis":null,"xTicks":null,"yTicks":null,"xNumberOfTicks":10,"yNumberOfTicks":5,"xTickPrecision":1,"yTickPrecision":1,"pieRadius":0.4};
 this.style=_42;
 MochiKit.Base.update(this.options,_43?_43:{});
 if(!MochiKit.Base.isUndefinedOrNull(this.options.xAxis)){
@@ -280,7 +280,7 @@ this.xscale=null;
 if(!MochiKit.Base.isUndefinedOrNull(this.options.yAxis)){
 this.minyval=this.options.yAxis[0];
 this.maxyval=this.options.yAxis[1];
-this.yscale=this.maxyval-this.maxymin;
+this.yscale=this.maxyval-this.minyval;
 }else{
 this.minyval=0;
 this.maxyval=null;
@@ -301,7 +301,7 @@ PlotKit.Layout.prototype.addDataset=function(_44,_45){
 this.datasets[_44]=_45;
 };
 PlotKit.Layout.prototype.removeDataset=function(_46,_47){
-this.datasets[_46]=null;
+delete this.datasets[_46];
 };
 PlotKit.Layout.prototype.addDatasetFromTable=function(_48,_49,_50,_51){
 var _52=MochiKit.Base.isUndefinedOrNull;
@@ -421,6 +421,7 @@ this.minxval=0;
 }else{
 this.minxval=_76(map(parseFloat,map(_74(0),all)));
 }
+this.maxxval=_77(map(parseFloat,map(_74(0),all)));
 }
 if(_78(this.options.yAxis)){
 if(this.options.yOriginIsZero){
@@ -428,9 +429,8 @@ this.minyval=0;
 }else{
 this.minyval=_76(map(parseFloat,map(_74(1),all)));
 }
-}
-this.maxxval=_77(map(parseFloat,map(_74(0),all)));
 this.maxyval=_77(map(parseFloat,map(_74(1),all)));
+}
 };
 PlotKit.Layout.prototype._evaluateScales=function(){
 var _80=MochiKit.Base.isUndefinedOrNull;
@@ -492,7 +492,9 @@ continue;
 for(var j=0;j<_94.length;j++){
 var _96=_94[j];
 var _97={x:((parseFloat(_96[0])-this.minxval)*this.xscale)+(i*_91)+_92,y:1-((parseFloat(_96[1])-this.minyval)*this.yscale),w:_91,h:((parseFloat(_96[1])-this.minyval)*this.yscale),xval:parseFloat(_96[0]),yval:parseFloat(_96[1]),name:_93};
+if((_97.x>=0)&&(_97.x<=1)&&(_97.y>=0)&&(_97.y<=1)){
 this.bars.push(_97);
+}
 }
 i++;
 }
@@ -532,7 +534,15 @@ continue;
 for(var j=0;j<_106.length;j++){
 var item=_106[j];
 var rect={y:((parseFloat(item[0])-this.minxval)*this.xscale)+(i*_103)+_104,x:0,h:_103,w:((parseFloat(item[1])-this.minyval)*this.yscale),xval:parseFloat(item[0]),yval:parseFloat(item[1]),name:_105};
+if(rect.y<=0){
+rect.y=0;
+}
+if(rect.y>=1){
+rect.y=1;
+}
+if((rect.x>=0)&&(rect.x<=1)){
 this.bars.push(rect);
+}
 }
 i++;
 }
@@ -553,7 +563,15 @@ return compare(parseFloat(a[0]),parseFloat(b[0]));
 for(var j=0;j<_112.length;j++){
 var item=_112[j];
 var _115={x:((parseFloat(item[0])-this.minxval)*this.xscale),y:1-((parseFloat(item[1])-this.minyval)*this.yscale),xval:parseFloat(item[0]),yval:parseFloat(item[1]),name:_111};
+if(_115.y<=0){
+_115.y=0;
+}
+if(_115.y>=1){
+_115.y=1;
+}
+if((_115.x>=0)&&(_115.x<=1)){
 this.points.push(_115);
+}
 }
 i++;
 }
@@ -599,7 +617,7 @@ for(var i=0;i<=_132.length;i++){
 if(_132[i]>=(_134)*_133){
 var pos=this.xscale*(_132[i]-this.minxval);
 if((pos>1)||(pos<0)){
-return;
+continue;
 }
 this.xticks.push([pos,_132[i]]);
 _134++;
@@ -632,11 +650,11 @@ if(this.options.yNumberOfTicks){
 this.yticks=new Array();
 var _138=PlotKit.Base.roundInterval;
 var prec=this.options.yTickPrecision;
-var _140=_138(this.yrange,this.options.yNumberOfTicks,this.options.yTickPrecision);
+var _140=_138(this.yrange,this.options.yNumberOfTicks,prec);
 for(var i=0;i<=this.options.yNumberOfTicks;i++){
 var yval=this.minyval+(i*_140);
 var pos=1-((yval-this.minyval)*this.yscale);
-this.yticks.push([pos,MochiKit.Format.roundToFixed(yval,1)]);
+this.yticks.push([pos,MochiKit.Format.roundToFixed(yval,prec)]);
 }
 }
 }

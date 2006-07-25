@@ -209,7 +209,7 @@ PlotKit.SweetSVGRenderer.prototype._renderBackground = function() {
             }
             
             this._drawRect(x, y, w, h,
-                           {"fill": Color.whiteColor().toRGBString()});
+                           {"fill": this.options.axisLineColor.toRGBString()});
         }
     }
     else {

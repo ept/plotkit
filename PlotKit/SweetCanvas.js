@@ -276,7 +276,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderBackground = function() {
         context.save();
         context.fillStyle = this.options.backgroundColor.toRGBString();
         context.fillRect(this.area.x, this.area.y, this.area.w, this.area.h);
-        context.strokeStyle = Color.whiteColor().toRGBString();
+        context.strokeStyle = this.options.axisLineColor..toRGBString();
         context.lineWidth = 1.0;
         
         var ticks = this.layout.yticks;
