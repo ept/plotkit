@@ -1859,7 +1859,7 @@ if(this.layout.style=="bar"||this.layout.style=="line"){
 _360.save();
 _360.fillStyle=this.options.backgroundColor.toRGBString();
 _360.fillRect(this.area.x,this.area.y,this.area.w,this.area.h);
-_360.strokeStyle=Color.whiteColor().toRGBString();
+_360.strokeStyle=this.options.axisLineColor.toRGBString();
 _360.lineWidth=1;
 var _361=this.layout.yticks;
 var _362=false;
@@ -2035,7 +2035,7 @@ y=_400[i][0]*this.area.h+this.area.y;
 w=this.area.w;
 h=1;
 }
-this._drawRect(x,y,w,h,{"fill":Color.whiteColor().toRGBString()});
+this._drawRect(x,y,w,h,{"fill":this.options.axisLineColor.toRGBString()});
 }
 }else{
 PlotKit.SweetSVGRenderer.__super__._renderBackground.call(this);
