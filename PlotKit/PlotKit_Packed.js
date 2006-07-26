@@ -638,7 +638,7 @@ var _137=tick.label;
 if(_135(_137)){
 _137=tick.v.toString();
 }
-var pos=1-(this.yscale*(tick.v+this.minxval));
+var pos=1-(this.yscale*(tick.v-this.minyval));
 if((pos<0)||(pos>1)){
 return;
 }

@@ -569,7 +569,7 @@ PlotKit.Layout.prototype._evaluateLineTicksForYAxis = function() {
             var label = tick.label;
             if (isNil(label))
                 label = tick.v.toString();
-            var pos = 1.0 - (this.yscale * (tick.v + this.minxval));
+            var pos = 1.0 - (this.yscale * (tick.v - this.minyval));
             if ((pos < 0.0) || (pos > 1.0))
                 return;
             this.yticks.push([pos, label]);
