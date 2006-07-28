@@ -80,7 +80,9 @@ Version History
     HubrisSonic).
 * Changed SweetCanvasRenderer to use axisLineColor for drawing lines over 
     background (thanks to HubrisSonic).
-* Fixed bug in y-axis tick drawing (thanks to Cliff)
+* Fixed bug in y-axis tick drawing (thanks to Cliff).
+* Fixed x-axis calculation bug when xAxisIsZero is false (thanks to 
+    Loic Jeannin)
 
 ###PlotKit 0.8
 
