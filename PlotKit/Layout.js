@@ -283,6 +283,11 @@ PlotKit.Layout.prototype._evaluateLimits = function() {
 
         this.maxxval = listMax(map(parseFloat, map(itemgetter(0), all)));
     }
+    else {
+        this.minxval = this.options.xAxis[0];
+        this.maxxval = this.options.xAxis[1];
+        this.xscale = this.maxval - this.minxval;
+    }
     
     if (isNil(this.options.yAxis)) {
         if (this.options.yOriginIsZero)
@@ -292,6 +297,12 @@ PlotKit.Layout.prototype._evaluateLimits = function() {
 
         this.maxyval = listMax(map(parseFloat, map(itemgetter(1), all)));
     }
+    else {
+        this.minyval = this.options.yAxis[0];
+        this.maxyval = this.options.yAxis[1];
+        this.yscale = this.maxyval - this.minyval;
+    }
+
 };
 
 PlotKit.Layout.prototype._evaluateScales = function() {

@@ -422,6 +422,10 @@ this.minxval=0;
 this.minxval=_76(map(parseFloat,map(_74(0),all)));
 }
 this.maxxval=_77(map(parseFloat,map(_74(0),all)));
+}else{
+this.minxval=this.options.xAxis[0];
+this.maxxval=this.options.xAxis[1];
+this.xscale=this.maxval-this.minxval;
 }
 if(_78(this.options.yAxis)){
 if(this.options.yOriginIsZero){
@@ -430,6 +434,10 @@ this.minyval=0;
 this.minyval=_76(map(parseFloat,map(_74(1),all)));
 }
 this.maxyval=_77(map(parseFloat,map(_74(1),all)));
+}else{
+this.minyval=this.options.yAxis[0];
+this.maxyval=this.options.yAxis[1];
+this.yscale=this.maxyval-this.minyval;
 }
 };
 PlotKit.Layout.prototype._evaluateScales=function(){
@@ -614,7 +622,7 @@ var _133=this.xrange/this.options.xNumberOfTicks;
 var _134=0;
 this.xticks=new Array();
 for(var i=0;i<=_132.length;i++){
-if(_132[i]>=(_134)*_133){
+if((_132[i]-this.minxval)>=(_134*_133)){
 var pos=this.xscale*(_132[i]-this.minxval);
 if((pos>1)||(pos<0)){
 continue;
