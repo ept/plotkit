@@ -30,9 +30,18 @@
     }
 
     function drawGraph() {
-        var layout = new PlotKit.Layout("line", options);
-        layout.addDataset("bar1", [[0, 5], [30, 10], [50, 10]]);
+        var layoutOptions = {
+         "xAxis"         : [1, 4],
+         "xOriginIsZero" : false,
+         "xTicks"        : [ {v: 0}, {v: 1}, {v: 2}, {v: 3}, {v: 4}, {v: 5} ], 
+         "yAxis"         : [1, 4],
+         "yOriginIsZero" : false,
+         "yTicks"        : [ {v: 0}, {v: 1}, {v: 2}, {v: 3}, {v: 4}, {v: 5} ] 
+        };
+        var layout = new PlotKit.Layout("line", layoutOptions);
+        layout.addDataset("myDataset", [ [1, 1], [2, 2], [3, 3], [4, 4] ]);
         layout.evaluate();
+
         var canvas = MochiKit.DOM.getElement("chart");
         var plotter = new PlotKit.SweetCanvasRenderer(canvas, layout, options);
         plotter.render();

@@ -612,7 +612,9 @@ if(_127(_130)){
 _130=tick.v.toString();
 }
 var pos=this.xscale*(tick.v-this.minxval);
+if((pos>=0)&&(pos<=1)){
 this.xticks.push([pos,_130]);
+}
 };
 MochiKit.Iter.forEach(this.options.xTicks,bind(_128,this));
 }else{
@@ -647,10 +649,9 @@ if(_135(_137)){
 _137=tick.v.toString();
 }
 var pos=1-(this.yscale*(tick.v-this.minyval));
-if((pos<0)||(pos>1)){
-return;
-}
+if((pos>=0)&&(pos<=1)){
 this.yticks.push([pos,_137]);
+}
 };
 MochiKit.Iter.forEach(this.options.yTicks,bind(_136,this));
 }else{
@@ -662,6 +663,9 @@ var _140=_138(this.yrange,this.options.yNumberOfTicks,prec);
 for(var i=0;i<=this.options.yNumberOfTicks;i++){
 var yval=this.minyval+(i*_140);
 var pos=1-((yval-this.minyval)*this.yscale);
+if((pos>1)||(pos<0)){
+continue;
+}
 this.yticks.push([pos,MochiKit.Format.roundToFixed(yval,prec)]);
 }
 }

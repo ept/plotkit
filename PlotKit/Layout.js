@@ -545,7 +545,9 @@ PlotKit.Layout.prototype._evaluateLineTicksForXAxis = function() {
             if (isNil(label))
                 label = tick.v.toString();
             var pos = this.xscale * (tick.v - this.minxval);
-            this.xticks.push([pos, label]);
+            if ((pos >= 0.0) && (pos <= 1.0)) {
+                this.xticks.push([pos, label]);
+            }
         };
         MochiKit.Iter.forEach(this.options.xTicks, bind(makeTicks, this));
     }
@@ -581,9 +583,9 @@ PlotKit.Layout.prototype._evaluateLineTicksForYAxis = function() {
             if (isNil(label))
                 label = tick.v.toString();
             var pos = 1.0 - (this.yscale * (tick.v - this.minyval));
-            if ((pos < 0.0) || (pos > 1.0))
-                return;
-            this.yticks.push([pos, label]);
+            if ((pos >= 0.0) && (pos <= 1.0)) {
+                this.yticks.push([pos, label]);
+            }
         };
         MochiKit.Iter.forEach(this.options.yTicks, bind(makeTicks, this));
     }
@@ -602,6 +604,8 @@ PlotKit.Layout.prototype._evaluateLineTicksForYAxis = function() {
         for (var i = 0; i <= this.options.yNumberOfTicks; i++) {
             var yval = this.minyval + (i * roughSeparation);
             var pos = 1.0 - ((yval - this.minyval) * this.yscale);
+            if ((pos > 1.0) || (pos < 0.0))
+                continue;
             this.yticks.push([pos, MochiKit.Format.roundToFixed(yval, prec)]);
         }
     }
