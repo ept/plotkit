@@ -83,6 +83,8 @@ Version History
 * Fixed bug in y-axis tick drawing (thanks to Cliff).
 * Fixed x-axis calculation bug when xAxisIsZero is false (thanks to 
     Loic Jeannin)
+* Fixed xTicks drawing that exceed the bounds of the chart (thanks to
+    Cliff)
 
 ###PlotKit 0.8
 
