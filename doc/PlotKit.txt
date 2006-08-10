@@ -85,6 +85,7 @@ Version History
     Loic Jeannin)
 * Fixed xTicks drawing that exceed the bounds of the chart (thanks to
     Cliff)
+* Fixed barchart drawing with only 2 values (thanks to HubrisSonic)
 
 ###PlotKit 0.8
 

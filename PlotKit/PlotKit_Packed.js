@@ -484,7 +484,15 @@ _90=1*this.options.barWidthFillFraction;
 _91=_90/_87;
 _92=(1-this.options.barWidthFillFraction)/2;
 }else{
+if(this.xrange==1){
+this.xscale=0.5;
+}else{
+if(this.xrange==2){
+this.xscale=1/3;
+}else{
 this.xscale=(1-_88/this.xrange)/this.xrange;
+}
+}
 _90=_88*this.xscale*this.options.barWidthFillFraction;
 _91=_90/_87;
 _92=_88*this.xscale*(1-this.options.barWidthFillFraction)/2;
@@ -1163,7 +1171,6 @@ this.ylabels=new Array();
 PlotKit.CanvasRenderer.prototype._initialiseEvents=function(){
 var _221=MochiKit.Signal.connect;
 var bind=MochiKit.Base.bind;
-MochiKit.Signal.registerSignals(this,["onmouseover","onclick","onmouseout","onmousemove"]);
 _221(this.element,"onclick",bind(this.onclick,this));
 };
 PlotKit.CanvasRenderer.prototype._resolveObject=function(e){

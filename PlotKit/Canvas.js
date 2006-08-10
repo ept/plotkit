@@ -554,7 +554,7 @@ PlotKit.CanvasRenderer.prototype.clear = function() {
 PlotKit.CanvasRenderer.prototype._initialiseEvents = function() {
     var connect = MochiKit.Signal.connect;
     var bind = MochiKit.Base.bind;
-    MochiKit.Signal.registerSignals(this, ['onmouseover', 'onclick', 'onmouseout', 'onmousemove']);
+    //MochiKit.Signal.registerSignals(this, ['onmouseover', 'onclick', 'onmouseout', 'onmousemove']);
     //connect(this.element, 'onmouseover', bind(this.onmouseover, this));
     //connect(this.element, 'onmouseout', bind(this.onmouseout, this));
     //connect(this.element, 'onmousemove', bind(this.onmousemove, this));

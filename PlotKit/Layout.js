@@ -360,7 +360,15 @@ PlotKit.Layout.prototype._evaluateBarCharts = function() {
     }
     else {
         // readjust xscale to fix with bar charts
-        this.xscale = (1.0 - xdelta/this.xrange)/this.xrange;
+        if (this.xrange == 1) {
+            this.xscale = 0.5;
+        }
+        else if (this.xrange == 2) {
+            this.xscale = 1/3.0;
+        }
+        else {
+            this.xscale = (1.0 - xdelta/this.xrange)/this.xrange;
+        }
         barWidth = xdelta * this.xscale * this.options.barWidthFillFraction;
         barWidthForSet = barWidth / setCount;
         barMargin = xdelta * this.xscale * (1.0 - this.options.barWidthFillFraction)/2;
