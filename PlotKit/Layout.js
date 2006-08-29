@@ -124,7 +124,7 @@ PlotKit.Layout.prototype.removeDataset = function(setname, set_xy) {
     delete this.datasets[setname];
 };
 
-PlotKit.Layout.prototype.addDatasetFromTable = function(name, tableElement, xcol, ycol) {
+PlotKit.Layout.prototype.addDatasetFromTable = function(name, tableElement, xcol, ycol,  lcol) {
 	var isNil = MochiKit.Base.isUndefinedOrNull;
 	var scrapeText = MochiKit.DOM.scrapeText;
 	var strip = MochiKit.Format.strip;
@@ -133,15 +133,26 @@ PlotKit.Layout.prototype.addDatasetFromTable = function(name, tableElement, xcol
 		xcol = 0;
 	if (isNil(ycol))
 		ycol = 1;
+	if (isNil(lcol))
+	    lcol = -1;
         
     var rows = tableElement.tBodies[0].rows;
     var data = new Array();
+    var labels = new Array();
+    
     if (!isNil(rows)) {
         for (var i = 0; i < rows.length; i++) {
             data.push([parseFloat(strip(scrapeText(rows[i].cells[xcol]))),
                        parseFloat(strip(scrapeText(rows[i].cells[ycol])))]);
+            if (lcol >= 0){
+               labels.push({v: parseFloat(strip(scrapeText(rows[i].cells[xcol]))),
+                            label:  strip(scrapeText(rows[i].cells[lcol]))});
+            }
         }
         this.addDataset(name, data);
+        if (lcol >= 0) {
+            this.options.xTicks = labels;
+        }
         return true;
     }
     return false;

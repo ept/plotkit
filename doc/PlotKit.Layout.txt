@@ -293,9 +293,11 @@ Layout Methods
   
  Removes a dataset from the layout engine. In order for the new data to take effect, you must run ``evaluate()``.
 
-* ``addDatasetFromTable(name, tableElement, xcol = 0, ycol = 1)``
+* ``addDatasetFromTable(name, tableElement, xcol = 0, ycol = 1, labelCol = -1)``
 
   Handy function to read values off a table. ``name`` is the name to give to the dataset just like in ``addDataset()``, ``tableElement`` is the table which contains the values. Optionally, the user may specify to extract alternative columns using ``xcol`` and ``ycol``. 
+  
+  **New in 0.9.1:** If ``labelCol`` is specified to a value greater than -1, it will take the contents of that column as the xTick labels.
 
 * ``evaluate()``
  

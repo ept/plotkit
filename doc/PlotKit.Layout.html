@@ -329,10 +329,12 @@
 </p>
 <ul>
  <li>
-      <code>addDatasetFromTable(name, tableElement, xcol = 0, ycol = 1)</code> 
+      <code>addDatasetFromTable(name, tableElement, xcol = 0, ycol = 1, labelCol = -1)</code> 
  </li>
 </ul>
 <p>  Handy function to read values off a table. <code>name</code> is the name to give to the dataset just like in <code>addDataset()</code>, <code>tableElement</code> is the table which contains the values. Optionally, the user may specify to extract alternative columns using <code>xcol</code> and <code>ycol</code>. 
+</p>
+<p>  <strong>New in 0.9.1:</strong> If <code>labelCol</code> is specified to a value greater than -1, it will take the contents of that column as the xTick labels.
 </p>
 <ul>
  <li>
