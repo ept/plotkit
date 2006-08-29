@@ -19,7 +19,7 @@ if (typeof(PlotKit.PlotKit) == 'undefined') {
 }
 
 PlotKit.PlotKit.NAME = "PlotKit.PlotKit";
-PlotKit.PlotKit.VERSION = "0.9";
+PlotKit.PlotKit.VERSION = "0.9.1";
 PlotKit.PlotKit.__repr__ = function () {
     return "[" + this.NAME + " " + this.VERSION + "]";
 };

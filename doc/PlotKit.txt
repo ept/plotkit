@@ -74,18 +74,6 @@ More Demos
 Version History
 ===============
 
-* Make Sweet{Canvas/SVG}Renderers respect shouldFill.
-* Fixed ignoring of maximum x and y values when setting xAxis/yAxis.
-* Fixed typo for calculating yrange in Layout.js (thanks to
-    HubrisSonic).
-* Changed SweetCanvasRenderer to use axisLineColor for drawing lines over 
-    background (thanks to HubrisSonic).
-* Fixed bug in y-axis tick drawing (thanks to Cliff).
-* Fixed x-axis calculation bug when xAxisIsZero is false (thanks to 
-    Loic Jeannin)
-* Fixed xTicks drawing that exceed the bounds of the chart (thanks to
-    Cliff)
-* Fixed barchart drawing with only 2 values (thanks to HubrisSonic)
 
 ###PlotKit 0.8
 
@@ -100,6 +88,24 @@ Version History
 * Added awareness of prototype.js and workaround Array/Object mutilation issues with MochiKit.
 * Added EasyPlot for single line plotting with Ajax support.
 * More tests, [dynamic charting][DynamicTest] and quickstart demos.
+
+###PlotKit 0.9.1
+
+* Make Sweet{Canvas/SVG}Renderers respect shouldFill.
+* Fixed ignoring of maximum x and y values when setting xAxis/yAxis.
+* Fixed typo for calculating yrange in Layout.js (thanks to
+    HubrisSonic).
+* Changed SweetCanvasRenderer to use axisLineColor for drawing lines over 
+    background (thanks to HubrisSonic).
+* Fixed bug in y-axis tick drawing (thanks to Cliff).
+* Fixed x-axis calculation bug when xAxisIsZero is false (thanks to 
+    Loic Jeannin)
+* Fixed xTicks drawing that exceed the bounds of the chart (thanks to
+    Cliff)
+* Fixed barchart drawing with only 2 values (thanks to HubrisSonic)
+* Hide pie chart labels of 0% (thanks to Attiks)
+* Added optional field to addDatasetFromTable to include x-axis labels.
+* Updated excanvas.js version to fix possible printing issues.
 
 Road Map
 ========
