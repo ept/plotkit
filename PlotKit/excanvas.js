@@ -53,7 +53,7 @@ if (!window.CanvasRenderingContext2D) {
         var ss = doc.createStyleSheet();
         ss.cssText = "canvas{display:inline-block;overflow:hidden;" +
             "text-align:left;}" +
-            "canvas *{behavior:url(#default#VML)}";
+            "g_vml_\\:*{behavior:url(#default#VML)}";
 
         // find all canvas elements
         var els = doc.getElementsByTagName("canvas");
@@ -258,6 +258,8 @@ if (!window.CanvasRenderingContext2D) {
     surfaceElement.appendChild(el);
 
     this.element_ = el;
+    this.arcScaleX_ = 1;
+    this.arcScaleY_ = 1;
   };
 
   var contextPrototype = CanvasRenderingContext2D_.prototype;
@@ -301,13 +303,8 @@ if (!window.CanvasRenderingContext2D) {
 
   contextPrototype.arc = function(aX, aY, aRadius,
                                   aStartAngle, aEndAngle, aClockwise) {
-    if (!aClockwise) {
-      var t = aStartAngle;
-      aStartAngle = aEndAngle;
-      aEndAngle = t;
-    }
-
     aRadius *= 10;
+    var arcType = aClockwise ? "at" : "wa";
 
     var xStart = aX + (mc(aStartAngle) * aRadius) - 5;
     var yStart = aY + (ms(aStartAngle) * aRadius) - 5;
@@ -315,7 +312,7 @@ if (!window.CanvasRenderingContext2D) {
     var xEnd = aX + (mc(aEndAngle) * aRadius) - 5;
     var yEnd = aY + (ms(aEndAngle) * aRadius) - 5;
 
-    this.currentPath_.push({type: "arc",
+    this.currentPath_.push({type: arcType,
                            x: aX,
                            y: aY,
                            radius: aRadius,
@@ -507,22 +504,16 @@ if (!window.CanvasRenderingContext2D) {
         lineStr.push(mr(c1.x), ",", mr(c1.y), ",",
                      mr(c2.x), ",", mr(c2.y), ",",
                      mr(c.x), ",", mr(c.y));
-      } else if (p.type == "arc") {
-        lineStr.push(" ar ");
+      } else if (p.type == "at" || p.type == "wa") {
+        lineStr.push(" ", p.type, " ");
         var c  = this.getCoords_(p.x, p.y);
         var cStart = this.getCoords_(p.xStart, p.yStart);
         var cEnd = this.getCoords_(p.xEnd, p.yEnd);
 
-        // TODO: FIX (matricies (scale+rotation) now buggered this up)
-        //       VML arc also doesn't seem able to do rotated non-circular
-        //       arcs without parent grouping.
-        var absXScale = this.m_[0][0];
-        var absYScale = this.m_[1][1];
-
-        lineStr.push(mr(c.x - absXScale * p.radius), ",",
-                     mr(c.y - absYScale * p.radius), " ",
-                     mr(c.x + absXScale * p.radius), ",",
-                     mr(c.y + absYScale * p.radius), " ",
+        lineStr.push(mr(c.x - this.arcScaleX_ * p.radius), ",",
+                     mr(c.y - this.arcScaleY_ * p.radius), " ",
+                     mr(c.x + this.arcScaleX_ * p.radius), ",",
+                     mr(c.y + this.arcScaleY_ * p.radius), " ",
                      mr(cStart.x), ",", mr(cStart.y), " ",
                      mr(cEnd.x), ",", mr(cEnd.y));
       }
@@ -681,6 +672,8 @@ if (!window.CanvasRenderingContext2D) {
   };
 
   contextPrototype.scale = function(aX, aY) {
+    this.arcScaleX_ *= aX;
+    this.arcScaleY_ *= aY;
     var m1 = [
       [aX, 0,  0],
       [0,  aY, 0],
