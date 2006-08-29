@@ -131,6 +131,7 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     {"style":{ "position": "relative", "width": this.width + "px"}});
 
     // load event system if we have Signals
+    /* Disabled until we have a proper implementation
     try {
         this.event_isinside = null;
         if (MochiKit.Signal && this.options.enableEvents) {
@@ -140,6 +141,7 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     catch (e) {
         // still experimental
     }
+    */
 };
 
 PlotKit.CanvasRenderer.prototype.render = function() {
