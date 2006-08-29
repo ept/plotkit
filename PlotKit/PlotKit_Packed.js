@@ -606,7 +606,9 @@ var _123=_120[i][1]/_121;
 var _124=_122*Math.PI*2;
 var _125=(_122+_123)*Math.PI*2;
 var _126={fraction:_123,xval:_120[i][0],yval:_120[i][1],startAngle:_124,endAngle:_125};
+if(_120[i][1]!=0){
 this.slices.push(_126);
+}
 _122+=_123;
 }
 };

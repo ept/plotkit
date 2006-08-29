@@ -536,7 +536,9 @@ PlotKit.Layout.prototype._evaluatePieCharts = function() {
                      startAngle: startAngle,
                      endAngle: endAngle
         };
-        this.slices.push(slice);
+        if (dataset[i][1] != 0) {
+            this.slices.push(slice);
+        }
         currentAngle += fraction;
     }
 };
