@@ -131,7 +131,6 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     {"style":{ "position": "relative", "width": this.width + "px"}});
 
     // load event system if we have Signals
-    /* Disabled until we have a proper implementation
     try {
         this.event_isinside = null;
         if (MochiKit.Signal && this.options.enableEvents) {
@@ -141,7 +140,6 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     catch (e) {
         // still experimental
     }
-    */
 };
 
 PlotKit.CanvasRenderer.prototype.render = function() {
@@ -556,7 +554,6 @@ PlotKit.CanvasRenderer.prototype.clear = function() {
 PlotKit.CanvasRenderer.prototype._initialiseEvents = function() {
     var connect = MochiKit.Signal.connect;
     var bind = MochiKit.Base.bind;
-    //MochiKit.Signal.registerSignals(this, ['onmouseover', 'onclick', 'onmouseout', 'onmousemove']);
     //connect(this.element, 'onmouseover', bind(this.onmouseover, this));
     //connect(this.element, 'onmouseout', bind(this.onmouseout, this));
     //connect(this.element, 'onmousemove', bind(this.onmousemove, this));

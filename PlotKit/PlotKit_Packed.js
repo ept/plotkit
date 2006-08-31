@@ -832,6 +832,14 @@ this.ylabels=new Array();
 this.isFirstRender=true;
 this.area={x:this.options.padding.left,y:this.options.padding.top,w:this.width-this.options.padding.left-this.options.padding.right,h:this.height-this.options.padding.top-this.options.padding.bottom};
 MochiKit.DOM.updateNodeAttributes(this.container,{"style":{"position":"relative","width":this.width+"px"}});
+try{
+this.event_isinside=null;
+if(MochiKit.Signal&&this.options.enableEvents){
+this._initialiseEvents();
+}
+}
+catch(e){
+}
 };
 PlotKit.CanvasRenderer.prototype.render=function(){
 if(this.isIE){
