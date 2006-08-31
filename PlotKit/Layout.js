@@ -677,7 +677,7 @@ PlotKit.Layout.prototype._evaluatePieTicks = function() {
 			if (slice) {
                 if (isNil(label))
                     label = tick.v.toString();
-				label += " (" + formatter(slice.fraction) + ")";
+				label = SPAN(null, label, " (" + formatter(slice.fraction) + ")");
 				this.xticks.push([tick.v, label]);
 			}
 		}

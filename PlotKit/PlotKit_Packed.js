@@ -728,7 +728,7 @@ if(_150){
 if(_147(_151)){
 _151=tick.v.toString();
 }
-_151+=" ("+_148(_150.fraction)+")";
+_151=SPAN(null,_151," ("+_148(_150.fraction)+")");
 this.xticks.push([tick.v,_151]);
 }
 }
