@@ -4,6 +4,7 @@ import sys
 import os
 import re
 sys.path.append('/home/al/sites')
+
 os.environ['DJANGO_SETTINGS_MODULE'] = '__main__'
 
 DEFAULT_CHARSET = "utf-8"
@@ -12,6 +13,7 @@ LANGUAGE_CODE = "en"
 
 INSTALLED_APPS = (
     'django.contrib.markup',
+    'liquidx.custom',
 )    
 
 TEMPLATE_DIRS = (

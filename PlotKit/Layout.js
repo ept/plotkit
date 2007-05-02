@@ -286,7 +286,7 @@ PlotKit.Layout.prototype._evaluateLimits = function() {
 
 
     var all = collapse(map(itemgetter(1), items(this.datasets)));
-    if (isNil(this.options.xAxis)) {
+    if (isNil(this.options.xAxis)) { // calc minxval, maxxval from dataset
         if (this.options.xOriginIsZero)
             this.minxval = 0;
         else

@@ -259,10 +259,12 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
                                 this.area.h * point.y + this.area.y);
             };
             MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
+            if (this.options.shouldFill) {
             ctx.lineTo(this.area.w + this.area.x,
                            this.area.h + this.area.y);
             ctx.lineTo(this.area.x, this.area.y + this.area.h);
             ctx.closePath();
+            }
         };
 
         if (this.options.shouldFill) {

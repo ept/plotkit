@@ -955,9 +955,11 @@ ctx_.lineTo(this.area.w*_195.x+this.area.x,this.area.h*_195.y+this.area.y);
 }
 };
 MochiKit.Iter.forEach(this.layout.points,_187(_193,ctx),this);
+if(this.options.shouldFill){
 ctx.lineTo(this.area.w+this.area.x,this.area.h+this.area.y);
 ctx.lineTo(this.area.x,this.area.y+this.area.h);
 ctx.closePath();
+}
 };
 if(this.options.shouldFill){
 bind(_191,this)(_182);

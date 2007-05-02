@@ -1,7 +1,6 @@
 /* actual tests */
 
 var opts = {
-    "IECanvasHTC": "../plotkit/iecanvas.htc",
     "enableEvents": true,
     "strokeColor": null
 };
@@ -36,6 +35,17 @@ function dualDataSet(num, plotStyle) {
 	var l = new PlotKit.Layout(plotStyle, {});
 	l.addDatasetFromTable("data1." + num, $("test" + num), 0, 1);	
 	l.addDatasetFromTable("data2." + num, $("test" + num), 0, 2);	
+	l.evaluate();
+	var c = $("test" + num + "canvas");
+	var g = new PlotKit.CanvasRenderer(c, l, opts);
+	g.render();
+}
+
+function twoValues(num, plotStyle) {
+    plotStyle['xTicks'] = [{"v":1, "label":"first"}, {"v":2, "label":"second"}];
+    plotStyle['xAxis'] = [1,2];
+    var l = new PlotKit.Layout(plotStyle, {});
+    var success = l.addDatasetFromTable("data" + num, $("test" + num));
 	l.evaluate();
 	var c = $("test" + num + "canvas");
 	var g = new PlotKit.CanvasRenderer(c, l, opts);
@@ -83,6 +93,7 @@ function generateTests() {
     var singleData = [[1, 1]];
 
     var ninety = [[1, 9], [2, 1]];
+    var twoValuesData = [[1, 1], [2, 2]];
     
     var floatData1 = [[0, 0.5], [1, 0.4], [2, 0.3]];
     var missingData = [[0, 1], [1, 4], [3, 16], [5, 17]];
@@ -99,6 +110,9 @@ function generateTests() {
 
     tests.appendChild(generateUnitTest(3, genericTest, simpleData2,
     "pie", ""));
+    
+    tests.appendChild(generateUnitTest(30, twoValues, twoValuesData,
+    "bar", ""));
 
     tests.appendChild(H2(null, "One Value Set"));
 

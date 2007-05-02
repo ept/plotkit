@@ -107,6 +107,12 @@ Version History
 * Added optional field to addDatasetFromTable to include x-axis labels.
 * Updated excanvas.js version to fix possible printing issues.
 
+###PlotKit SVN
+
+* Allow DOM elements into pie chart labels just like bar and line
+     charts. (Thanks to cho45).
+* Fix respecting shouldFill option for Canvas renderer. (Thanks to Dan Vanderkam)
+
 Road Map
 ========
 ###Version 0.9
