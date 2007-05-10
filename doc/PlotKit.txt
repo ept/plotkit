@@ -111,7 +111,8 @@ Version History
 
 * Allow DOM elements into pie chart labels just like bar and line
      charts. (Thanks to cho45).
-* Fix respecting shouldFill option for Canvas renderer. (Thanks to Dan Vanderkam)
+* Fix respecting shouldFill option for Canvas renderer. (Thanks to Dan Vanderkam).
+* Fix unbound map in pie chart drawing (Thanks to David Evans).
 
 Road Map
 ========
