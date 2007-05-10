@@ -603,6 +603,7 @@ i++;
 }
 };
 PlotKit.Layout.prototype._evaluatePieCharts=function(){
+var map=PlotKit.Base.map;
 var _118=PlotKit.Base.items;
 var sum=MochiKit.Iter.sum;
 var _120=MochiKit.Base.itemgetter;

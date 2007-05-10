@@ -524,6 +524,7 @@ PlotKit.Layout.prototype._evaluateLineCharts = function() {
 
 // Create the pie charts
 PlotKit.Layout.prototype._evaluatePieCharts = function() {
+    var map = PlotKit.Base.map;
     var items = PlotKit.Base.items;
     var sum = MochiKit.Iter.sum;
     var getter = MochiKit.Base.itemgetter;
