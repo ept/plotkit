@@ -1870,7 +1870,7 @@ _353.fillStyle=_360.toRGBString();
 var _361=function(){
 _353.beginPath();
 _353.moveTo(_356,_357);
-_353.arc(_356,_357,_358,_355[i].startAngle-Math.PI/2,_355[i].endAngle-Math.PI/2,false);
+_353.arc(_356,_357,_358,_355[i].startAngle-Math.PI/2,_355[i].endAngle-Math.PI/2,_355[i].fraction==1);
 _353.lineTo(_356,_357);
 _353.closePath();
 };

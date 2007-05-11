@@ -250,7 +250,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderPieChart = function() {
             context.arc(centerx, centery, radius, 
                         slices[i].startAngle - Math.PI/2,
                         slices[i].endAngle - Math.PI/2,
-                        false);
+                        slices[i].fraction == 1);
             context.lineTo(centerx, centery);
             context.closePath();
         };
