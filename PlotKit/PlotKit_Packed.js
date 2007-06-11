@@ -205,7 +205,7 @@ PlotKit.Base.baseColors=function(){
 var _40=MochiKit.Color.Color.fromHexString;
 return [_40("#476fb2"),_40("#be2c2b"),_40("#85b730"),_40("#734a99"),_40("#26a1c5"),_40("#fb8707"),_40("#000000")];
 };
-PlotKit.Base.officeBaseStyle={"axisLineWidth":2,"axisLabelColor":Color.grayColor(),"axisLineColor":Color.whiteColor(),"padding":{top:5,bottom:10,left:30,right:30}};
+PlotKit.Base.officeBaseStyle={"axisLineWidth":2,"axisLabelColor":MochiKit.Color.Color.grayColor(),"axisLineColor":MochiKit.Color.Color.whiteColor(),"padding":{top:5,bottom:10,left:30,right:30}};
 MochiKit.Base.update(PlotKit.Base,{officeBlue:function(){
 var r={"colorScheme":PlotKit.Base.palette(PlotKit.Base.baseColors()[0]),"backgroundColor":PlotKit.Base.baseColors()[0].lighterColorWithLevel(0.45)};
 MochiKit.Base.update(r,PlotKit.Base.officeBaseStyle);

@@ -300,8 +300,8 @@ PlotKit.Base.baseColors = function () {
 
 PlotKit.Base.officeBaseStyle = {
     "axisLineWidth": 2.0,
-    "axisLabelColor": Color.grayColor(),
-    "axisLineColor": Color.whiteColor(),
+    "axisLabelColor": MochiKit.Color.Color.grayColor(),
+    "axisLineColor": MochiKit.Color.Color.whiteColor(),
     "padding": {top: 5, bottom: 10, left: 30, right: 30}
 };    
 
