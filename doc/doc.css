@@ -6,19 +6,21 @@
 }
 
 .doc h2 {
-   font-size: medium;
-   padding-left: 0;
+   font-size: 18px;
+   margin-top: 2.0em;
 }   
 
 .doc h3 {
    padding-left: 0;
-   font-size: medium;
+   font-size: 16px;
    color: #666;
+   margin-top: 2.0em;
 }
 
 .doc ul {
    padding-left: 10px;
    margin-left: 10px;
+   margin-bottom: 20px;
 }
 
 .api li {
