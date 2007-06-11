@@ -394,11 +394,17 @@ return obj;
 }
 }else{
 if(this.style=="pie"){
+x=2*x-0.5;
 var _71=Math.sqrt((y-0.5)*(y-0.5)+(x-0.5)*(x-0.5));
 if(_71>this.options.pieRadius){
 return null;
 }
-var _72=Math.atan2(y-0.5,x-0.5)-Math.PI/2;
+var _72=0;
+if(y<0.5&&x<0.5){
+_72=Math.atan2(y-0.5,x-0.5)+5*Math.PI/2;
+}else{
+_72=Math.atan2(y-0.5,x-0.5)+Math.PI/2;
+}
 for(var i=0;i<this.slices.length;i++){
 var _73=this.slices[i];
 if(_73.startAngle<_72&&_73.endAngle>=_72){
