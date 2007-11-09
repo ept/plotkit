@@ -69,7 +69,7 @@ PlotKit.SweetCanvasRenderer.prototype.__init__ = function(el, layout, opts) {
 
 PlotKit.SweetCanvasRenderer.prototype._renderBarChart = function() {
     var bind = MochiKit.Base.bind;
-    var shadowColor = Color.blackColor().colorWithAlpha(0.1).toRGBString();
+    var shadowColor = MochiKit.Color.Color.blackColor().colorWithAlpha(0.1).toRGBString();
 
     var prepareFakeShadow = function(context, x, y, w, h) {
         context.fillStyle = shadowColor;
@@ -103,7 +103,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderBarChart = function() {
         context.save();
 
         context.shadowBlur = 5.0;
-        context.shadowColor = Color.fromHexString("#888888").toRGBString();
+        context.shadowColor = MochiKit.Color.Color.fromHexString("#888888").toRGBString();
 
         if (this.isIE) {
             context.save();
@@ -121,7 +121,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderBarChart = function() {
         }
 
         context.shadowBlur = 0;
-        context.strokeStyle = Color.whiteColor().toRGBString();
+        context.strokeStyle = MochiKit.Color.Color.whiteColor().toRGBString();
         context.lineWidth = 2.0;
         
         if (this.options.shouldStroke) {
@@ -174,7 +174,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
                 context.fillStyle = "#cccccc";
             }
             else {
-                context.fillStyle = Color.blackColor().colorWithAlpha(0.2).toRGBString();
+                context.fillStyle = MochiKit.Color.Color.blackColor().colorWithAlpha(0.2).toRGBString();
             }
             context.translate(-1, -2);
             bind(makePath, this)(context);
@@ -185,10 +185,10 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
         }
 
         context.shadowBlur = 5.0;
-        context.shadowColor = Color.fromHexString("#888888").toRGBString();
+        context.shadowColor = MochiKit.Color.Color.fromHexString("#888888").toRGBString();
         context.fillStyle = color.toRGBString();
         context.lineWidth = 2.0;
-        context.strokeStyle = Color.whiteColor().toRGBString();
+        context.strokeStyle = MochiKit.Color.Color.whiteColor().toRGBString();
 
         if (this.options.shouldFill) {
             bind(makePath, this)(context);
@@ -224,10 +224,10 @@ PlotKit.SweetCanvasRenderer.prototype._renderPieChart = function() {
 
     if (!this.isIE) {
         context.save();
-        var shadowColor = Color.blackColor().colorWithAlpha(0.2);
+        var shadowColor = MochiKit.Color.Color.blackColor().colorWithAlpha(0.2);
         context.fillStyle = shadowColor.toRGBString();
         context.shadowBlur = 5.0;
-        context.shadowColor = Color.fromHexString("#888888").toRGBString();
+        context.shadowColor = MochiKit.Color.Color.fromHexString("#888888").toRGBString();
         context.translate(1, 1);
         context.beginPath();
         context.moveTo(centerx, centery);
@@ -238,7 +238,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderPieChart = function() {
     }
 
     context.save();
-    context.strokeStyle = Color.whiteColor().toRGBString();
+    context.strokeStyle = MochiKit.Color.Color.whiteColor().toRGBString();
     context.lineWidth = 2.0;    
     for (var i = 0; i < slices.length; i++) {
         var color = this.options.colorScheme[i%colorCount];

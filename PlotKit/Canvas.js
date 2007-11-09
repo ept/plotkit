@@ -101,8 +101,15 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
         this.element = G_vmlCanvasManager.initElement(this.element);
     }
 
-    this.height = this.element.height;
-    this.width = this.element.width;
+    //this.height = this.element.height;
+    //this.width = this.element.width;
+
+    // TODO: I don't know whether this is correct.
+    this.height=MochiKit.DOM.elementDimensions(this.element).h;
+    this.width=MochiKit.DOM.elementDimensions(this.element).w;
+
+    this.element.width = this.width;
+    this.element.height = this.height;
 
     // --- check whether everything is ok before we return
 
@@ -202,7 +209,7 @@ PlotKit.CanvasRenderer.prototype._renderBarChartWrap = function(data, plotFunc) 
                 plotFunc(context, obj);
         };                
 
-        MochiKit.Iter.forEach(data, bind(forEachFunc, this));
+        MochiKit.Iter.forEach(data, MochiKit.Basebind(forEachFunc, this));
         context.restore();
     }
 };
@@ -349,8 +356,11 @@ PlotKit.CanvasRenderer.prototype._renderAxis = function() {
     if (!this.options.drawXAxis && !this.options.drawYAxis)
         return;
 
-    var context = this.element.getContext("2d");
+    // Convenience Shortcuts.
+    var DIV = MochiKit.DOM.DIV;
 
+    var context = this.element.getContext("2d");
+    
     var labelStyle = {"style":
          {"position": "absolute",
           "fontSize": this.options.axisLabelFontSize + "px",
@@ -365,7 +375,6 @@ PlotKit.CanvasRenderer.prototype._renderAxis = function() {
     context.save();
     context.strokeStyle = this.options.axisLineColor.toRGBString();
     context.lineWidth = this.options.axisLineWidth;
-
 
     if (this.options.drawYAxis) {
         if (this.layout.yticks) {
@@ -388,7 +397,8 @@ PlotKit.CanvasRenderer.prototype._renderAxis = function() {
                 this.ylabels.push(label);
             };
             
-            MochiKit.Iter.forEach(this.layout.yticks, bind(drawTick, this));
+            MochiKit.Iter.forEach(this.layout.yticks, 
+                                  MochiKit.Base.bind(drawTick, this));
         }
 
         context.beginPath();
@@ -420,7 +430,8 @@ PlotKit.CanvasRenderer.prototype._renderAxis = function() {
                 this.xlabels.push(label);
             };
             
-            MochiKit.Iter.forEach(this.layout.xticks, bind(drawTick, this));
+            MochiKit.Iter.forEach(this.layout.xticks,
+                                  MochiKit.Base.bind(drawTick, this));
         }
 
         context.beginPath();

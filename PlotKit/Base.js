@@ -193,7 +193,8 @@ MochiKit.Base.update(PlotKit.Base, {
         var makeColor = function(color, fraction) {
             return color.lighterColorWithLevel(fraction);
         };
-        return MochiKit.Base.map(partial(makeColor, baseColor), fractions);
+        return MochiKit.Base.map(MochiKit.Base.partial(makeColor, baseColor),
+                                 fractions);
     },
     
     excanvasSupported: function() {
