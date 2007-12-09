@@ -163,7 +163,7 @@ PlotKit.CanvasRenderer.prototype.render = function() {
             this.isFirstRender = false;
             if (this.maxTries-- > 0) {
                 this.renderDelay = MochiKit.Async.wait(this.IEDelay);
-                this.renderDelay.addCallback(bind(this.render, this));
+                this.renderDelay.addCallback(MochiKit.Base.bind(this.render, this));
             }
             return;
         }
@@ -209,7 +209,7 @@ PlotKit.CanvasRenderer.prototype._renderBarChartWrap = function(data, plotFunc) 
                 plotFunc(context, obj);
         };                
 
-        MochiKit.Iter.forEach(data, MochiKit.Basebind(forEachFunc, this));
+        MochiKit.Iter.forEach(data, MochiKit.Base.bind(forEachFunc, this));
         context.restore();
     }
 };
@@ -546,7 +546,7 @@ PlotKit.CanvasRenderer.prototype.clear = function() {
         catch (e) {
             this.isFirstRender = false;
             this.clearDelay = MochiKit.Async.wait(this.IEDelay);
-            this.clearDelay.addCallback(bind(this.clear, this));
+            this.clearDelay.addCallback(MochiKit.Base.bind(this.clear, this));
             return;
         }
     }

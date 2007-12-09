@@ -8,7 +8,7 @@
 
     Copyright
     ---------
-    Copyright 2005,2006 (c) Alastair Tse <alastair^liquidx.net>
+    Copyright 2005-2008 (c) Alastair Tse <alastair^liquidx.net>
     For use under the BSD license. <http://www.liquidx.net/plotkit>
 */
 
@@ -57,7 +57,7 @@ if (typeof(PlotKit) == 'undefined') {
 }
 
 PlotKit.NAME = "PlotKit";
-PlotKit.VERSION = "0.8";
+PlotKit.VERSION = "0.9.2";
 PlotKit.__repr__ = function() {
     return "[" + this.NAME + " " + this.VERSION + "]";
 };
@@ -105,6 +105,8 @@ MochiKit.Base.update(PlotKit.Base, {
         return parseFloat(trunc(sep, precision));
     },
 
+    // Collapses a list of lists into a single list.
+    // [[1,2,3], [4,5,6]] => [1,2,3,4,5,6]
     collapse: function(lst) {
         var m = MochiKit.Base;
         var biggerList = new Array();
@@ -116,7 +118,6 @@ MochiKit.Base.update(PlotKit.Base, {
             delete biggerList.from;
             delete biggerList.inspect;
         }
-        
         return biggerList;
     },
     
@@ -284,9 +285,9 @@ PlotKit.Base.keys = function(lst) {
     }
 };
 
-// 
-// colour schemes
-//
+// --------------
+// Colour Schemes
+// --------------
 
 PlotKit.Base.baseColors = function () {
    var hexColor = MochiKit.Color.Color.fromHexString;
@@ -299,6 +300,9 @@ PlotKit.Base.baseColors = function () {
            hexColor("#000000")];
 };
 
+//
+// MS Office 2007 style colour scheme.
+//
 PlotKit.Base.officeBaseStyle = {
     "axisLineWidth": 2.0,
     "axisLabelColor": MochiKit.Color.Color.grayColor(),
