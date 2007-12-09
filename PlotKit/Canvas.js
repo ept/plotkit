@@ -70,6 +70,7 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
         "strokeColor": Color.whiteColor(),
         "strokeColorTransform": "asStrokeColor",
         "strokeWidth": 0.5,
+        "fillColorTransform": null,
         "shouldFill": true,
         "shouldStroke": true,
         "drawXAxis": true,
@@ -197,11 +198,17 @@ PlotKit.CanvasRenderer.prototype._renderBarChartWrap = function(data, plotFunc) 
         var setName = setNames[i];
         var color = colorScheme[i%colorCount];
         context.save();
-        context.fillStyle = color.toRGBString();
+        if (this.options.fillColorTransform && color[this.options.fillColorTransform])
+            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
+        else
+            context.fillStyle = color.toRGBString();
+
         if (this.options.strokeColor)
             context.strokeStyle = this.options.strokeColor.toRGBString();
         else if (this.options.strokeColorTransform) 
             context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
+        else
+            context.strokeStyle = color.toRGBString();
         
         context.lineWidth = this.options.strokeWidth;
         var forEachFunc = function(obj) {
@@ -248,11 +255,17 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
 
         // setup graphics context
         context.save();
-        context.fillStyle = color.toRGBString();
+        if (this.options.fillColorTransform && color[this.options.fillColorTransform])
+            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
+        else
+            context.fillStyle = color.toRGBString();
+
         if (this.options.strokeColor)
             context.strokeStyle = this.options.strokeColor.toRGBString();
         else if (this.options.strokeColorTransform) 
-            context.strokeStyle = color[strokeX]().toRGBString();
+            context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
+        else
+            context.strokeStyle = color.toRGBString();
         
         context.lineWidth = this.options.strokeWidth;
         
@@ -267,10 +280,10 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
             };
             MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
             if (this.options.shouldFill) {
-            ctx.lineTo(this.area.w + this.area.x,
-                           this.area.h + this.area.y);
-            ctx.lineTo(this.area.x, this.area.y + this.area.h);
-            ctx.closePath();
+                ctx.lineTo(this.area.w + this.area.x,
+                               this.area.h + this.area.y);
+                ctx.lineTo(this.area.x, this.area.y + this.area.h);
+                ctx.closePath();
             }
         };
 
@@ -310,7 +323,12 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
     for (var i = 0; i < slices.length; i++) {
         var color = this.options.colorScheme[i%colorCount];
         context.save();
-        context.fillStyle = color.toRGBString();
+
+        if (this.options.fillColorTransform && color[this.options.fillColorTransform])
+            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
+        else
+            context.fillStyle = color.toRGBString();
+
 
         var makePath = function() {
             context.beginPath();
@@ -334,8 +352,10 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
                 context.lineWidth = this.options.strokeWidth;
                 if (this.options.strokeColor)
                     context.strokeStyle = this.options.strokeColor.toRGBString();
-                else if (this.options.strokeColorTransform)
+                else if (this.options.strokeColorTransform) 
                     context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
+                else
+                    context.strokeStyle = color.toRGBString();
                 context.stroke();
             }
         }

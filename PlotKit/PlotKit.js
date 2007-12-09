@@ -19,7 +19,7 @@ if (typeof(PlotKit.PlotKit) == 'undefined') {
 }
 
 PlotKit.PlotKit.NAME = "PlotKit.PlotKit";
-PlotKit.PlotKit.VERSION = "0.9.1";
+PlotKit.PlotKit.VERSION = "0.9.2";
 PlotKit.PlotKit.__repr__ = function () {
     return "[" + this.NAME + " " + this.VERSION + "]";
 };
@@ -88,9 +88,9 @@ if (typeof(JSAN) != 'undefined' || typeof(dojo) != 'undefined') {
     }
     (function () {
         if (typeof(document) == "undefined") {
-              return;
+            return;
         }
-        
+
         var scripts = document.getElementsByTagName("script");
         var kXULNSURI = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
         var base = null;
@@ -107,7 +107,6 @@ if (typeof(JSAN) != 'undefined' || typeof(dojo) != 'undefined') {
                 base = src.substring(0, src.lastIndexOf('PlotKit.js'));
                 baseElem = scripts[i];
             }
-
         }
 
         if (base === null) {
@@ -138,7 +137,7 @@ if (typeof(JSAN) != 'undefined' || typeof(dojo) != 'undefined') {
                     in the document or inserted with document.write
 
                     This is not XHTML compliant.  If you want XHTML
-                    compliance then you must use the packed version of MochiKit
+                    compliance then you must use the packed version of PlotKit
                     or include each script individually (basically unroll
                     these document.write calls into your XHTML source)
 

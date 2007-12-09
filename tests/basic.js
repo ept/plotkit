@@ -85,6 +85,8 @@ function generateUnitTest(num, func, data, type, desc) {
 }
 
 function generateTests() {
+     MochiKit.Base.update(opts, PlotKit.Base.googleStyle());
+         
     var tests = $('tests');
     
     // datasets 
@@ -154,4 +156,4 @@ function generateTests() {
 
 }
 
-addLoadEvent(generateTests);
+MochiKit.DOM.addLoadEvent(generateTests);

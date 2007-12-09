@@ -37,13 +37,14 @@ MochiKit.Base.update(MochiKit.Color.Color.prototype, {
     asFillColor: function() {
         return this.lighterColorWithLevel(0.3);
     },
-        
     asStrokeColor: function() {
         return this.darkerColorWithLevel(0.1);
     },
-
     asPointColor: function() {
         return this.lighterColorWithLevel(0.1);
+    },
+    asTransparent: function() {
+        return this.colorWithAlpha(0.1);
     }
 });
 
@@ -299,6 +300,30 @@ PlotKit.Base.baseColors = function () {
            hexColor("#fb8707"),
            hexColor("#000000")];
 };
+
+PlotKit.Base.googleColors = function() {
+    var hexColor = MochiKit.Color.Color.fromHexString;
+    return [hexColor("#0066dd"),
+            hexColor("#dc3912"),
+            hexColor("#ff9900"),
+            hexColor("#008000"),
+            hexColor("#4942cc"),
+            hexColor("#990099")];
+};
+
+PlotKit.Base.googleStyle = function() {
+    var r = {
+        'colorScheme': PlotKit.Base.googleColors(),
+        'backgroundColor': MochiKit.Color.Color.whiteColor(),
+        'strokeWidth': 2.0,
+        'axisLineWidth': 2.0,
+        'strokeColor': null,
+        'strokeColorTransform': null,
+        'fillColorTransform': 'asTransparent',
+        'shouldFill': true
+    };
+    return r;
+}
 
 //
 // MS Office 2007 style colour scheme.
