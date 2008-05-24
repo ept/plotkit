@@ -537,7 +537,7 @@ PlotKit.CanvasRenderer.prototype._renderPieAxis = function() {
 	            attrib["top"] = (labely - this.options.axisLabelFontSize) + "px";
 	        }
 	
-			var label = DIV({'style': attrib}, this.layout.xticks[i][1]);
+			var label = MochiKit.DOM.DIV({'style': attrib}, this.layout.xticks[i][1]);
 			this.xlabels.push(label);
 			MochiKit.DOM.appendChildNodes(this.container, label);
 	  }

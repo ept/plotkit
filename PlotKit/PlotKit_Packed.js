@@ -745,7 +745,7 @@ if(_150){
 if(_147(_151)){
 _151=tick.v.toString();
 }
-_151=SPAN(null,_151," ("+_148(_150.fraction)+")");
+_151=MochiKit.DOM.SPAN(null,_151," ("+_148(_150.fraction)+")");
 this.xticks.push([tick.v,_151]);
 }
 }
@@ -1184,7 +1184,7 @@ _220["top"]=(_219-this.options.axisLabelFontSize)+"px";
 }
 }
 }
-var _221=DIV({"style":_220},this.layout.xticks[i][1]);
+var _221=MochiKit.DOM.DIV({"style":_220},this.layout.xticks[i][1]);
 this.xlabels.push(_221);
 MochiKit.DOM.appendChildNodes(this.container,_221);
 }
@@ -1531,7 +1531,7 @@ var x=this.area.x;
 var y=this.area.y+tick[0]*this.area.h;
 this._drawLine(x,y,x-3,y,_285);
 if(this.options.axisLabelUseDiv){
-var _287=DIV(_284,tick[1]);
+var _287=MochiKit.DOM.DIV(_284,tick[1]);
 _287.style.top=(y-this.options.axisLabelFontSize)+"px";
 _287.style.left=(x-this.options.padding.left+this.options.axisTickSize)+"px";
 _287.style.textAlign="left";
@@ -1556,7 +1556,7 @@ var x=this.area.x+tick[0]*this.area.w;
 var y=this.area.y+this.area.h;
 this._drawLine(x,y,x,y+this.options.axisTickSize,_285);
 if(this.options.axisLabelUseDiv){
-var _289=DIV(_284,tick[1]);
+var _289=MochiKit.DOM.DIV(_284,tick[1]);
 _289.style.top=(y+this.options.axisTickSize)+"px";
 _289.style.left=(x-this.options.axisLabelWidth/2)+"px";
 _289.style.textAlign="center";
@@ -1621,7 +1621,7 @@ MochiKit.Base.update(_302,{"textAnchor":"left","x":_299-_295,"y":_300-this.optio
 }
 }
 if(this.options.axisLabelUseDiv){
-var _303=DIV({"style":_301},this.layout.xticks[i][1]);
+var _303=MochiKit.DOM.DIV({"style":_301},this.layout.xticks[i][1]);
 this.xlabels.push(_303);
 MochiKit.DOM.appendChildNodes(this.container,_303);
 }else{

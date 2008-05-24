@@ -337,7 +337,7 @@ PlotKit.SVGRenderer.prototype._renderAxis = function() {
                 this._drawLine(x, y, x - 3, y, lineAttrs);
                 
                 if (this.options.axisLabelUseDiv) {
-                    var label = DIV(labelStyle, tick[1]);
+                    var label = MochiKit.DOM.DIV(labelStyle, tick[1]);
                     label.style.top = (y - this.options.axisLabelFontSize) + "px";
                     label.style.left = (x - this.options.padding.left + this.options.axisTickSize) + "px";
                     label.style.textAlign = "left";
@@ -392,7 +392,7 @@ PlotKit.SVGRenderer.prototype._renderAxis = function() {
                 this._drawLine(x, y, x, y + this.options.axisTickSize, lineAttrs);
 
                 if (this.options.axisLabelUseDiv) {
-                    var label = DIV(labelStyle, tick[1]);
+                    var label = MochiKit.DOM.DIV(labelStyle, tick[1]);
                     label.style.top = (y + this.options.axisTickSize) + "px";
                     label.style.left = (x - this.options.axisLabelWidth/2) + "px";
                     label.style.textAlign = "center";
@@ -526,7 +526,7 @@ PlotKit.SVGRenderer.prototype._renderPieAxis = function() {
             }
 
             if (this.options.axisLabelUseDiv) {
-                var label = DIV({'style': attrib}, this.layout.xticks[i][1]);
+                var label = MochiKit.DOM.DIV({'style': attrib}, this.layout.xticks[i][1]);
                 this.xlabels.push(label);
                 MochiKit.DOM.appendChildNodes(this.container, label);
             }
