@@ -174,7 +174,7 @@ PlotKit.Layout.prototype.evaluate = function() {
         }
         this._evaluateBarTicks();
     }
-    else if (this.style == "line") {
+    else if (this.style == "line" || this.style == "point") {
         this._evaluateLineCharts();
         this._evaluateLineTicks();
     }

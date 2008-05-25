@@ -185,6 +185,10 @@ PlotKit.CanvasRenderer.prototype.render = function() {
         this._renderLineChart();
 		this._renderLineAxis();
 	}
+    else if (this.layout.style == "point") {
+		this._renderLineAxis();
+        this._renderPointChart();
+	}
 };
 
 PlotKit.CanvasRenderer.prototype._renderBarChartWrap = function(data, plotFunc) {
@@ -359,6 +363,61 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
                 context.stroke();
             }
         }
+        context.restore();
+    }
+};
+
+PlotKit.CanvasRenderer.prototype._renderPointChart = function() {
+    var context = this.element.getContext("2d");
+    var colorCount = this.options.colorScheme.length;
+    var colorScheme = this.options.colorScheme;
+    var setNames = MochiKit.Base.keys(this.layout.datasets);
+    var setCount = setNames.length;
+    var bind = MochiKit.Base.bind;
+    var partial = MochiKit.Base.partial;
+
+    for (var i = 0; i < setCount; i++) {
+        var setName = setNames[i];
+        var color = colorScheme[i%colorCount];
+        var strokeX = this.options.strokeColorTransform;
+
+        // setup graphics context
+        context.save();
+        if (this.options.fillColorTransform && color[this.options.fillColorTransform])
+            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
+        else
+            context.fillStyle = color.toRGBString();
+
+        if (this.options.strokeColor)
+            context.strokeStyle = this.options.strokeColor.toRGBString();
+        else if (this.options.strokeColorTransform) 
+            context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
+        else
+            context.strokeStyle = color.toRGBString();
+        
+        context.lineWidth = this.options.strokeWidth;
+        
+        // draw dots
+        var addPoint = function(ctx, point) {
+            if (point.name == setName) {
+                ctx.beginPath();
+                ctx.arc(this.area.w * point.x + this.area.x,
+                        this.area.h * point.y + this.area.y,
+                        this.area.h / 50,
+                        0,
+                        2 * Math.PI,
+                        false);
+                ctx.closePath();
+                if (this.options.shouldFill) {
+                    ctx.fill();
+                }
+                if (this.options.shouldStroke) {
+                    ctx.stroke();
+                }
+            }
+        };
+        MochiKit.Iter.forEach(this.layout.points, bind(addPoint, this, context));
+
         context.restore();
     }
 };
