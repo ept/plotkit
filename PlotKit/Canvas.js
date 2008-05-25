@@ -630,16 +630,16 @@ PlotKit.CanvasRenderer.prototype.onmouseover = function(e) {
     var layoutObject = this._resolveObject(e);
     var eventObject = this._createEventObject(layoutObject, e);
     if (eventObject != null) 
-        signal(this, "onmouseover", eventObject);
+        MochiKit.Signal.signal(this, "onmouseover", eventObject);
 };
 
 PlotKit.CanvasRenderer.prototype.onmouseout = function(e) {
     var layoutObject = this._resolveObject(e);
     var eventObject = this._createEventObject(layoutObject, e);
     if (eventObject == null)
-        signal(this, "onmouseout", e);
+        MochiKit.Signal.signal(this, "onmouseout", e);
     else 
-        signal(this, "onmouseout", eventObject);
+        MochiKit.Signal.signal(this, "onmouseout", eventObject);
 
 };
 
@@ -653,13 +653,13 @@ PlotKit.CanvasRenderer.prototype.onmousemove = function(e) {
     }
 
     if ((layoutObject != null) && (this.event_isinside == null))
-        signal(this, "onmouseover", eventObject);
+        MochiKit.Signal.signal(this, "onmouseover", eventObject);
 
     if ((layoutObject == null) && (this.event_isinside != null))
-        signal(this, "onmouseout", eventObject);
+        MochiKit.Signal.signal(this, "onmouseout", eventObject);
 
     if ((layoutObject != null) && (this.event_isinside != null))
-        signal(this, "onmousemove", eventObject);
+        MochiKit.Signal.signal(this, "onmousemove", eventObject);
 
     this.event_isinside = layoutObject;
     //log("move", x, y);    

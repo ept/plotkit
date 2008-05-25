@@ -711,6 +711,7 @@ PlotKit.Layout.prototype._regenerateHitTestCache = function() {
     var listMax = MochiKit.Base.listMax;
     var itemgetter = MochiKit.Base.itemgetter;
     var map = MochiKit.Base.map;
+    var keys = MochiKit.Base.keys;
 
     // generate a lookup table for x values to y values
     var setNames = keys(this.datasets);

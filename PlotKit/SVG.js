@@ -179,7 +179,7 @@ PlotKit.SVGRenderer.prototype._renderBarOrLine = function(data, plotFunc, startF
                 plotFunc(attrs, obj);
         };                
 
-        MochiKit.Iter.forEach(data, bind(forEachFunc, this));
+        MochiKit.Iter.forEach(data, MochiKit.Base.bind(forEachFunc, this));
         if (endFunc)
             endFunc(attrs);
     }
@@ -378,7 +378,7 @@ PlotKit.SVGRenderer.prototype._renderAxis = function() {
                 }
             };
             
-            MochiKit.Iter.forEach(this.layout.yticks, bind(drawTick, this));
+            MochiKit.Iter.forEach(this.layout.yticks, MochiKit.Base.bind(drawTick, this));
         }
 
         this._drawLine(this.area.x, this.area.y, this.area.x, this.area.y + this.area.h, lineAttrs);
@@ -417,7 +417,7 @@ PlotKit.SVGRenderer.prototype._renderAxis = function() {
                 }
             };
             
-            MochiKit.Iter.forEach(this.layout.xticks, bind(drawTick, this));
+            MochiKit.Iter.forEach(this.layout.xticks, MochiKit.Base.bind(drawTick, this));
         }
 
         this._drawLine(this.area.x, this.area.y + this.area.h, this.area.x + this.area.w, this.area.y + this.area.h, lineAttrs)

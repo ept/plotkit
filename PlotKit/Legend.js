@@ -142,6 +142,7 @@ PlotKit.LegendRenderer.prototype._renderListTable =
 function(colorScheme, setNames) {
 	var tabhead = MochiKit.DOM.THEAD(null);
 	var tabfoot = MochiKit.DOM.TFOOT(null);
+	var partial = MochiKit.Base.partial;
 
 	var tabbody = partial(MochiKit.DOM.TBODY, null);
 	var i = 0;

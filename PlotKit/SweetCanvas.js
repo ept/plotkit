@@ -141,7 +141,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
     var setNames = PlotKit.Base.keys(this.layout.datasets);
     var setCount = setNames.length;
     var bind = MochiKit.Base.bind;
-
+    var partial = MochiKit.Base.partial;
 
     for (var i = 0; i < setCount; i++) {
         var setName = setNames[i];
