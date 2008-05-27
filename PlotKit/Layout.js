@@ -574,6 +574,8 @@ PlotKit.Layout.prototype._evaluateLineTicksForXAxis = function() {
             var label = tick.label;
             if (isNil(label))
                 label = tick.v.toString();
+            if (!isNil(tick.tooltip))
+                label = MochiKit.DOM.SPAN({ title: tick.tooltip }, label);
             var pos = this.xscale * (tick.v - this.minxval);
             if ((pos >= 0.0) && (pos <= 1.0)) {
                 this.xticks.push([pos, label]);
@@ -613,6 +615,8 @@ PlotKit.Layout.prototype._evaluateLineTicksForYAxis = function() {
             var label = tick.label;
             if (isNil(label))
                 label = tick.v.toString();
+            if (!isNil(tick.tooltip))
+                label = MochiKit.DOM.SPAN({ title: tick.tooltip }, label);
             var pos = 1.0 - (this.yscale * (tick.v - this.minyval));
             if ((pos >= 0.0) && (pos <= 1.0)) {
                 this.yticks.push([pos, label]);
@@ -688,7 +692,9 @@ PlotKit.Layout.prototype._evaluatePieTicks = function() {
 			if (slice) {
                 if (isNil(label))
                     label = tick.v.toString();
-				label = MochiKit.DOM.SPAN(null, label, " (" + formatter(slice.fraction) + ")");
+                label += " (" + formatter(slice.fraction) + ")";
+                if (!isNil(tick.tooltip))
+                    label = MochiKit.DOM.SPAN({ title: tick.tooltip }, label);
 				this.xticks.push([tick.v, label]);
 			}
 		}

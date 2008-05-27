@@ -648,6 +648,9 @@ var _132=tick.label;
 if(_129(_132)){
 _132=tick.v.toString();
 }
+if(!_129(tick.tooltip)){
+_132=MochiKit.DOM.SPAN({title:tick.tooltip},_132);
+}
 var pos=this.xscale*(tick.v-this.minxval);
 if((pos>=0)&&(pos<=1)){
 this.xticks.push([pos,_132]);
@@ -684,6 +687,9 @@ var _138=function(tick){
 var _139=tick.label;
 if(_137(_139)){
 _139=tick.v.toString();
+}
+if(!_137(tick.tooltip)){
+_139=MochiKit.DOM.SPAN({title:tick.tooltip},_139);
 }
 var pos=1-(this.yscale*(tick.v-this.minyval));
 if((pos>=0)&&(pos<=1)){
@@ -745,7 +751,10 @@ if(_150){
 if(_147(_151)){
 _151=tick.v.toString();
 }
-_151=MochiKit.DOM.SPAN(null,_151," ("+_148(_150.fraction)+")");
+_151+=" ("+_148(_150.fraction)+")";
+if(!_147(tick.tooltip)){
+_151=MochiKit.DOM.SPAN({title:tick.tooltip},_151);
+}
 this.xticks.push([tick.v,_151]);
 }
 }
