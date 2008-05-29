@@ -751,7 +751,13 @@ if(_150){
 if(_147(_151)){
 _151=tick.v.toString();
 }
+if(this.options.pieValue=="value"){
+_151+=" ("+_150.yval+")";
+}else{
+if(this.options.pieValue!="none"){
 _151+=" ("+_148(_150.fraction)+")";
+}
+}
 if(!_147(tick.tooltip)){
 _151=MochiKit.DOM.SPAN({title:tick.tooltip},_151);
 }

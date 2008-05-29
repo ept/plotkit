@@ -692,7 +692,11 @@ PlotKit.Layout.prototype._evaluatePieTicks = function() {
 			if (slice) {
                 if (isNil(label))
                     label = tick.v.toString();
-                label += " (" + formatter(slice.fraction) + ")";
+                if (this.options.pieValue == "value") {
+                    label += " (" + slice.yval + ")";
+                } else if (this.options.pieValue != "none") {
+                    label += " (" + formatter(slice.fraction) + ")";
+                }
                 if (!isNil(tick.tooltip))
                     label = MochiKit.DOM.SPAN({ title: tick.tooltip }, label);
 				this.xticks.push([tick.v, label]);
