@@ -92,9 +92,9 @@ PlotKit.SweetSVGRenderer.prototype._addDropShadowFilter = function() {
 
 PlotKit.SweetSVGRenderer.prototype._renderBarChart = function() {
     var bind = MochiKit.Base.bind;
-    var shadowColor = Color.blackColor().toRGBString();
+    var shadowColor = MochiKit.Color.Color.blackColor().toRGBString();
     var shadowStyle = "fill:" + shadowColor + ";fill-opacity:0.15";
-    var strokeStyle = "stroke-width: 2.0; stroke:" + Color.whiteColor().toRGBString();
+    var strokeStyle = "stroke-width: 2.0; stroke:" + MochiKit.Color.Color.whiteColor().toRGBString();
     
     var drawRect = function(attrs, bar) {
         var x = this.area.w * bar.x + this.area.x;
@@ -116,9 +116,9 @@ PlotKit.SweetSVGRenderer.prototype._renderBarChart = function() {
 
 PlotKit.SweetSVGRenderer.prototype._renderLineChart = function() {
     var bind = MochiKit.Base.bind;
-    var shadowColor = Color.blackColor().toRGBString();
+    var shadowColor = MochiKit.Color.Color.blackColor().toRGBString();
     var shadowStyle = "fill:" + shadowColor + ";fill-opacity:0.15";
-    var strokeStyle = "stroke-width: 2.0; stroke:" + Color.whiteColor().toRGBString();
+    var strokeStyle = "stroke-width: 2.0; stroke:" + MochiKit.Color.Color.whiteColor().toRGBString();
 
     var addPoint = function(attrs, point) {
         this._tempPointsBuffer += (this.area.w * point.x + this.area.x) + "," +
@@ -157,7 +157,7 @@ PlotKit.SweetSVGRenderer.prototype._renderLineChart = function() {
 PlotKit.SweetSVGRenderer.prototype._renderPieChart = function() {
     var centerx = this.area.x + this.area.w * 0.5;
     var centery = this.area.y + this.area.h * 0.5;
-    var shadowColor = Color.blackColor().toRGBString();
+    var shadowColor = MochiKit.Color.Color.blackColor().toRGBString();
     var radius = Math.min(this.area.w * this.options.pieRadius, 
                           this.area.h * this.options.pieRadius);
     var shadowStyle = "fill:" + shadowColor + ";fill-opacity:0.15";
