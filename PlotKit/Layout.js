@@ -1,25 +1,25 @@
-/* 
+/*
     PlotKit Layout
     ==============
-    
-    Handles laying out data on to a virtual canvas square canvas between 0.0 
+
+    Handles laying out data on to a virtual canvas square canvas between 0.0
     and 1.0. If you want to add new chart/plot types such as point plots,
     you need to add them here.
-    
+
     Copyright
     ---------
     Copyright 2005,2006 (c) Alastair Tse <alastair^liquidx.net>
     For use under the BSD license. <http://www.liquidx.net/plotkit>
-    
+
 */
 
-try {    
+try {
     if (typeof(PlotKit.Base) == 'undefined')
     {
         throw ""
     }
-} 
-catch (e) {    
+}
+catch (e) {
     throw "PlotKit.Layout depends on MochiKit.{Base,Color,DOM,Format} and PlotKit.Base"
 }
 
@@ -49,7 +49,7 @@ PlotKit.Layout.valid_styles = ["bar", "line", "pie", "point"];
 // --------------------------------------------------------------------
 
 PlotKit.Layout = function(style, options) {
-  
+
     this.options = {
         "barWidthFillFraction": 0.75,
         "barOrientation": "vertical",
@@ -67,7 +67,7 @@ PlotKit.Layout = function(style, options) {
     };
 
     // valid external options : TODO: input verification
-    this.style = style; 
+    this.style = style;
     MochiKit.Base.update(this.options, options ? options : {});
 
     // externally visible states
@@ -75,7 +75,7 @@ PlotKit.Layout = function(style, options) {
     if (!MochiKit.Base.isUndefinedOrNull(this.options.xAxis)) {
         this.minxval = this.options.xAxis[0];
         this.maxxval = this.options.xAxis[1];
-        this.xscale = this.maxxval - this.minxval; 
+        this.xscale = this.maxxval - this.minxval;
     }
     else {
         this.minxval = 0;
@@ -108,7 +108,7 @@ PlotKit.Layout = function(style, options) {
     this.yrange = 1;
 
     this.hitTestCache = {x2maxy: null};
-    
+
 };
 
 // --------------------------------------------------------------------
@@ -135,11 +135,11 @@ PlotKit.Layout.prototype.addDatasetFromTable = function(name, tableElement, xcol
 		ycol = 1;
 	if (isNil(lcol))
 	    lcol = -1;
-        
+
     var rows = tableElement.tBodies[0].rows;
     var data = new Array();
     var labels = new Array();
-    
+
     if (!isNil(rows)) {
         for (var i = 0; i < rows.length; i++) {
             data.push([parseFloat(strip(scrapeText(rows[i].cells[xcol]))),
@@ -197,7 +197,7 @@ PlotKit.Layout.prototype.hitTest = function(x, y) {
     if ((this.style == "bar") && this.bars && (this.bars.length > 0)) {
         for (var i = 0; i < this.bars.length; i++) {
             var bar = this.bars[i];
-            if ((x >= bar.x) && (x <= bar.x + bar.w) 
+            if ((x >= bar.x) && (x <= bar.x + bar.w)
                 && (y >= bar.y) && (y - bar.y <= bar.h))
                 return bar;
         }
@@ -257,7 +257,7 @@ PlotKit.Layout.prototype.hitTest = function(x, y) {
         else {
             angle = Math.atan2(y - 0.5, x - 0.5) + Math.PI/2;
         }
-            
+
         for (var i = 0; i < this.slices.length; i++) {
             var slice = this.slices[i];
             if (slice.startAngle < angle && slice.endAngle >= angle)
@@ -307,7 +307,7 @@ PlotKit.Layout.prototype._evaluateLimits = function() {
         this.maxxval = this.options.xAxis[1];
         this.xscale = this.maxval - this.minxval;
     }
-    
+
     if (isNil(this.options.yAxis)) {
         if (this.options.yOriginIsZero)
             this.minyval = 0;
@@ -340,16 +340,36 @@ PlotKit.Layout.prototype._evaluateScales = function() {
         this.yscale = 1/this.yrange;
 };
 
-PlotKit.Layout.prototype._uniqueXValues = function() {
+PlotKit.Layout.prototype._uniqueXValues = function(includeArray) {
     var collapse = PlotKit.Base.collapse;
     var map = PlotKit.Base.map;
     var uniq = PlotKit.Base.uniq;
     var getter = MochiKit.Base.itemgetter;
     var items = PlotKit.Base.items;
-    
+
     var xvalues = map(parseFloat, map(getter(0), collapse(map(getter(1), items(this.datasets)))));
+    // concatenate any passed iterable object to the xvalues
+    try {
+       xvalues = MochiKit.Base.concat(xvalues, includeArray);
+    } catch (e) {}
     xvalues.sort(MochiKit.Base.compare);
     return uniq(xvalues);
+};
+
+PlotKit.Layout.prototype._barChartXDelta = function() {
+   /*
+     Work out the maximum bin size where each bin has at most one data point per bin per data set.
+     The maximum possible bin size for any set is the range for sets with more than one element or the value of the element for sets with one element. Start with that value and work down.
+   */
+   var xbin = (this.xrange == 0) ? this.maxxval : this.xrange;
+   // get the sorted bag of x values, make sure to include the min and max values.
+   var xvalues = this._uniqueXValues([this.minxval, this.maxxval]);
+   // find the smallest difference between x values, this corresponds to the maximum bin size.
+   for (var i = 1; i < xvalues.length; i++) {
+       xbin = Math.min(Math.abs(xvalues[i] - xvalues[i-1]), xbin);
+   }
+
+   return xbin;
 };
 
 // Create the bars
@@ -357,42 +377,15 @@ PlotKit.Layout.prototype._evaluateBarCharts = function() {
     var items = PlotKit.Base.items;
 
     var setCount = items(this.datasets).length;
+    var xdelta = this._barChartXDelta();
 
-    // work out how far separated values are
-    var xdelta = 10000000;
-    var xvalues = this._uniqueXValues();
-    for (var i = 1; i < xvalues.length; i++) {
-        xdelta = Math.min(Math.abs(xvalues[i] - xvalues[i-1]), xdelta);
-    }
+    // Now that we have the maximum bin size we need to re-adjust the xscale to take this into account.
+    this.xscale = 1 / (this.xrange + xdelta);
 
-    var barWidth = 0;
-    var barWidthForSet = 0;
-    var barMargin = 0;
-    if (xvalues.length == 1) {
-        // note we have to do something smarter if we only plot one value
-        xdelta = 1.0;
-        this.xscale = 1.0;
-        this.minxval = xvalues[0];
-        barWidth = 1.0 * this.options.barWidthFillFraction;
-        barWidthForSet = barWidth/setCount;
-        barMargin = (1.0 - this.options.barWidthFillFraction)/2;
-    }
-    else {
-        // readjust xscale to fix with bar charts
-        if (this.xrange == 1) {
-            this.xscale = 0.5;
-        }
-        else if (this.xrange == 2) {
-            this.xscale = 1/3.0;
-        }
-        else {
-            this.xscale = (1.0 - xdelta/this.xrange)/this.xrange;
-        }
-        barWidth = xdelta * this.xscale * this.options.barWidthFillFraction;
-        barWidthForSet = barWidth / setCount;
-        barMargin = xdelta * this.xscale * (1.0 - this.options.barWidthFillFraction)/2;
-    }
-    
+    var barWidth = xdelta * this.xscale * this.options.barWidthFillFraction;
+    var barWidthForSet = barWidth / setCount;
+    var barMargin = (xdelta * this.xscale - barWidth) / 2;
+
     this.minxdelta = xdelta; // need this for tick positions
 
     // add all the rects
@@ -412,7 +405,7 @@ PlotKit.Layout.prototype._evaluateBarCharts = function() {
                 yval: parseFloat(item[1]),
                 name: setName
             };
-            if ((rect.x >= 0.0) && (rect.x <= 1.0) && 
+            if ((rect.x >= 0.0) && (rect.x <= 1.0) &&
                 (rect.y >= 0.0) && (rect.y <= 1.0)) {
                 this.bars.push(rect);
             }
@@ -426,35 +419,14 @@ PlotKit.Layout.prototype._evaluateHorizBarCharts = function() {
     var items = PlotKit.Base.items;
 
     var setCount = items(this.datasets).length;
+    var xdelta = this._barChartXDelta();
 
-    // work out how far separated values are
-    var xdelta = 10000000;
-    var xvalues = this._uniqueXValues();
-    for (var i = 1; i < xvalues.length; i++) {
-        xdelta = Math.min(Math.abs(xvalues[i] - xvalues[i-1]), xdelta);
-    }
+    // re-adjust the xscale to take xdelta into account.
+    this.xscale = 1 / (this.xrange + xdelta);
 
-    var barWidth = 0;
-    var barWidthForSet = 0;
-    var barMargin = 0;
-    
-    // work out how far each far each bar is separated
-    if (xvalues.length == 1) {
-        // do something smarter if we only plot one value
-        xdelta = 1.0;
-        this.xscale = 1.0;
-        this.minxval = xvalues[0];
-        barWidth = 1.0 * this.options.barWidthFillFraction;
-        barWidthForSet = barWidth/setCount;
-        barMargin = (1.0 - this.options.barWidthFillFraction)/2;
-    }
-    else {
-        // readjust yscale to fix with bar charts
-        this.xscale = (1.0 - xdelta/this.xrange)/this.xrange;
-        barWidth = xdelta * this.xscale * this.options.barWidthFillFraction;
-        barWidthForSet = barWidth / setCount;
-        barMargin = xdelta * this.xscale * (1.0 - this.options.barWidthFillFraction)/2;
-    }
+    var barWidth = xdelta * this.xscale * this.options.barWidthFillFraction;
+    var barWidthForSet = barWidth / setCount;
+    var barMargin = (xdelta * this.xscale - barWidth) / 2;
 
     this.minxdelta = xdelta; // need this for tick positions
 
@@ -565,7 +537,7 @@ PlotKit.Layout.prototype._evaluatePieCharts = function() {
 
 PlotKit.Layout.prototype._evaluateLineTicksForXAxis = function() {
     var isNil = MochiKit.Base.isUndefinedOrNull;
-    
+
     if (this.options.xTicks) {
         // we use use specified ticks with optional labels
 
@@ -581,7 +553,7 @@ PlotKit.Layout.prototype._evaluateLineTicksForXAxis = function() {
                 this.xticks.push([pos, label]);
             }
         };
-        MochiKit.Iter.forEach(this.options.xTicks, 
+        MochiKit.Iter.forEach(this.options.xTicks,
                               MochiKit.Base.bind(makeTicks, this));
     }
     else if (this.options.xNumberOfTicks) {
@@ -626,13 +598,13 @@ PlotKit.Layout.prototype._evaluateLineTicksForYAxis = function() {
                               MochiKit.Base.bind(makeTicks, this));
     }
     else if (this.options.yNumberOfTicks) {
-        // We use the optionally defined number of ticks as a guide        
+        // We use the optionally defined number of ticks as a guide
         this.yticks = new Array();
 
         // if we get this separation right, we'll have good looking graphs
         var roundInt = PlotKit.Base.roundInterval;
         var prec = this.options.yTickPrecision;
-        var roughSeparation = roundInt(this.yrange, 
+        var roughSeparation = roundInt(this.yrange,
                                        this.options.yNumberOfTicks, prec);
 
         // round off each value of the y-axis to the precision
@@ -658,7 +630,7 @@ PlotKit.Layout.prototype._evaluateBarTicks = function() {
         return [tick[0] + (this.minxdelta * this.xscale)/2, tick[1]];
     };
     this.xticks = MochiKit.Base.map(MochiKit.Base.bind(centerInBar, this), this.xticks);
-    
+
     if (this.options.barOrientation == "horizontal") {
         // swap scales
         var tempticks = this.xticks;
@@ -687,7 +659,7 @@ PlotKit.Layout.prototype._evaluatePieTicks = function() {
 		
 		for (var i =0; i < this.options.xTicks.length; i++) {
 			var tick = this.options.xTicks[i];
-			var slice = lookup[tick.v]; 
+			var slice = lookup[tick.v];
             var label = tick.label;
 			if (slice) {
                 if (isNil(label))
@@ -732,7 +704,7 @@ PlotKit.Layout.prototype._regenerateHitTestCache = function() {
             var yval = dataset[j][1];
             if (this.hitTestCache.xlookup[xval])
                 this.hitTestCache.xlookup[xval].push([yval, setNames[i]]);
-            else 
+            else
                 this.hitTestCache.xlookup[xval] = [[yval, setNames[i]]];
         }
     }
@@ -763,9 +735,9 @@ PlotKit.LayoutModule.EXPORT_OK = [];
 
 PlotKit.LayoutModule.__new__ = function() {
     var m = MochiKit.Base;
-    
+
     m.nameFunctions(this);
-    
+
     this.EXPORT_TAGS = {
         ":common": this.EXPORT,
         ":all": m.concat(this.EXPORT, this.EXPORT_OK)
