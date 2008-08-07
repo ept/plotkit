@@ -199,7 +199,7 @@ PlotKit.SweetSVGRenderer.prototype._renderBackground = function() {
                 x = ticks[i][0] * this.area.w + this.area.x;
                 y = this.area.y;
                 w = 1;
-                h = this.area.w;
+                h = this.area.h;
             }
             else {
                 x = this.area.x;
