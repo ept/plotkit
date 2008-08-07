@@ -67,7 +67,7 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
         "backgroundColor": Color.whiteColor(),
         "padding": {left: 30, right: 30, top: 5, bottom: 10},
         "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[0]),
-        "strokeColor": Color.whiteColor(),
+        "strokeColor": null,
         "strokeColorTransform": "asStrokeColor",
         "strokeWidth": 0.5,
         "fillColorTransform": null,
@@ -290,6 +290,32 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
                 ctx.closePath();
             }
         };
+        if (!this.options.shouldFill) {
+            // TODO: The path should be different when not being filled,
+            // but perhaps there is a cleaner way to do this that avoids
+            // some of the code duplication?
+            makePath = function(ctx) {
+                ctx.beginPath();
+                var startX = null;
+                var startY = null;
+                var addPoint = function(ctx_, point) {
+                    if (point.name == setName) {
+                        var x = this.area.w * point.x + this.area.x;
+                        var y = this.area.h * point.y + this.area.y;
+                        if (startX == null) {
+                            ctx_.moveTo(x, y);
+                            startX = x;
+                            startY = y;
+                        } else {
+                            ctx_.lineTo(x, y);
+                        }
+                    }
+                };
+                MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
+                ctx.moveTo(startX, startY);
+                ctx.closePath();
+            };
+        }
 
         if (this.options.shouldFill) {
             bind(makePath, this)(context);

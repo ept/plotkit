@@ -156,16 +156,42 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
             ctx.beginPath();
             ctx.moveTo(this.area.x, this.area.y + this.area.h);
             var addPoint = function(ctx_, point) {
-            if (point.name == setName)
-                ctx_.lineTo(this.area.w * point.x + this.area.x,
-                            this.area.h * point.y + this.area.y);
+                if (point.name == setName) {
+                    ctx_.lineTo(this.area.w * point.x + this.area.x,
+                                this.area.h * point.y + this.area.y);
+                }
             };
             MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
-            ctx.lineTo(this.area.w + this.area.x,
-                           this.area.h + this.area.y);
+            ctx.lineTo(this.area.x + this.area.w, this.area.y + this.area.h);
             ctx.lineTo(this.area.x, this.area.y + this.area.h);
             ctx.closePath();
         };
+        if (!this.options.shouldFill) {
+            // TODO: The path should be different when not being filled,
+            // but perhaps there is a cleaner way to do this that avoids
+            // some of the code duplication?
+            makePath = function(ctx) {
+                ctx.beginPath();
+                var startX = null;
+                var startY = null;
+                var addPoint = function(ctx_, point) {
+                    if (point.name == setName) {
+                        var x = this.area.w * point.x + this.area.x;
+                        var y = this.area.h * point.y + this.area.y;
+                        if (startX == null) {
+                            ctx_.moveTo(x, y);
+                            startX = x;
+                            startY = y;
+                        } else {
+                            ctx_.lineTo(x, y);
+                        }
+                    }
+                };
+                MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
+                ctx.moveTo(startX, startY);
+                ctx.closePath();
+            };
+        }
 
         // faux shadow for firefox
         if (this.options.shouldFill) {
@@ -193,10 +219,17 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
         if (this.options.shouldFill) {
             bind(makePath, this)(context);
             context.fill();
-        } else {
-            context.strokeStyle = color.toRGBString();
         }
         if (this.options.shouldStroke) {
+            if (!this.options.shouldFill) {
+                context.save();
+                context.lineWidth = 6.0;
+                context.lineCap = "round";
+                bind(makePath, this)(context);
+                context.stroke();
+                context.restore();
+                context.strokeStyle = color.toRGBString();
+            }
             bind(makePath, this)(context);
             context.stroke();
         }
