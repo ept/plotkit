@@ -481,59 +481,48 @@ this.yscale=1;
 this.yscale=1/this.yrange;
 }
 };
-PlotKit.Layout.prototype._uniqueXValues=function(){
-var _84=PlotKit.Base.collapse;
+PlotKit.Layout.prototype._uniqueXValues=function(_84){
+var _85=PlotKit.Base.collapse;
 var map=PlotKit.Base.map;
-var _85=PlotKit.Base.uniq;
-var _86=MochiKit.Base.itemgetter;
-var _87=PlotKit.Base.items;
-var _88=map(parseFloat,map(_86(0),_84(map(_86(1),_87(this.datasets)))));
-_88.sort(MochiKit.Base.compare);
-return _85(_88);
+var _86=PlotKit.Base.uniq;
+var _87=MochiKit.Base.itemgetter;
+var _88=PlotKit.Base.items;
+var _89=map(parseFloat,map(_87(0),_85(map(_87(1),_88(this.datasets)))));
+try{
+_89=MochiKit.Base.concat(_89,_84);
+}
+catch(e){
+}
+_89.sort(MochiKit.Base.compare);
+return _86(_89);
+};
+PlotKit.Layout.prototype._barChartXDelta=function(){
+var _90=(this.xrange==0)?this.maxxval:this.xrange;
+var _91=this._uniqueXValues([this.minxval,this.maxxval]);
+for(var i=1;i<_91.length;i++){
+_90=Math.min(Math.abs(_91[i]-_91[i-1]),_90);
+}
+return _90;
 };
 PlotKit.Layout.prototype._evaluateBarCharts=function(){
-var _89=PlotKit.Base.items;
-var _90=_89(this.datasets).length;
-var _91=10000000;
-var _92=this._uniqueXValues();
-for(var i=1;i<_92.length;i++){
-_91=Math.min(Math.abs(_92[i]-_92[i-1]),_91);
-}
-var _93=0;
-var _94=0;
-var _95=0;
-if(_92.length==1){
-_91=1;
-this.xscale=1;
-this.minxval=_92[0];
-_93=1*this.options.barWidthFillFraction;
-_94=_93/_90;
-_95=(1-this.options.barWidthFillFraction)/2;
-}else{
-if(this.xrange==1){
-this.xscale=0.5;
-}else{
-if(this.xrange==2){
-this.xscale=1/3;
-}else{
-this.xscale=(1-_91/this.xrange)/this.xrange;
-}
-}
-_93=_91*this.xscale*this.options.barWidthFillFraction;
-_94=_93/_90;
-_95=_91*this.xscale*(1-this.options.barWidthFillFraction)/2;
-}
-this.minxdelta=_91;
+var _92=PlotKit.Base.items;
+var _93=_92(this.datasets).length;
+var _94=this._barChartXDelta();
+this.xscale=1/(this.xrange+_94);
+var _95=_94*this.xscale*this.options.barWidthFillFraction;
+var _96=_95/_93;
+var _97=(_94*this.xscale-_95)/2;
+this.minxdelta=_94;
 this.bars=new Array();
 var i=0;
-for(var _96 in this.datasets){
-var _97=this.datasets[_96];
-if(PlotKit.Base.isFuncLike(_97)){
+for(var _98 in this.datasets){
+var _99=this.datasets[_98];
+if(PlotKit.Base.isFuncLike(_99)){
 continue;
 }
-for(var j=0;j<_97.length;j++){
-var _99=_97[j];
-var rect={x:((parseFloat(_99[0])-this.minxval)*this.xscale)+(i*_94)+_95,y:1-((parseFloat(_99[1])-this.minyval)*this.yscale),w:_94,h:((parseFloat(_99[1])-this.minyval)*this.yscale),xval:parseFloat(_99[0]),yval:parseFloat(_99[1]),name:_96};
+for(var j=0;j<_99.length;j++){
+var item=_99[j];
+var rect={x:((parseFloat(item[0])-this.minxval)*this.xscale)+(i*_96)+_97,y:1-((parseFloat(item[1])-this.minyval)*this.yscale),w:_96,h:((parseFloat(item[1])-this.minyval)*this.yscale),xval:parseFloat(item[0]),yval:parseFloat(item[1]),name:_98};
 if((rect.x>=0)&&(rect.x<=1)&&(rect.y>=0)&&(rect.y<=1)){
 this.bars.push(rect);
 }
@@ -542,40 +531,24 @@ i++;
 }
 };
 PlotKit.Layout.prototype._evaluateHorizBarCharts=function(){
-var _101=PlotKit.Base.items;
-var _102=_101(this.datasets).length;
-var _103=10000000;
-var _104=this._uniqueXValues();
-for(var i=1;i<_104.length;i++){
-_103=Math.min(Math.abs(_104[i]-_104[i-1]),_103);
-}
-var _105=0;
-var _106=0;
-var _107=0;
-if(_104.length==1){
-_103=1;
-this.xscale=1;
-this.minxval=_104[0];
-_105=1*this.options.barWidthFillFraction;
-_106=_105/_102;
-_107=(1-this.options.barWidthFillFraction)/2;
-}else{
-this.xscale=(1-_103/this.xrange)/this.xrange;
-_105=_103*this.xscale*this.options.barWidthFillFraction;
-_106=_105/_102;
-_107=_103*this.xscale*(1-this.options.barWidthFillFraction)/2;
-}
-this.minxdelta=_103;
+var _103=PlotKit.Base.items;
+var _104=_103(this.datasets).length;
+var _105=this._barChartXDelta();
+this.xscale=1/(this.xrange+_105);
+var _106=_105*this.xscale*this.options.barWidthFillFraction;
+var _107=_106/_104;
+var _108=(_105*this.xscale-_106)/2;
+this.minxdelta=_105;
 this.bars=new Array();
 var i=0;
-for(var _108 in this.datasets){
-var _109=this.datasets[_108];
-if(PlotKit.Base.isFuncLike(_109)){
+for(var _109 in this.datasets){
+var _110=this.datasets[_109];
+if(PlotKit.Base.isFuncLike(_110)){
 continue;
 }
-for(var j=0;j<_109.length;j++){
-var item=_109[j];
-var rect={y:((parseFloat(item[0])-this.minxval)*this.xscale)+(i*_106)+_107,x:0,h:_106,w:((parseFloat(item[1])-this.minyval)*this.yscale),xval:parseFloat(item[0]),yval:parseFloat(item[1]),name:_108};
+for(var j=0;j<_110.length;j++){
+var item=_110[j];
+var rect={y:((parseFloat(item[0])-this.minxval)*this.xscale)+(i*_107)+_108,x:0,h:_107,w:((parseFloat(item[1])-this.minyval)*this.yscale),xval:parseFloat(item[0]),yval:parseFloat(item[1]),name:_109};
 if(rect.y<=0){
 rect.y=0;
 }
@@ -1931,6 +1904,8 @@ _355.strokeStyle=MochiKit.Color.Color.whiteColor().toRGBString();
 if(this.options.shouldFill){
 bind(_364,this)(_355);
 _355.fill();
+}else{
+_355.strokeStyle=_362.toRGBString();
 }
 if(this.options.shouldStroke){
 bind(_364,this)(_355);
@@ -2227,7 +2202,7 @@ if(_428){
 x=_427[i][0]*this.area.w+this.area.x;
 y=this.area.y;
 w=1;
-h=this.area.w;
+h=this.area.h;
 }else{
 x=this.area.x;
 y=_427[i][0]*this.area.h+this.area.y;

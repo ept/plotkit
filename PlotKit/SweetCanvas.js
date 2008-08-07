@@ -193,6 +193,8 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
         if (this.options.shouldFill) {
             bind(makePath, this)(context);
             context.fill();
+        } else {
+            context.strokeStyle = color.toRGBString();
         }
         if (this.options.shouldStroke) {
             bind(makePath, this)(context);
