@@ -304,7 +304,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderPieChart = function() {
     context.restore();
 };
 
-PlotKit.CanvasRenderer.prototype._renderPointChart = function() {
+PlotKit.SweetCanvasRenderer.prototype._renderPointChart = function() {
     var context = this.element.getContext("2d");
     var colorCount = this.options.colorScheme.length;
     var colorScheme = this.options.colorScheme;
@@ -316,23 +316,16 @@ PlotKit.CanvasRenderer.prototype._renderPointChart = function() {
     for (var i = 0; i < setCount; i++) {
         var setName = setNames[i];
         var color = colorScheme[i%colorCount];
-        var strokeX = this.options.strokeColorTransform;
 
         // setup graphics context
         context.save();
-        if (this.options.fillColorTransform && color[this.options.fillColorTransform])
+        if (this.options.fillColorTransform && color[this.options.fillColorTransform]) {
             context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
-        else
+        } else {
             context.fillStyle = color.toRGBString();
-
-        if (this.options.strokeColor)
-            context.strokeStyle = this.options.strokeColor.toRGBString();
-        else if (this.options.strokeColorTransform) 
-            context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
-        else
-            context.strokeStyle = color.toRGBString();
-        
-        context.lineWidth = this.options.strokeWidth;
+        }
+        context.strokeStyle = MochiKit.Color.Color.whiteColor().toRGBString();
+        context.lineWidth = 2.0;
         
         // draw points
         var drawPoint = function(ctx, point) {
@@ -340,39 +333,30 @@ PlotKit.CanvasRenderer.prototype._renderPointChart = function() {
                 ctx.beginPath();
                 ctx.arc(this.area.w * point.x + this.area.x,
                         this.area.h * point.y + this.area.y,
-                        this.area.h / 75,
+                        this.options.strokeWidth * 8,
                         0,
                         2 * Math.PI,
                         false);
                 ctx.closePath();
-                if (this.options.shouldFill) {
-                    ctx.fill();
-                }
-                if (this.options.shouldStroke) {
-                    ctx.stroke();
-                }
+                ctx.fill();
+                ctx.stroke();
             }
         };
 
         // faux shadow for firefox
-        if (this.options.shouldFill) {
-            context.save();
-            if (this.isIE) {
-                context.fillStyle = "#cccccc";
-            }
-            else {
-                context.fillStyle = MochiKit.Color.Color.blackColor().colorWithAlpha(0.2).toRGBString();
-            }
-            context.translate(3, 4);
-            MochiKit.Iter.forEach(this.layout.points, bind(drawPoint, this, context));
-            context.restore();
+        context.save();
+        context.lineWidth = 0.0;
+        if (this.isIE) {
+            context.fillStyle = "#cccccc";
+        } else {
+            context.fillStyle = MochiKit.Color.Color.blackColor().colorWithAlpha(0.2).toRGBString();
         }
+        context.translate(3, 4);
+        MochiKit.Iter.forEach(this.layout.points, bind(drawPoint, this, context));
+        context.restore();
 
         context.shadowBlur = 5.0;
         context.shadowColor = MochiKit.Color.Color.fromHexString("#888888").toRGBString();
-        context.fillStyle = color.toRGBString();
-        context.lineWidth = 2.0;
-        context.strokeStyle = MochiKit.Color.Color.whiteColor().toRGBString();
         MochiKit.Iter.forEach(this.layout.points, bind(drawPoint, this, context));
 
         context.restore();

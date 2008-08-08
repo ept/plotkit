@@ -400,46 +400,32 @@ PlotKit.CanvasRenderer.prototype._renderPointChart = function() {
     var setNames = MochiKit.Base.keys(this.layout.datasets);
     var setCount = setNames.length;
     var bind = MochiKit.Base.bind;
-    var partial = MochiKit.Base.partial;
 
     for (var i = 0; i < setCount; i++) {
         var setName = setNames[i];
         var color = colorScheme[i%colorCount];
-        var strokeX = this.options.strokeColorTransform;
 
         // setup graphics context
         context.save();
-        if (this.options.fillColorTransform && color[this.options.fillColorTransform])
+        if (this.options.fillColorTransform && color[this.options.fillColorTransform]) {
             context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
-        else
+        } else {
             context.fillStyle = color.toRGBString();
-
-        if (this.options.strokeColor)
-            context.strokeStyle = this.options.strokeColor.toRGBString();
-        else if (this.options.strokeColorTransform) 
-            context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
-        else
-            context.strokeStyle = color.toRGBString();
-        
+        }
         context.lineWidth = this.options.strokeWidth;
-        
+
         // draw dots
         var addPoint = function(ctx, point) {
             if (point.name == setName) {
                 ctx.beginPath();
                 ctx.arc(this.area.w * point.x + this.area.x,
                         this.area.h * point.y + this.area.y,
-                        this.area.h / 50,
+                        this.options.strokeWidth * 5,
                         0,
                         2 * Math.PI,
                         false);
                 ctx.closePath();
-                if (this.options.shouldFill) {
-                    ctx.fill();
-                }
-                if (this.options.shouldStroke) {
-                    ctx.stroke();
-                }
+                ctx.fill();
             }
         };
         MochiKit.Iter.forEach(this.layout.points, bind(addPoint, this, context));
