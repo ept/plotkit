@@ -176,18 +176,18 @@ PlotKit.CanvasRenderer.prototype.render = function() {
     if (this.layout.style == "bar") {
         this._renderBarChart();
 		this._renderBarAxis(); 
-	}
-    else if (this.layout.style == "pie") {
+	} else if (this.layout.style == "pie") {
         this._renderPieChart();
 		this._renderPieAxis();
-	}
-    else if (this.layout.style == "line") {
+	} else if (this.layout.style == "line") {
         this._renderLineChart();
 		this._renderLineAxis();
-	}
-    else if (this.layout.style == "point") {
+	} else if (this.layout.style == "point") {
 		this._renderLineAxis();
         this._renderPointChart();
+	} else if (this.layout.style == "area") {
+		this._renderLineAxis();
+        this._renderAreaChart();
 	}
 };
 
@@ -430,6 +430,70 @@ PlotKit.CanvasRenderer.prototype._renderPointChart = function() {
         };
         MochiKit.Iter.forEach(this.layout.points, bind(addPoint, this, context));
 
+        context.restore();
+    }
+};
+
+PlotKit.CanvasRenderer.prototype._renderAreaChart = function() {
+    var context = this.element.getContext("2d");
+    var colorCount = this.options.colorScheme.length;
+    var colorScheme = this.options.colorScheme;
+    var setNames = MochiKit.Base.keys(this.layout.datasets);
+    var setCount = setNames.length;
+    var bind = MochiKit.Base.bind;
+    var partial = MochiKit.Base.partial;
+
+    for (var i = 0; i < setCount; i++) {
+        var setName = setNames[i];
+        var color = colorScheme[i%colorCount];
+
+        // setup graphics context
+        context.save();
+        if (this.options.fillColorTransform && color[this.options.fillColorTransform]) {
+            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
+        } else {
+            context.fillStyle = color.toRGBString();
+        }
+        if (this.options.strokeColor) {
+            context.strokeStyle = this.options.strokeColor.toRGBString();
+        } else if (this.options.strokeColorTransform) {
+            context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
+        } else {
+            context.strokeStyle = color.toRGBString();
+        }
+        context.lineWidth = this.options.strokeWidth;
+
+        // create paths
+        var makePath = function(ctx) {
+            ctx.beginPath();
+            var startX = null;
+            var startY = null;
+            var addPoint = function(ctx_, point) {
+                if (point.name == setName) {
+                    var x = this.area.w * point.x + this.area.x;
+                    var y = this.area.h * point.y + this.area.y;
+                    if (startX == null) {
+                        ctx_.moveTo(x, y);
+                        startX = x;
+                        startY = y;
+                    } else {
+                        ctx_.lineTo(x, y);
+                    }
+                }
+            };
+            MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
+            ctx.lineTo(startX, startY);
+            ctx.closePath();
+        };
+
+        if (this.options.shouldFill) {
+            bind(makePath, this)(context);
+            context.fill();
+        }
+        if (this.options.shouldStroke) {
+            bind(makePath, this)(context);
+            context.stroke();
+        }
         context.restore();
     }
 };

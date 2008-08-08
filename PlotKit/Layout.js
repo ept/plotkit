@@ -173,14 +173,12 @@ PlotKit.Layout.prototype.evaluate = function() {
             this._evaluateBarCharts();
         }
         this._evaluateBarTicks();
-    }
-    else if (this.style == "line" || this.style == "point") {
-        this._evaluateLineCharts();
-        this._evaluateLineTicks();
-    }
-    else if (this.style == "pie") {
+    } else if (this.style == "pie") {
         this._evaluatePieCharts();
         this._evaluatePieTicks();
+    } else {
+        this._evaluateLineCharts();
+        this._evaluateLineTicks();
     }
 };
 
@@ -476,7 +474,11 @@ PlotKit.Layout.prototype._evaluateLineCharts = function() {
     for (var setName in this.datasets) {
         var dataset = this.datasets[setName];
         if (PlotKit.Base.isFuncLike(dataset)) continue;
-        dataset.sort(function(a, b) { return MochiKit.Base.compare(parseFloat(a[0]), parseFloat(b[0])); });
+        if (this.style != "area") {
+            dataset.sort(function(a, b) {
+                return MochiKit.Base.compare(parseFloat(a[0]), parseFloat(b[0]));
+            });
+        }
         for (var j = 0; j < dataset.length; j++) {
             var item = dataset[j];
             var point = {
