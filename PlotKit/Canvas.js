@@ -522,7 +522,7 @@ PlotKit.CanvasRenderer.prototype._renderAxis = function() {
           "zIndex": 10,
           "color": this.options.axisLabelColor.toRGBString(),
           "width": this.options.axisLabelWidth + "px",
-          "overflow": "hidden"
+          "overflow": "visible"
          }
     };
 
@@ -638,7 +638,7 @@ PlotKit.CanvasRenderer.prototype._renderPieAxis = function() {
 	                      "zIndex": 11,
 	                      "width": labelWidth + "px",
 	                      "fontSize": this.options.axisLabelFontSize + "px",
-	                      "overflow": "hidden",
+	                      "overflow": "visible",
 						  "color": this.options.axisLabelColor.toHexString()
 						};
 

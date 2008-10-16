@@ -1175,7 +1175,7 @@ return;
 }
 var DIV=MochiKit.DOM.DIV;
 var _232=this.element.getContext("2d");
-var _233={"style":{"position":"absolute","fontSize":this.options.axisLabelFontSize+"px","zIndex":10,"color":this.options.axisLabelColor.toRGBString(),"width":this.options.axisLabelWidth+"px","overflow":"hidden"}};
+var _233={"style":{"position":"absolute","fontSize":this.options.axisLabelFontSize+"px","zIndex":10,"color":this.options.axisLabelColor.toRGBString(),"width":this.options.axisLabelWidth+"px","overflow":"visible"}};
 _232.save();
 _232.strokeStyle=this.options.axisLineColor.toRGBString();
 _232.lineWidth=this.options.axisLineWidth;
@@ -1268,7 +1268,7 @@ _244=_244+Math.PI*2;
 }
 var _245=_238+Math.sin(_244)*(_240+10);
 var _246=_239-Math.cos(_244)*(_240+10);
-var _247={"position":"absolute","zIndex":11,"width":_241+"px","fontSize":this.options.axisLabelFontSize+"px","overflow":"hidden","color":this.options.axisLabelColor.toHexString()};
+var _247={"position":"absolute","zIndex":11,"width":_241+"px","fontSize":this.options.axisLabelFontSize+"px","overflow":"visible","color":this.options.axisLabelColor.toHexString()};
 if(_244<=Math.PI*0.5){
 _247["textAlign"]="left";
 _247["verticalAlign"]="top";
