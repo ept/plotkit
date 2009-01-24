@@ -202,18 +202,8 @@ PlotKit.CanvasRenderer.prototype._renderBarChartWrap = function(data, plotFunc) 
         var setName = setNames[i];
         var color = colorScheme[i%colorCount];
         context.save();
-        if (this.options.fillColorTransform && color[this.options.fillColorTransform])
-            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
-        else
-            context.fillStyle = color.toRGBString();
-
-        if (this.options.strokeColor)
-            context.strokeStyle = this.options.strokeColor.toRGBString();
-        else if (this.options.strokeColorTransform) 
-            context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
-        else
-            context.strokeStyle = color.toRGBString();
-        
+        context.fillStyle = this._fillColor(color);
+        context.strokeStyle = this._strokeColor(color);
         context.lineWidth = this.options.strokeWidth;
         var forEachFunc = function(obj) {
             if (obj.name == setName)
@@ -255,22 +245,11 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
     for (var i = 0; i < setCount; i++) {
         var setName = setNames[i];
         var color = colorScheme[i%colorCount];
-        var strokeX = this.options.strokeColorTransform;
 
         // setup graphics context
         context.save();
-        if (this.options.fillColorTransform && color[this.options.fillColorTransform])
-            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
-        else
-            context.fillStyle = color.toRGBString();
-
-        if (this.options.strokeColor)
-            context.strokeStyle = this.options.strokeColor.toRGBString();
-        else if (this.options.strokeColorTransform) 
-            context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
-        else
-            context.strokeStyle = color.toRGBString();
-        
+        context.fillStyle = this._fillColor(color);
+        context.strokeStyle = this._strokeColor(color);
         context.lineWidth = this.options.strokeWidth;
         
         // create paths
@@ -353,12 +332,7 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
     for (var i = 0; i < slices.length; i++) {
         var color = this.options.colorScheme[i%colorCount];
         context.save();
-
-        if (this.options.fillColorTransform && color[this.options.fillColorTransform])
-            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
-        else
-            context.fillStyle = color.toRGBString();
-
+        context.fillStyle = this._fillColor(color);
 
         var makePath = function() {
             context.beginPath();
@@ -380,12 +354,7 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
             if (this.options.shouldStroke) {
                 makePath();
                 context.lineWidth = this.options.strokeWidth;
-                if (this.options.strokeColor)
-                    context.strokeStyle = this.options.strokeColor.toRGBString();
-                else if (this.options.strokeColorTransform) 
-                    context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
-                else
-                    context.strokeStyle = color.toRGBString();
+                context.strokeStyle = this._strokeColor(color);
                 context.stroke();
             }
         }
@@ -407,11 +376,7 @@ PlotKit.CanvasRenderer.prototype._renderPointChart = function() {
 
         // setup graphics context
         context.save();
-        if (this.options.fillColorTransform && color[this.options.fillColorTransform]) {
-            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
-        } else {
-            context.fillStyle = color.toRGBString();
-        }
+        context.fillStyle = this._fillColor(color);
         context.lineWidth = this.options.strokeWidth;
 
         // draw dots
@@ -449,18 +414,8 @@ PlotKit.CanvasRenderer.prototype._renderAreaChart = function() {
 
         // setup graphics context
         context.save();
-        if (this.options.fillColorTransform && color[this.options.fillColorTransform]) {
-            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
-        } else {
-            context.fillStyle = color.toRGBString();
-        }
-        if (this.options.strokeColor) {
-            context.strokeStyle = this.options.strokeColor.toRGBString();
-        } else if (this.options.strokeColorTransform) {
-            context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
-        } else {
-            context.strokeStyle = color.toRGBString();
-        }
+        context.fillStyle = this._fillColor(color);
+        context.strokeStyle = this._strokeColor(color);
         context.lineWidth = this.options.strokeWidth;
 
         // create paths
@@ -714,6 +669,42 @@ PlotKit.CanvasRenderer.prototype.clear = function() {
     this.xlabels = new Array();
     this.ylabels = new Array();
 };
+
+// Returns the configured stroke color, with optional color
+// transformation applied.
+//
+// @param {Color} color the basic color scheme color
+//
+// @return {String} the stroke color RGB string
+PlotKit.CanvasRenderer.prototype._strokeColor = function (color) {
+    var opts = this.options;
+    if (opts.strokeColor) {
+        color = opts.strokeColor;
+    } else if (typeof(opts.strokeColorTransform) == "string") {
+        color = color[opts.strokeColorTransform]();
+    } else if (typeof(opts.strokeColorTransform) == "function") {
+        color = opts.strokeColorTransform(color);
+    }
+    return color.toRGBString();
+}
+
+// Returns the configured fill color, with optional color
+// transformation applied.
+//
+// @param {Color} color the basic color scheme color
+//
+// @return {String} the fill color RGB string
+PlotKit.CanvasRenderer.prototype._fillColor = function (color) {
+    var opts = this.options;
+    if (opts.fillColor) {
+        color = opts.fillColor;
+    } else if (typeof(opts.fillColorTransform) == "string") {
+        color = color[opts.fillColorTransform]();
+    } else if (typeof(opts.fillColorTransform) == "function") {
+        color = opts.fillColorTransform(color);
+    }
+    return color.toRGBString();
+}
 
 // ----------------------------------------------------------------
 //  Everything below here is experimental and undocumented.

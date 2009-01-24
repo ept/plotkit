@@ -116,7 +116,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderBarChart = function() {
         }
 
         if (this.options.shouldFill) {
-            context.fillStyle = chooseColor(bar.name).toRGBString();
+            context.fillStyle = this._fillColor(chooseColor(bar.name));
             context.fillRect(x, y, w, h);
         }
 
@@ -212,7 +212,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
 
         context.shadowBlur = 5.0;
         context.shadowColor = MochiKit.Color.Color.fromHexString("#888888").toRGBString();
-        context.fillStyle = color.toRGBString();
+        context.fillStyle = this._fillColor(color);
         context.lineWidth = 2.0;
         context.strokeStyle = MochiKit.Color.Color.whiteColor().toRGBString();
 
@@ -228,7 +228,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
                 bind(makePath, this)(context);
                 context.stroke();
                 context.restore();
-                context.strokeStyle = color.toRGBString();
+                context.strokeStyle = this._strokeColor(color);
             }
             bind(makePath, this)(context);
             context.stroke();
@@ -277,7 +277,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderPieChart = function() {
     context.lineWidth = 2.0;    
     for (var i = 0; i < slices.length; i++) {
         var color = this.options.colorScheme[i%colorCount];
-        context.fillStyle = color.toRGBString();
+        context.fillStyle = this._fillColor(color);
 
         var makePath = function() {
             context.beginPath();
@@ -319,11 +319,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderPointChart = function() {
 
         // setup graphics context
         context.save();
-        if (this.options.fillColorTransform && color[this.options.fillColorTransform]) {
-            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
-        } else {
-            context.fillStyle = color.toRGBString();
-        }
+        context.fillStyle = this._fillColor(color);
         context.strokeStyle = MochiKit.Color.Color.whiteColor().toRGBString();
         context.lineWidth = 2.0;
         
@@ -378,13 +374,9 @@ PlotKit.SweetCanvasRenderer.prototype._renderAreaChart = function() {
 
         // setup graphics context
         context.save();
-        if (this.options.fillColorTransform && color[this.options.fillColorTransform]) {
-            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
-        } else {
-            context.fillStyle = color.colorWithAlpha(0.6).toRGBString();
-        }
+        context.fillStyle = this._fillColor(color.colorWithAlpha(0.6));
         context.lineWidth = 2.0;
-        context.strokeStyle = color.toRGBString();
+        context.strokeStyle = this._strokeColor(color);
 
         // create paths
         var makePath = function(ctx) {
