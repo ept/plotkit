@@ -80,7 +80,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderBarChart = function() {
 
     var colorCount = this.options.colorScheme.length;
     var colorScheme =  this.options.colorScheme;
-    var setNames = PlotKit.Base.keys(this.layout.datasets);
+    var setNames = this.layout.datasetNames;
     var setCount = setNames.length;
 
     var chooseColor = function(name) {
@@ -135,10 +135,11 @@ PlotKit.SweetCanvasRenderer.prototype._renderBarChart = function() {
 };
 
 PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
+    var Color = MochiKit.Color.Color;
     var context = this.element.getContext("2d");
     var colorCount = this.options.colorScheme.length;
     var colorScheme = this.options.colorScheme;
-    var setNames = PlotKit.Base.keys(this.layout.datasets);
+    var setNames = this.layout.datasetNames;
     var setCount = setNames.length;
     var bind = MochiKit.Base.bind;
 
@@ -160,7 +161,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
                 ctx_.lineTo(this.area.w * point.x + this.area.x,
                             this.area.h * point.y + this.area.y);
             };
-            MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
+            MochiKit.Iter.forEach(this.layout.points, MochiKit.Base.partial(addPoint, ctx), this);
             ctx.lineTo(this.area.w + this.area.x,
                            this.area.h + this.area.y);
             ctx.lineTo(this.area.x, this.area.y + this.area.h);
@@ -203,6 +204,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
 };
 
 PlotKit.SweetCanvasRenderer.prototype._renderPieChart = function() {
+    var Color = MochiKit.Color.Color;
     var context = this.element.getContext("2d");
 
     var colorCount = this.options.colorScheme.length;

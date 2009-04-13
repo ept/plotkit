@@ -143,7 +143,7 @@ MochiKit.Base.update(PlotKit.Base, {
     
     colorScheme: function() {
         var mb = MochiKit.Base;
-        var mc = MochiKit.Color
+        var mc = MochiKit.Color;
         var scheme = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "magenta"];
         
         var makeColor = function(name) {

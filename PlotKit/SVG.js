@@ -54,6 +54,7 @@ PlotKit.SVGRenderer.SVGNS = 'http://www.w3.org/2000/svg';
 
 PlotKit.SVGRenderer.prototype.__init__ = function(element, layout, options) {
     var isNil = MochiKit.Base.isUndefinedOrNull;
+    var Color = MochiKit.Color.Color;
 
     // default options
     this.options = {
@@ -149,7 +150,7 @@ PlotKit.SVGRenderer.prototype._renderBarOrLine = function(data, plotFunc, startF
     
     var colorCount = this.options.colorScheme.length;
     var colorScheme = this.options.colorScheme;
-    var setNames = MochiKit.Base.keys(this.layout.datasets);
+    var setNames = this.layout.datasetNames;
     var setCount = setNames.length;
 
     for (var i = 0; i < setCount; i++) {
@@ -179,7 +180,7 @@ PlotKit.SVGRenderer.prototype._renderBarOrLine = function(data, plotFunc, startF
                 plotFunc(attrs, obj);
         };                
 
-        MochiKit.Iter.forEach(data, bind(forEachFunc, this));
+        MochiKit.Iter.forEach(data, MochiKit.Base.bind(forEachFunc, this));
         if (endFunc)
             endFunc(attrs);
     }
@@ -337,7 +338,7 @@ PlotKit.SVGRenderer.prototype._renderAxis = function() {
                 this._drawLine(x, y, x - 3, y, lineAttrs);
                 
                 if (this.options.axisLabelUseDiv) {
-                    var label = DIV(labelStyle, tick[1]);
+                    var label = MochiKit.DOM.DIV(labelStyle, tick[1]);
                     label.style.top = (y - this.options.axisLabelFontSize) + "px";
                     label.style.left = (x - this.options.padding.left + this.options.axisTickSize) + "px";
                     label.style.textAlign = "left";
@@ -378,7 +379,7 @@ PlotKit.SVGRenderer.prototype._renderAxis = function() {
                 }
             };
             
-            MochiKit.Iter.forEach(this.layout.yticks, bind(drawTick, this));
+            MochiKit.Iter.forEach(this.layout.yticks, MochiKit.Base.bind(drawTick, this));
         }
 
         this._drawLine(this.area.x, this.area.y, this.area.x, this.area.y + this.area.h, lineAttrs);
@@ -392,7 +393,7 @@ PlotKit.SVGRenderer.prototype._renderAxis = function() {
                 this._drawLine(x, y, x, y + this.options.axisTickSize, lineAttrs);
 
                 if (this.options.axisLabelUseDiv) {
-                    var label = DIV(labelStyle, tick[1]);
+                    var label = MochiKit.DOM.DIV(labelStyle, tick[1]);
                     label.style.top = (y + this.options.axisTickSize) + "px";
                     label.style.left = (x - this.options.axisLabelWidth/2) + "px";
                     label.style.textAlign = "center";
@@ -417,7 +418,7 @@ PlotKit.SVGRenderer.prototype._renderAxis = function() {
                 }
             };
             
-            MochiKit.Iter.forEach(this.layout.xticks, bind(drawTick, this));
+            MochiKit.Iter.forEach(this.layout.xticks, MochiKit.Base.bind(drawTick, this));
         }
 
         this._drawLine(this.area.x, this.area.y + this.area.h, this.area.x + this.area.w, this.area.y + this.area.h, lineAttrs)
@@ -526,7 +527,7 @@ PlotKit.SVGRenderer.prototype._renderPieAxis = function() {
             }
 
             if (this.options.axisLabelUseDiv) {
-                var label = DIV({'style': attrib}, this.layout.xticks[i][1]);
+                var label = MochiKit.DOM.DIV({'style': attrib}, this.layout.xticks[i][1]);
                 this.xlabels.push(label);
                 MochiKit.DOM.appendChildNodes(this.container, label);
             }
