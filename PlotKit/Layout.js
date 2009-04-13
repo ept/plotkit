@@ -63,7 +63,8 @@ PlotKit.Layout = function(style, options) {
         "yNumberOfTicks": 5,
         "xTickPrecision": 1,
         "yTickPrecision": 1,
-        "pieRadius": 0.4
+        "pieRadius": 0.4,
+        "piePercentages": true
     };
 
     // valid external options : TODO: input verification
@@ -671,7 +672,7 @@ PlotKit.Layout.prototype._evaluatePieTicks = function() {
 			if (slice) {
                 if (isNil(label))
                     label = tick.v.toString();
-				label = MochiKit.DOM.SPAN(null, label, " (" + formatter(slice.fraction) + ")");
+				if (this.options.piePercentages) label += " (" + formatter(slice.fraction) + ")";
 				this.xticks.push([tick.v, label]);
 			}
 		}
