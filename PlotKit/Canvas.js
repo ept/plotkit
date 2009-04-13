@@ -183,7 +183,7 @@ PlotKit.CanvasRenderer.prototype._renderBarChartWrap = function(data, plotFunc) 
     var context = this.element.getContext("2d");
     var colorCount = this.options.colorScheme.length;
     var colorScheme = this.options.colorScheme;
-    var setNames = MochiKit.Base.keys(this.layout.datasets);
+    var setNames = this.layout.datasetNames;
     var setCount = setNames.length;
 
     for (var i = 0; i < setCount; i++) {
@@ -229,7 +229,7 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
     var context = this.element.getContext("2d");
     var colorCount = this.options.colorScheme.length;
     var colorScheme = this.options.colorScheme;
-    var setNames = MochiKit.Base.keys(this.layout.datasets);
+    var setNames = this.layout.datasetNames;
     var setCount = setNames.length;
     var bind = MochiKit.Base.bind;
     var partial = MochiKit.Base.partial;

@@ -97,7 +97,7 @@ PlotKit.EasyPlot = function(style, options, divElem, datasources) {
         this.renderer = new SweetSVGRenderer(this.element, this.layout, options);
     }
     
-    if ((this.deferredCount == 0) && (PlotKit.Base.keys(this.layout.datasets).length > 0)) {
+    if ((this.deferredCount == 0) && (this.layout.datasetNames.length > 0)) {
         this.layout.evaluate();
         this.renderer.clear();
         this.renderer.render();    
@@ -120,7 +120,7 @@ PlotKit.EasyPlot.onDataLoaded = function(request) {
     this.layout.addDataset("data-ajax-" + this.deferredCount, table);
     this.deferredCount--;
     
-    if ((this.deferredCount == 0) && (PlotKit.Base.keys(this.layout.datasets).length > 0)) {
+    if ((this.deferredCount == 0) && (this.layout.datasetNames.length > 0)) {
         this.layout.evaluate();
         this.renderer.clear();
         this.renderer.render();

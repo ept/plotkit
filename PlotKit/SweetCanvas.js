@@ -81,7 +81,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderBarChart = function() {
 
     var colorCount = this.options.colorScheme.length;
     var colorScheme =  this.options.colorScheme;
-    var setNames = PlotKit.Base.keys(this.layout.datasets);
+    var setNames = this.layout.datasetNames;
     var setCount = setNames.length;
 
     var chooseColor = function(name) {
@@ -140,7 +140,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
     var context = this.element.getContext("2d");
     var colorCount = this.options.colorScheme.length;
     var colorScheme = this.options.colorScheme;
-    var setNames = PlotKit.Base.keys(this.layout.datasets);
+    var setNames = this.layout.datasetNames;
     var setCount = setNames.length;
     var bind = MochiKit.Base.bind;
 

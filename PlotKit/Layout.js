@@ -103,12 +103,12 @@ PlotKit.Layout = function(style, options) {
 
     // internal states
     this.datasets = new Array();
+    this.datasetNames = new Array();
     this.minxdelta = 0;
     this.xrange = 1;
     this.yrange = 1;
 
     this.hitTestCache = {x2maxy: null};
-    
 };
 
 // --------------------------------------------------------------------
@@ -118,10 +118,13 @@ PlotKit.Layout = function(style, options) {
 
 PlotKit.Layout.prototype.addDataset = function(setname, set_xy) {
     this.datasets[setname] = set_xy;
+    if (MochiKit.Base.findValue(this.datasetNames, setname) < 0)
+        this.datasetNames.push(setname);
 };
 
 PlotKit.Layout.prototype.removeDataset = function(setname, set_xy) {
     delete this.datasets[setname];
+    this.datasetNames = MochiKit.Base.filter(function(name) { return name != setname; }, this.datasetNames);
 };
 
 PlotKit.Layout.prototype.addDatasetFromTable = function(name, tableElement, xcol, ycol,  lcol) {
@@ -354,9 +357,7 @@ PlotKit.Layout.prototype._uniqueXValues = function() {
 
 // Create the bars
 PlotKit.Layout.prototype._evaluateBarCharts = function() {
-    var items = PlotKit.Base.items;
-
-    var setCount = items(this.datasets).length;
+    var setCount = this.datasetNames.length;
 
     // work out how far separated values are
     var xdelta = 10000000;
@@ -397,8 +398,8 @@ PlotKit.Layout.prototype._evaluateBarCharts = function() {
 
     // add all the rects
     this.bars = new Array();
-    var i = 0;
-    for (var setName in this.datasets) {
+    for (var i = 0; i < this.datasetNames.length; i++) {
+        var setName = this.datasetNames[i];
         var dataset = this.datasets[setName];
         if (PlotKit.Base.isFuncLike(dataset)) continue;
         for (var j = 0; j < dataset.length; j++) {
@@ -417,15 +418,12 @@ PlotKit.Layout.prototype._evaluateBarCharts = function() {
                 this.bars.push(rect);
             }
         }
-        i++;
     }
 };
 
 // Create the horizontal bars
 PlotKit.Layout.prototype._evaluateHorizBarCharts = function() {
-    var items = PlotKit.Base.items;
-
-    var setCount = items(this.datasets).length;
+    var setCount = this.datasetNames.length;
 
     // work out how far separated values are
     var xdelta = 10000000;
@@ -460,8 +458,8 @@ PlotKit.Layout.prototype._evaluateHorizBarCharts = function() {
 
     // add all the rects
     this.bars = new Array();
-    var i = 0;
-    for (var setName in this.datasets) {
+    for (var i = 0; i < this.datasetNames.length; i++) {
+        var setName = this.datasetNames[i];
         var dataset = this.datasets[setName];
         if (PlotKit.Base.isFuncLike(dataset)) continue;
         for (var j = 0; j < dataset.length; j++) {
@@ -487,21 +485,18 @@ PlotKit.Layout.prototype._evaluateHorizBarCharts = function() {
                 this.bars.push(rect);
             }
         }
-        i++;
     }
 };
 
 
 // Create the line charts
 PlotKit.Layout.prototype._evaluateLineCharts = function() {
-    var items = PlotKit.Base.items;
-
-    var setCount = items(this.datasets).length;
+    var setCount = this.datasetNames.length;
 
     // add all the rects
     this.points = new Array();
-    var i = 0;
-    for (var setName in this.datasets) {
+    for (var i = 0; i < this.datasetNames.length; i++) {
+        var setName = this.datasetNames[i];
         var dataset = this.datasets[setName];
         if (PlotKit.Base.isFuncLike(dataset)) continue;
         dataset.sort(function(a, b) { return MochiKit.Base.compare(parseFloat(a[0]), parseFloat(b[0])); });
@@ -526,21 +521,19 @@ PlotKit.Layout.prototype._evaluateLineCharts = function() {
                 this.points.push(point);
             }
         }
-        i++;
     }
 };
 
 // Create the pie charts
 PlotKit.Layout.prototype._evaluatePieCharts = function() {
     var map = MochiKit.Base.map;
-    var items = MochiKit.Base.items;
     var sum = MochiKit.Iter.sum;
     var getter = MochiKit.Base.itemgetter;
 
-    var setCount = items(this.datasets).length;
+    var setCount = this.datasetNames.length;
 
     // we plot the y values of the first dataset
-    var dataset = items(this.datasets)[0][1];
+    var dataset = this.datasets[this.datasetNames[0]];
     var total = sum(map(getter(1), dataset));
 
     this.slices = new Array();
@@ -711,16 +704,15 @@ PlotKit.Layout.prototype._regenerateHitTestCache = function() {
     var map = MochiKit.Base.map;
 
     // generate a lookup table for x values to y values
-    var setNames = keys(this.datasets);
-    for (var i = 0; i < setNames.length; i++) {
-        var dataset = this.datasets[setNames[i]];
+    for (var i = 0; i < this.datasetNames.length; i++) {
+        var dataset = this.datasets[this.datasetNames[i]];
         for (var j = 0; j < dataset.length; j++) {
             var xval = dataset[j][0];
             var yval = dataset[j][1];
             if (this.hitTestCache.xlookup[xval])
-                this.hitTestCache.xlookup[xval].push([yval, setNames[i]]);
+                this.hitTestCache.xlookup[xval].push([yval, this.datasetNames[i]]);
             else 
-                this.hitTestCache.xlookup[xval] = [[yval, setNames[i]]];
+                this.hitTestCache.xlookup[xval] = [[yval, this.datasetNames[i]]];
         }
     }
 
@@ -728,8 +720,6 @@ PlotKit.Layout.prototype._regenerateHitTestCache = function() {
         var yvals = this.hitTestCache.xlookup[x];
         this.hitTestCache.x2maxy[x] = listMax(map(itemgetter(0), yvals));
     }
-
-
 };
 
 // --------------------------------------------------------------------

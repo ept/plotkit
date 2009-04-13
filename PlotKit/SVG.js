@@ -150,7 +150,7 @@ PlotKit.SVGRenderer.prototype._renderBarOrLine = function(data, plotFunc, startF
     
     var colorCount = this.options.colorScheme.length;
     var colorScheme = this.options.colorScheme;
-    var setNames = MochiKit.Base.keys(this.layout.datasets);
+    var setNames = this.layout.datasetNames;
     var setCount = setNames.length;
 
     for (var i = 0; i < setCount; i++) {
