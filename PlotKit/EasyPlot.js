@@ -61,7 +61,7 @@ PlotKit.EasyPlot = function(style, options, divElem, datasources) {
     }
     
     // load data sources
-    if (isArrayLike(datasources)) {
+    if (MochiKit.Base.isArrayLike(datasources)) {
         for (var i = 0; i < datasources.length; i++) {
             if (typeof(datasources[i]) == "string") {
                 this.deferredCount++;
@@ -69,19 +69,19 @@ PlotKit.EasyPlot = function(style, options, divElem, datasources) {
                 var d = MochiKit.Async.doSimpleXMLHttpRequest(datasources[i]);
                 d.addCallback(MochiKit.Base.bind(PlotKit.EasyPlot.onDataLoaded, this));
             }
-            else if (isArrayLike(datasources[i])) {
+            else if (MochiKit.Base.isArrayLike(datasources[i])) {
                 this.layout.addDataset("data-" + i, datasources[i]);
             }
         }
     }
-    else if (!isUndefinedOrNull(datasources)) {
+    else if (!MochiKit.Base.isUndefinedOrNull(datasources)) {
         throw "Passed datasources are not Array like";
     }
     
     // setup canvas to render
     
     if (CanvasRenderer.isSupported()) {
-        this.element = CANVAS({"id": this.divElem.getAttribute("id") + "-canvas",
+        this.element = MochiKit.DOM.CANVAS({"id": this.divElem.getAttribute("id") + "-canvas",
                                "width": this.width,
                                "height": this.height}, "");
         this.divElem.appendChild(this.element);

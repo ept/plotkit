@@ -504,7 +504,7 @@ PlotKit.Layout.prototype._evaluateLineCharts = function() {
     for (var setName in this.datasets) {
         var dataset = this.datasets[setName];
         if (PlotKit.Base.isFuncLike(dataset)) continue;
-        dataset.sort(function(a, b) { return compare(parseFloat(a[0]), parseFloat(b[0])); });
+        dataset.sort(function(a, b) { return MochiKit.Base.compare(parseFloat(a[0]), parseFloat(b[0])); });
         for (var j = 0; j < dataset.length; j++) {
             var item = dataset[j];
             var point = {
@@ -532,8 +532,8 @@ PlotKit.Layout.prototype._evaluateLineCharts = function() {
 
 // Create the pie charts
 PlotKit.Layout.prototype._evaluatePieCharts = function() {
-    var map = PlotKit.Base.map;
-    var items = PlotKit.Base.items;
+    var map = MochiKit.Base.map;
+    var items = MochiKit.Base.items;
     var sum = MochiKit.Iter.sum;
     var getter = MochiKit.Base.itemgetter;
 
@@ -579,7 +579,7 @@ PlotKit.Layout.prototype._evaluateLineTicksForXAxis = function() {
                 this.xticks.push([pos, label]);
             }
         };
-        MochiKit.Iter.forEach(this.options.xTicks, bind(makeTicks, this));
+        MochiKit.Iter.forEach(this.options.xTicks, MochiKit.Base.bind(makeTicks, this));
     }
     else if (this.options.xNumberOfTicks) {
         // we use defined number of ticks as hint to auto generate
@@ -617,7 +617,7 @@ PlotKit.Layout.prototype._evaluateLineTicksForYAxis = function() {
                 this.yticks.push([pos, label]);
             }
         };
-        MochiKit.Iter.forEach(this.options.yTicks, bind(makeTicks, this));
+        MochiKit.Iter.forEach(this.options.yTicks, MochiKit.Base.bind(makeTicks, this));
     }
     else if (this.options.yNumberOfTicks) {
         // We use the optionally defined number of ticks as a guide        
@@ -651,7 +651,7 @@ PlotKit.Layout.prototype._evaluateBarTicks = function() {
     var centerInBar = function(tick) {
         return [tick[0] + (this.minxdelta * this.xscale)/2, tick[1]];
     };
-    this.xticks = MochiKit.Base.map(bind(centerInBar, this), this.xticks);
+    this.xticks = MochiKit.Base.map(MochiKit.Base.bind(centerInBar, this), this.xticks);
     
     if (this.options.barOrientation == "horizontal") {
         // swap scales
@@ -686,7 +686,7 @@ PlotKit.Layout.prototype._evaluatePieTicks = function() {
 			if (slice) {
                 if (isNil(label))
                     label = tick.v.toString();
-				label = SPAN(null, label, " (" + formatter(slice.fraction) + ")");
+				label = MochiKit.DOM.SPAN(null, label, " (" + formatter(slice.fraction) + ")");
 				this.xticks.push([tick.v, label]);
 			}
 		}
