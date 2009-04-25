@@ -140,10 +140,11 @@ document.createTextNode(title));
 
 PlotKit.LegendRenderer.prototype._renderListTable =
 function(colorScheme, setNames) {
-	var tabhead = THEAD(null);
-	var tabfoot = TFOOT(null);
+	var tabhead = MochiKit.DOM.THEAD(null);
+	var tabfoot = MochiKit.DOM.TFOOT(null);
+	var partial = MochiKit.Base.partial;
 
-	var tabbody = partial(TBODY, null);
+	var tabbody = partial(MochiKit.DOM.TBODY, null);
 	var i = 0;
 	var colorcount = colorScheme.length;
 	var tabrow;
@@ -151,7 +152,7 @@ function(colorScheme, setNames) {
 	for (var label in setNames)
 	{
 		var legendcolor = colorScheme[i%colorcount];
-		var legendbox = DIV({'class': 'legendbox', 'className':
+		var legendbox = MochiKit.DOM.DIV({'class': 'legendbox', 'className':
 'legendbox'});
 		legendbox.style.width = "10px";
 		legendbox.style.height = "10px";
@@ -159,15 +160,15 @@ function(colorScheme, setNames) {
 		legendbox.style.borderWidth = "1px";
 		legendbox.style.borderStyle = "solid";
 		legendbox.style.borderColor = "#000000";
-		var boxcell = TD(null, legendbox);
+		var boxcell = MochiKit.DOM.TD(null, legendbox);
 
-		var labelcell = TD({'class': 'legendlabel', 'className':
+		var labelcell = MochiKit.DOM.TD({'class': 'legendlabel', 'className':
 'legendlabel'}, setNames[i]);
 		labelcell.style.font = 'normal 10pt arial';
 
 		if (!(i % columns))
 		{
-		    tabrow = partial(TR, null);
+		    tabrow = partial(MochiKit.DOM.TR, null);
 		}
 		tabrow = partial(tabrow, boxcell, labelcell);
 		if (i % columns)
@@ -179,12 +180,12 @@ function(colorScheme, setNames) {
 	}
 	if ((setNames % columns))
 	{
-		tabrow = tabrow(TD(null), TD(null));
+		tabrow = tabrow(MochiKit.DOM.TD(), MochiKit.DOM.TD());
 		tabbody = partial(tabbody, tabrow);
 	}
 	tabbody = tabbody(null);
 
-	tab = TABLE({'class': 'legendcontainer', 'className':
+	tab = MochiKit.DOM.TABLE({'class': 'legendcontainer', 'className':
 'legendcontainer'}, tabhead, tabfoot, tabbody);
 	tab.style.marginTop = '1em';
 	tab.style.marginLeft = '1.5em';

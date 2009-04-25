@@ -116,7 +116,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderBarChart = function() {
         }
 
         if (this.options.shouldFill) {
-            context.fillStyle = chooseColor(bar.name).toRGBString();
+            context.fillStyle = this._fillColor(chooseColor(bar.name));
             context.fillRect(x, y, w, h);
         }
 
@@ -142,7 +142,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
     var setNames = this.layout.datasetNames;
     var setCount = setNames.length;
     var bind = MochiKit.Base.bind;
-
+    var partial = MochiKit.Base.partial;
 
     for (var i = 0; i < setCount; i++) {
         var setName = setNames[i];
@@ -157,16 +157,42 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
             ctx.beginPath();
             ctx.moveTo(this.area.x, this.area.y + this.area.h);
             var addPoint = function(ctx_, point) {
-            if (point.name == setName)
-                ctx_.lineTo(this.area.w * point.x + this.area.x,
-                            this.area.h * point.y + this.area.y);
+                if (point.name == setName) {
+                    ctx_.lineTo(this.area.w * point.x + this.area.x,
+                                this.area.h * point.y + this.area.y);
+                }
             };
-            MochiKit.Iter.forEach(this.layout.points, MochiKit.Base.partial(addPoint, ctx), this);
-            ctx.lineTo(this.area.w + this.area.x,
-                           this.area.h + this.area.y);
+            MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
+            ctx.lineTo(this.area.x + this.area.w, this.area.y + this.area.h);
             ctx.lineTo(this.area.x, this.area.y + this.area.h);
             ctx.closePath();
         };
+        if (!this.options.shouldFill) {
+            // TODO: The path should be different when not being filled,
+            // but perhaps there is a cleaner way to do this that avoids
+            // some of the code duplication?
+            makePath = function(ctx) {
+                ctx.beginPath();
+                var startX = null;
+                var startY = null;
+                var addPoint = function(ctx_, point) {
+                    if (point.name == setName) {
+                        var x = this.area.w * point.x + this.area.x;
+                        var y = this.area.h * point.y + this.area.y;
+                        if (startX == null) {
+                            ctx_.moveTo(x, y);
+                            startX = x;
+                            startY = y;
+                        } else {
+                            ctx_.lineTo(x, y);
+                        }
+                    }
+                };
+                MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
+                ctx.moveTo(startX, startY);
+                ctx.closePath();
+            };
+        }
 
         // faux shadow for firefox
         if (this.options.shouldFill) {
@@ -187,7 +213,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
 
         context.shadowBlur = 5.0;
         context.shadowColor = MochiKit.Color.Color.fromHexString("#888888").toRGBString();
-        context.fillStyle = color.toRGBString();
+        context.fillStyle = this._fillColor(color);
         context.lineWidth = 2.0;
         context.strokeStyle = MochiKit.Color.Color.whiteColor().toRGBString();
 
@@ -196,6 +222,15 @@ PlotKit.SweetCanvasRenderer.prototype._renderLineChart = function() {
             context.fill();
         }
         if (this.options.shouldStroke) {
+            if (!this.options.shouldFill) {
+                context.save();
+                context.lineWidth = 6.0;
+                context.lineCap = "round";
+                bind(makePath, this)(context);
+                context.stroke();
+                context.restore();
+                context.strokeStyle = this._strokeColor(color);
+            }
             bind(makePath, this)(context);
             context.stroke();
         }
@@ -244,7 +279,7 @@ PlotKit.SweetCanvasRenderer.prototype._renderPieChart = function() {
     context.lineWidth = 2.0;    
     for (var i = 0; i < slices.length; i++) {
         var color = this.options.colorScheme[i%colorCount];
-        context.fillStyle = color.toRGBString();
+        context.fillStyle = this._fillColor(color);
 
         var makePath = function() {
             context.beginPath();
@@ -271,10 +306,128 @@ PlotKit.SweetCanvasRenderer.prototype._renderPieChart = function() {
     context.restore();
 };
 
+PlotKit.SweetCanvasRenderer.prototype._renderPointChart = function() {
+    var context = this.element.getContext("2d");
+    var colorCount = this.options.colorScheme.length;
+    var colorScheme = this.options.colorScheme;
+    var setNames = MochiKit.Base.keys(this.layout.datasets);
+    var setCount = setNames.length;
+    var bind = MochiKit.Base.bind;
+    var partial = MochiKit.Base.partial;
+
+    for (var i = 0; i < setCount; i++) {
+        var setName = setNames[i];
+        var color = colorScheme[i%colorCount];
+
+        // setup graphics context
+        context.save();
+        context.fillStyle = this._fillColor(color);
+        context.strokeStyle = MochiKit.Color.Color.whiteColor().toRGBString();
+        context.lineWidth = 2.0;
+        
+        // draw points
+        var drawPoint = function(ctx, point) {
+            if (point.name == setName) {
+                ctx.beginPath();
+                ctx.arc(this.area.w * point.x + this.area.x,
+                        this.area.h * point.y + this.area.y,
+                        this.options.strokeWidth * 8,
+                        0,
+                        2 * Math.PI,
+                        false);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+        };
+
+        // faux shadow for firefox
+        context.save();
+        context.lineWidth = 0.0;
+        if (this.isIE) {
+            context.fillStyle = "#cccccc";
+        } else {
+            context.fillStyle = MochiKit.Color.Color.blackColor().colorWithAlpha(0.2).toRGBString();
+        }
+        context.translate(3, 4);
+        MochiKit.Iter.forEach(this.layout.points, bind(drawPoint, this, context));
+        context.restore();
+
+        context.shadowBlur = 5.0;
+        context.shadowColor = MochiKit.Color.Color.fromHexString("#888888").toRGBString();
+        MochiKit.Iter.forEach(this.layout.points, bind(drawPoint, this, context));
+
+        context.restore();
+    }
+};
+
+PlotKit.SweetCanvasRenderer.prototype._renderAreaChart = function() {
+    var context = this.element.getContext("2d");
+    var colorCount = this.options.colorScheme.length;
+    var colorScheme = this.options.colorScheme;
+    var setNames = MochiKit.Base.keys(this.layout.datasets);
+    var setCount = setNames.length;
+    var bind = MochiKit.Base.bind;
+    var partial = MochiKit.Base.partial;
+
+    for (var i = 0; i < setCount; i++) {
+        var setName = setNames[i];
+        var color = colorScheme[i%colorCount];
+
+        // setup graphics context
+        context.save();
+        context.fillStyle = this._fillColor(color.colorWithAlpha(0.6));
+        context.lineWidth = 2.0;
+        context.strokeStyle = this._strokeColor(color);
+
+        // create paths
+        var makePath = function(ctx) {
+            ctx.beginPath();
+            var startX = null;
+            var startY = null;
+            var addPoint = function(ctx_, point) {
+                if (point.name == setName) {
+                    var x = this.area.w * point.x + this.area.x;
+                    var y = this.area.h * point.y + this.area.y;
+                    if (startX == null) {
+                        ctx_.moveTo(x, y);
+                        startX = x;
+                        startY = y;
+                    } else {
+                        ctx_.lineTo(x, y);
+                    }
+                }
+            };
+            MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
+            ctx.lineTo(startX, startY);
+            ctx.closePath();
+        };
+
+        // white outline
+        context.save();
+        context.strokeStyle = MochiKit.Color.Color.whiteColor().toRGBString();
+        context.lineWidth = 4.0;
+        context.lineCap = "round";
+        bind(makePath, this)(context);
+        context.stroke();
+        context.restore();
+
+        if (this.options.shouldFill) {
+            bind(makePath, this)(context);
+            context.fill();
+        }
+        if (this.options.shouldStroke) {
+            bind(makePath, this)(context);
+            context.stroke();
+        }
+        context.restore();
+    }
+};
+
 PlotKit.SweetCanvasRenderer.prototype._renderBackground = function() {
     var context = this.element.getContext("2d");
    
-    if (this.layout.style == "bar" || this.layout.style == "line") {
+    if (this.layout.style == "bar" || this.layout.style == "line" || this.layout.style == "point") {
         context.save();
         context.fillStyle = this.options.backgroundColor.toRGBString();
         context.fillRect(this.area.x, this.area.y, this.area.w, this.area.h);

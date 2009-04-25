@@ -45,7 +45,7 @@ PlotKit.EasyPlot.toString = function() {
 // --------------------------------------------------------------------
 
 PlotKit.EasyPlot = function(style, options, divElem, datasources) {
-    this.layout = new Layout(style, options);
+    this.layout = new PlotKit.Layout(style, options);
     this.divElem = divElem;
     this.width = parseInt(divElem.getAttribute('width'));
     this.height = parseInt(divElem.getAttribute('height'));
@@ -82,8 +82,8 @@ PlotKit.EasyPlot = function(style, options, divElem, datasources) {
     
     if (CanvasRenderer.isSupported()) {
         this.element = MochiKit.DOM.CANVAS({"id": this.divElem.getAttribute("id") + "-canvas",
-                               "width": this.width,
-                               "height": this.height}, "");
+                                            "width": this.width,
+                                            "height": this.height}, "");
         this.divElem.appendChild(this.element);
         this.renderer = new SweetCanvasRenderer(this.element, this.layout, options);
     }

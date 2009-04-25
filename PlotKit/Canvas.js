@@ -67,7 +67,7 @@ PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
         "backgroundColor": Color.whiteColor(),
         "padding": {left: 30, right: 30, top: 5, bottom: 10},
         "colorScheme": PlotKit.Base.palette(PlotKit.Base.baseColors()[0]),
-        "strokeColor": Color.whiteColor(),
+        "strokeColor": null,
         "strokeColorTransform": "asStrokeColor",
         "strokeWidth": 0.5,
         "fillColorTransform": null,
@@ -176,14 +176,18 @@ PlotKit.CanvasRenderer.prototype.render = function() {
     if (this.layout.style == "bar") {
         this._renderBarChart();
 		this._renderBarAxis(); 
-	}
-    else if (this.layout.style == "pie") {
+	} else if (this.layout.style == "pie") {
         this._renderPieChart();
 		this._renderPieAxis();
-	}
-    else if (this.layout.style == "line") {
+	} else if (this.layout.style == "line") {
         this._renderLineChart();
 		this._renderLineAxis();
+	} else if (this.layout.style == "point") {
+		this._renderLineAxis();
+        this._renderPointChart();
+	} else if (this.layout.style == "area") {
+		this._renderLineAxis();
+        this._renderAreaChart();
 	}
 };
 
@@ -198,18 +202,8 @@ PlotKit.CanvasRenderer.prototype._renderBarChartWrap = function(data, plotFunc) 
         var setName = setNames[i];
         var color = colorScheme[i%colorCount];
         context.save();
-        if (this.options.fillColorTransform && color[this.options.fillColorTransform])
-            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
-        else
-            context.fillStyle = color.toRGBString();
-
-        if (this.options.strokeColor)
-            context.strokeStyle = this.options.strokeColor.toRGBString();
-        else if (this.options.strokeColorTransform) 
-            context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
-        else
-            context.strokeStyle = color.toRGBString();
-        
+        context.fillStyle = this._fillColor(color);
+        context.strokeStyle = this._strokeColor(color);
         context.lineWidth = this.options.strokeWidth;
         var forEachFunc = function(obj) {
             if (obj.name == setName)
@@ -251,22 +245,11 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
     for (var i = 0; i < setCount; i++) {
         var setName = setNames[i];
         var color = colorScheme[i%colorCount];
-        var strokeX = this.options.strokeColorTransform;
 
         // setup graphics context
         context.save();
-        if (this.options.fillColorTransform && color[this.options.fillColorTransform])
-            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
-        else
-            context.fillStyle = color.toRGBString();
-
-        if (this.options.strokeColor)
-            context.strokeStyle = this.options.strokeColor.toRGBString();
-        else if (this.options.strokeColorTransform) 
-            context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
-        else
-            context.strokeStyle = color.toRGBString();
-        
+        context.fillStyle = this._fillColor(color);
+        context.strokeStyle = this._strokeColor(color);
         context.lineWidth = this.options.strokeWidth;
         
         // create paths
@@ -280,6 +263,32 @@ PlotKit.CanvasRenderer.prototype._renderLineChart = function() {
             };
             MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
         };
+        if (!this.options.shouldFill) {
+            // TODO: The path should be different when not being filled,
+            // but perhaps there is a cleaner way to do this that avoids
+            // some of the code duplication?
+            makePath = function(ctx) {
+                ctx.beginPath();
+                var startX = null;
+                var startY = null;
+                var addPoint = function(ctx_, point) {
+                    if (point.name == setName) {
+                        var x = this.area.w * point.x + this.area.x;
+                        var y = this.area.h * point.y + this.area.y;
+                        if (startX == null) {
+                            ctx_.moveTo(x, y);
+                            startX = x;
+                            startY = y;
+                        } else {
+                            ctx_.lineTo(x, y);
+                        }
+                    }
+                };
+                MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
+                ctx.moveTo(startX, startY);
+                ctx.closePath();
+            };
+        }
 
         if (this.options.shouldFill) {
             bind(makePath, this)(context);
@@ -320,12 +329,7 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
     for (var i = 0; i < slices.length; i++) {
         var color = this.options.colorScheme[i%colorCount];
         context.save();
-
-        if (this.options.fillColorTransform && color[this.options.fillColorTransform])
-            context.fillStyle = color[this.options.fillColorTransform]().toRGBString();
-        else
-            context.fillStyle = color.toRGBString();
-
+        context.fillStyle = this._fillColor(color);
 
         var makePath = function() {
             context.beginPath();
@@ -347,14 +351,100 @@ PlotKit.CanvasRenderer.prototype._renderPieChart = function() {
             if (this.options.shouldStroke) {
                 makePath();
                 context.lineWidth = this.options.strokeWidth;
-                if (this.options.strokeColor)
-                    context.strokeStyle = this.options.strokeColor.toRGBString();
-                else if (this.options.strokeColorTransform) 
-                    context.strokeStyle = color[this.options.strokeColorTransform]().toRGBString();
-                else
-                    context.strokeStyle = color.toRGBString();
+                context.strokeStyle = this._strokeColor(color);
                 context.stroke();
             }
+        }
+        context.restore();
+    }
+};
+
+PlotKit.CanvasRenderer.prototype._renderPointChart = function() {
+    var context = this.element.getContext("2d");
+    var colorCount = this.options.colorScheme.length;
+    var colorScheme = this.options.colorScheme;
+    var setNames = MochiKit.Base.keys(this.layout.datasets);
+    var setCount = setNames.length;
+    var bind = MochiKit.Base.bind;
+
+    for (var i = 0; i < setCount; i++) {
+        var setName = setNames[i];
+        var color = colorScheme[i%colorCount];
+
+        // setup graphics context
+        context.save();
+        context.fillStyle = this._fillColor(color);
+        context.lineWidth = this.options.strokeWidth;
+
+        // draw dots
+        var addPoint = function(ctx, point) {
+            if (point.name == setName) {
+                ctx.beginPath();
+                ctx.arc(this.area.w * point.x + this.area.x,
+                        this.area.h * point.y + this.area.y,
+                        this.options.strokeWidth * 5,
+                        0,
+                        2 * Math.PI,
+                        false);
+                ctx.closePath();
+                ctx.fill();
+            }
+        };
+        MochiKit.Iter.forEach(this.layout.points, bind(addPoint, this, context));
+
+        context.restore();
+    }
+};
+
+PlotKit.CanvasRenderer.prototype._renderAreaChart = function() {
+    var context = this.element.getContext("2d");
+    var colorCount = this.options.colorScheme.length;
+    var colorScheme = this.options.colorScheme;
+    var setNames = MochiKit.Base.keys(this.layout.datasets);
+    var setCount = setNames.length;
+    var bind = MochiKit.Base.bind;
+    var partial = MochiKit.Base.partial;
+
+    for (var i = 0; i < setCount; i++) {
+        var setName = setNames[i];
+        var color = colorScheme[i%colorCount];
+
+        // setup graphics context
+        context.save();
+        context.fillStyle = this._fillColor(color);
+        context.strokeStyle = this._strokeColor(color);
+        context.lineWidth = this.options.strokeWidth;
+
+        // create paths
+        var makePath = function(ctx) {
+            ctx.beginPath();
+            var startX = null;
+            var startY = null;
+            var addPoint = function(ctx_, point) {
+                if (point.name == setName) {
+                    var x = this.area.w * point.x + this.area.x;
+                    var y = this.area.h * point.y + this.area.y;
+                    if (startX == null) {
+                        ctx_.moveTo(x, y);
+                        startX = x;
+                        startY = y;
+                    } else {
+                        ctx_.lineTo(x, y);
+                    }
+                }
+            };
+            MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
+            ctx.lineTo(startX, startY);
+            ctx.closePath();
+        };
+
+        if (this.options.shouldFill) {
+            bind(makePath, this)(context);
+            context.fill();
+        }
+        if (this.options.shouldStroke) {
+            bind(makePath, this)(context);
+            context.stroke();
         }
         context.restore();
     }
@@ -384,7 +474,7 @@ PlotKit.CanvasRenderer.prototype._renderAxis = function() {
           "zIndex": 10,
           "color": this.options.axisLabelColor.toRGBString(),
           "width": this.options.axisLabelWidth + "px",
-          "overflow": "hidden"
+          "overflow": "visible"
          }
     };
 
@@ -500,7 +590,7 @@ PlotKit.CanvasRenderer.prototype._renderPieAxis = function() {
 	                      "zIndex": 11,
 	                      "width": labelWidth + "px",
 	                      "fontSize": this.options.axisLabelFontSize + "px",
-	                      "overflow": "hidden",
+	                      "overflow": "visible",
 						  "color": this.options.axisLabelColor.toHexString()
 						};
 
@@ -576,6 +666,42 @@ PlotKit.CanvasRenderer.prototype.clear = function() {
     this.xlabels = new Array();
     this.ylabels = new Array();
 };
+
+// Returns the configured stroke color, with optional color
+// transformation applied.
+//
+// @param {Color} color the basic color scheme color
+//
+// @return {String} the stroke color RGB string
+PlotKit.CanvasRenderer.prototype._strokeColor = function (color) {
+    var opts = this.options;
+    if (opts.strokeColor) {
+        color = opts.strokeColor;
+    } else if (typeof(opts.strokeColorTransform) == "string") {
+        color = color[opts.strokeColorTransform]();
+    } else if (typeof(opts.strokeColorTransform) == "function") {
+        color = opts.strokeColorTransform(color);
+    }
+    return color.toRGBString();
+}
+
+// Returns the configured fill color, with optional color
+// transformation applied.
+//
+// @param {Color} color the basic color scheme color
+//
+// @return {String} the fill color RGB string
+PlotKit.CanvasRenderer.prototype._fillColor = function (color) {
+    var opts = this.options;
+    if (opts.fillColor) {
+        color = opts.fillColor;
+    } else if (typeof(opts.fillColorTransform) == "string") {
+        color = color[opts.fillColorTransform]();
+    } else if (typeof(opts.fillColorTransform) == "function") {
+        color = opts.fillColorTransform(color);
+    }
+    return color.toRGBString();
+}
 
 // ----------------------------------------------------------------
 //  Everything below here is experimental and undocumented.
