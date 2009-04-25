@@ -1,0 +1,3 @@
+[submodule "MochiKit"]
+	path = MochiKit
+	url = git://git.debian.org/git/pkg-javascript/mochikit.git
