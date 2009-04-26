@@ -1,14 +1,7 @@
-{% extends "basex.html" %}
-{% load markup %}
-{% block pageid %}code{% endblock %}
-{% block headers %}
-<link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
-{% endblock %}
-{% block title %}PlotKit.Renderer{% endblock %}
-
-{% block content %}
-<div class="page doc api">
-{% filter markdown %}
+---
+title: PlotKit.Renderer
+layout: doc
+---
 [PlotKit Home](PlotKit.html) | [<<](PlotKit.Layout.html) | [>>](PlotKit.Canvas.html)
 
 PlotKit Renderer
@@ -293,7 +286,3 @@ Events from the Chart
 
 There is preliminary support for events from the chart for the Canvas
 Renderer but the API is not stablised and subject to change. __(TODO)__.
-
-{% endfilter %}
-</div>
-{% endblock %}

@@ -1,15 +1,8 @@
-{% extends "basex.html" %}
-{% load markup %}
-{% block pageid %}code{% endblock %}
-{% block title %}PlotKit Documentation{% endblock %}
-{% block headers %}
-<link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
-{% endblock %}
+---
+title: PlotKit Documentation
+layout: doc
+---
 
-
-{% block content %}
-<div class="page doc">
-{% filter markdown %}
 PlotKit
 =======
 
@@ -154,6 +147,3 @@ Road Map
 [Labels with Images]: http://media.liquidx.net/js/plotkit-tests/labels-img.html
 [Axis Restrictions]: http://media.liquidx.net/js/plotkit-tests/axis.html
 
-{% endfilter %}
-</div>
-{% endblock %}

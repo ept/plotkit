@@ -1,3 +1,8 @@
+---
+title: PlotKit
+layout: default
+---
+
 PlotKit
 =======
 

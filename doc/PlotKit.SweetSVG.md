@@ -1,14 +1,7 @@
-{% extends "basex.html" %}
-{% load markup %}
-{% block pageid %}code{% endblock %}
-{% block headers %}
-<link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
-{% endblock %}
-{% block title %}PlotKit.SweetSVG{% endblock %}
-
-{% block content %}
-<div class="page doc">
-{% filter markdown %}
+---
+title: PlotKit.SweetSVG
+layout: doc
+---
 [PlotKit Home](PlotKit.html) | [<<](PlotKit.SweetCanvas.html) | [>>](PlotKit.EasyPlot.html)
 
 PlotKit Sweet SVG Renderer
@@ -27,8 +20,4 @@ background.
 
 Example
 =======
-
-{% endfilter %}
-</div>
-{% endblock %}
 

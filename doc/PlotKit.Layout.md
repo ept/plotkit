@@ -1,14 +1,7 @@
-{% extends "basex.html" %}
-{% load markup %}
-{% block pageid %}code{% endblock %}
-{% block headers %}
-<link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
-{% endblock %}
-{% block title %}PlotKit.Layout{% endblock %}
-
-{% block content %}
-<div class="page doc api">
-{% filter markdown %}
+---
+title: PlotKit.Layout
+layout: doc
+---
 [PlotKit Home](PlotKit.html) | [<<](PlotKit.Base.html) | [>>](PlotKit.Renderer.html)
 
 PlotKit Layout
@@ -323,10 +316,4 @@ Labels for pie charts will only use xTicks.
 
 Layout Examples
 ===============
-
-{% endfilter %}
-</div>
-{% endblock %}
-
-
 

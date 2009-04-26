@@ -1,14 +1,7 @@
-{% extends "basex.html" %}
-{% load markup %}
-{% block pageid %}code{% endblock %}
-{% block headers %}
-<link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
-{% endblock %}
-{% block title %}PlotKit.Base{% endblock %}
-
-{% block content %}
-<div class="page doc api">
-{% filter markdown %}
+---
+title: PlotKit.Base
+layout: doc
+---
 [PlotKit Home](PlotKit.html) | [>>](PlotKit.Layout.html)
 
 PlotKit Base
@@ -103,37 +96,33 @@ charts available online.
 
 * ``officeBlue()``
 
-  Blue colors: ![bluecolors](blue.png)
+  Blue colors: ![bluecolors](../images/blue.png)
 
 * ``officeRed()``
 
-  Red colors: ![redcolors](red.png)
+  Red colors: ![redcolors](../images/red.png)
 
 * ``officeGreen()``
 
-  Green colors: ![greencolors](green.png)
+  Green colors: ![greencolors](../images/green.png)
 
 * ``officePurple()``
 
-  Purple colors: ![purplecolors](purple.png)
+  Purple colors: ![purplecolors](../images/purple.png)
 
 * ``officeCyan()``
 
-  Cyan colors: ![cyancolors](cyan.png)
+  Cyan colors: ![cyancolors](../images/cyan.png)
 
 * ``officeOrange()``
 
-  Orange colors: ![orangecolors](orange.png)
+  Orange colors: ![orangecolors](../images/orange.png)
 
 * ``officeBlack()``
 
-  Black colors: ![blackcolors](black.png)
+  Black colors: ![blackcolors](../images/black.png)
 
 Usage
 -----
 
   ``var layout = PlotKit.Layout("bar", officeOrange());``
-
-{% endfilter %}
-</div>
-{% endblock %}

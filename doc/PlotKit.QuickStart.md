@@ -1,20 +1,7 @@
-{% extends "basex.html" %}
-{% load markup %}
-{% block pageid %}code{% endblock %}
-{% block title %}PlotKit Quick Start{% endblock %}
-{% block headers %}
-<script type="text/javascript" src="/js/mochi/MochiKit.js"></script>
-<script type="text/javascript" src="/js/plotkit/Base.js"></script>
-<script type="text/javascript" src="/js/plotkit/Layout.js"></script>
-<script type="text/javascript" src="/js/plotkit/Canvas.js"></script>
-<script type="text/javascript" src="/js/plotkit/SweetCanvas.js"></script>
-<link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
-{% endblock %}
-
-
-{% block content %}
-<div class="page doc">
-{% filter markdown %}
+---
+title: PlotKit Quick Start
+layout: doc_canvas
+---
 PlotKit Quick Start
 ===================
 
@@ -73,7 +60,7 @@ SweetCanvas.
 
 Now we add the ``<canvas>`` tag to where we want the graph to
 appear. Note PlotKit __requires__ the ``<canvas>`` tag is enclosed
-inside a <div> tags for labels to work.
+inside a ``<div>`` tag for labels to work.
 
      <div><canvas id="graph" height="300" width="300"></canvas></div>
 
@@ -140,8 +127,6 @@ There, it is that simple. Lets explain what each line is doing:
 
 This is a sample of what you would use to plot the graph of sqare roots for 0 to 4. Make sure you plot the graph on the load event because the DOM will not be ready if when the Javascript is first loaded.
 
-See this in an [HTML example here][example1].
-
 ### Additional Options
 
 We mentioned that both the layout and renderer may take some additional options. In order to take advantage of that, we can use a simple options dictionary to store options for both layout and the renderer, in this way:
@@ -184,7 +169,7 @@ To show you that is how it works, below is the graph defined exactly how it is p
 ### Bar charts
 
 <div>
-<div style="float: left; padding-right: 5px;" width="300" height="300"><img src="barsample.png" width="300" height="300" alt="screenshot of graph" /></div>
+<div style="float: left; padding-right: 5px;" width="300" height="300"><img src="../images/barsample.png" width="300" height="300" alt="screenshot of graph" /></div>
 <div style="float: left; padding-left: 5px;" width="300" height="300"><canvas id="bargraph" width="300" height="300"></canvas></div>
 <div style="clear: both; height: 1px; width: 1px;">&nbsp</div>
 </div>
@@ -192,7 +177,7 @@ To show you that is how it works, below is the graph defined exactly how it is p
 ### Pie Charts
 
 <div>
-<div style="float: left; padding-right: 5px;" width="300" height="300"><img src="piesample.png" width="300" height="300" alt="screenshot of graph" /></div>
+<div style="float: left; padding-right: 5px;" width="300" height="300"><img src="../images/piesample.png" width="300" height="300" alt="screenshot of graph" /></div>
 <div style="float: left; padding-left: 5px;" width="300" height="300"><canvas id="piegraph" width="300" height="300"></canvas></div>
 <div style="clear: both; height: 1px; width: 1px;">&nbsp</div>
 </div>
@@ -207,8 +192,6 @@ Alastair Tse - Last Updated: 17th March 2006
 [PlotKit]: http://www.liquidx.net/plotkit/
 [MochiKit]: http://www.mochikit.com/
 
-{% endfilter %}
-</div>
 <script type="text/javascript">
 <!--
 
@@ -253,4 +236,3 @@ if (navigator.userAgent.toLowerCase().indexOf("opera") == -1) {
 
 //-->
 </script>
-{% endblock %}

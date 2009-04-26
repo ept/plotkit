@@ -1,15 +1,8 @@
-{% extends "basex.html" %}
-{% load markup %}
-{% block pageid %}code{% endblock %}
-{% block title %}SVG and Canvas Support Status in Various Browsers.{% endblock %}
-{% block headers %}
-<link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
-{% endblock %}
+---
+title: SVG and Canvas Support Status in Various Browsers
+layout: doc
+---
 
-
-{% block content %}
-<div class="page doc">
-{% filter markdown %}
 State of SVG and Canvas in Modern Browsers
 ==========================================
 
@@ -100,20 +93,20 @@ Quirks (Inline)
   following is added to the HTML and all SVG elements are in the
   correct namespace ``svg:``.
 
-    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
-    xmlns:svg="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink">
-    ...
-    <body>
-    <!-- START Required for IE to support  inlined SVG -->
-    <object id="AdobeSVG"
-    classid="clsid:78156a80-c6a1-4bbf-8e6a-3cd390eeb4e2" width="1"
-    height="1"></object>
-    <?import namespace="svg" implementation="#AdobeSVG"?>
-    <!-- END   Required for IE to support inlined SVG -->
-    <svg:svg width="300" height="300" baseProfile="full" version="1.1"></svg:svg>
-    </body>
-    </html>
+        <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
+        xmlns:svg="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink">
+        ...
+        <body>
+        <!-- START Required for IE to support  inlined SVG -->
+        <object id="AdobeSVG"
+        classid="clsid:78156a80-c6a1-4bbf-8e6a-3cd390eeb4e2" width="1"
+        height="1"></object>
+        <?import namespace="svg" implementation="#AdobeSVG"?>
+        <!-- END   Required for IE to support inlined SVG -->
+        <svg:svg width="300" height="300" baseProfile="full" version="1.1"></svg:svg>
+        </body>
+        </html>
 
 * __Mozilla Firefox (1.5 and nightly) on Mac__ will not render
   ``text`` elements when inlined. Note that it does for Linux and Windows.
@@ -139,6 +132,3 @@ If you have anything to add or modify, please contact me at
 
 [WHATWG]: http://whatwg.org/specs/web-apps/current-work/
 
-{% endfilter %}
-</div>
-{% endblock %}

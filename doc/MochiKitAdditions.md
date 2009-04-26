@@ -1,2 +1,5 @@
-.. title: MochiKit Additions
+---
+title: MochiKit Additions
+layout: doc
+---
 

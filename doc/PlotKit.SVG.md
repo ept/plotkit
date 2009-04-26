@@ -1,14 +1,7 @@
-{% extends "basex.html" %}
-{% load markup %}
-{% block pageid %}code{% endblock %}
-{% block headers %}
-<link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
-{% endblock %}
-{% block title %}PlotKit.SVG{% endblock %}
-
-{% block content %}
-<div class="page doc api">
-{% filter markdown %}
+---
+title: PlotKit.SVG
+layout: doc
+---
 [PlotKit Home](PlotKit.html) | [<<](PlotKit.Canvas.html) | [>>](PlotKit.SweetCanvas.html)
 
 PlotKit SVG
@@ -58,7 +51,3 @@ PlotKit SVG Options
 -------------------
 
 There are no additional options for the SVG Renderer apart from the default Renderer options.
-
-{% endfilter %}
-</div>
-{% endblock %}

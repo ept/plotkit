@@ -1,14 +1,7 @@
-{% extends "basex.html" %}
-{% load markup %}
-{% block pageid %}code{% endblock %}
-{% block headers %}
-<link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
-{% endblock %}
-{% block title %}PlotKit.Canvas{% endblock %}
-
-{% block content %}
-<div class="page doc api">
-{% filter markdown %}
+---
+title: PlotKit.Canvas
+layout: doc
+---
 [PlotKit Home](PlotKit.html) | [<<](PlotKit.Renderer.html) | [>>](PlotKit.SVG.html)
 
 PlotKit Canvas
@@ -75,7 +68,3 @@ HTML page itself.
 
 [PlotKit.Renderer]: PlotKit.Renderer.html
 [Browser]: SVGCanvasCompat.html
-
-{% endfilter %}
-</div>
-{% endblock %}

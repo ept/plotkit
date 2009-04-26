@@ -1,14 +1,7 @@
-{% extends "basex.html" %}
-{% load markup %}
-{% block pageid %}code{% endblock %}
-{% block headers %}
-<link href="doc.css" media="screen" rel="stylesheet" type="text/css" />
-{% endblock %}
-{% block title %}PlotKit.Canvas{% endblock %}
-
-{% block content %}
-<div class="page doc api">
-{% filter markdown %}
+---
+title: PlotKit.EasyPlot
+layout: doc
+---
 [PlotKit Home](PlotKit.html) | [<<](PlotKit.SweetSVG.html) 
 
 PlotKit EasyPlot
@@ -44,7 +37,3 @@ In this example, two datasets are passed, one defined as a 2D array and another 
 
 
 [QuickStartEasy]: http://media.liquidx.net/js/plotkit-tests/quickstart-easy.html
-
-{% endfilter %}
-</div>
-{% endblock %}
