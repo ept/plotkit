@@ -63,9 +63,10 @@ Bar and Line Chart layout options
 	</tr>
 	<tr>
 		<th>xNumberOfTicks</th>
-		<td>Used when automatically calculating axis ticks. This denotes the number of ticks there should be in the graph.</td>
-		<td>integer</td>
-		<td>10</td>
+		<td>Used when automatically calculating axis ticks. This denotes the number of ticks there should be in the graph.
+		    Can be just a number, or an array defining a range [min, max].</td>
+		<td>integer or array of integer</td>
+		<td>[8, 12]</td>
 	</tr>
 	<tr>
 		<th>xOriginIsZero</th>
@@ -94,9 +95,10 @@ Bar and Line Chart layout options
 	</tr>
 	<tr>
 		<th>yNumberOfTicks</th>
-		<td>Used when automatically calculating axis ticks. This denotes the number of ticks there should be in the graph.</td>
-		<td>integer</td>
-		<td>5</td>
+		<td>Used when automatically calculating axis ticks. This denotes the number of ticks there should be in the graph.
+		    Can be just a number, or an array defining a range [min, max].</td>
+		<td>integer or array of integer</td>
+		<td>[5, 8]</td>
 	</tr>
 	<tr>
 		<th>yOriginIsZero</th>

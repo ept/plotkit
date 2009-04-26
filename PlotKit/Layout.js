@@ -59,8 +59,8 @@ PlotKit.Layout = function(style, options) {
         "yAxis": null, // [ymin, ymax]
         "xTicks": null, // [{label: "somelabel", v: value}, ..] (label opt.)
         "yTicks": null, // [{label: "somelabel", v: value}, ..] (label opt.)
-        "xNumberOfTicks": 10,
-        "yNumberOfTicks": 5,
+        "xNumberOfTicks": [8, 12],
+        "yNumberOfTicks": [5, 8],
         "xTickPrecision": 1,
         "yTickPrecision": 1,
         "pieRadius": 0.4,
@@ -171,19 +171,19 @@ PlotKit.Layout.prototype.evaluate = function() {
     this._evaluateLimits();
     this._evaluateScales();
     if (this.style == "bar") {
+        this._evaluateBarTicks();
         if (this.options.barOrientation == "horizontal") {
             this._evaluateHorizBarCharts();
         }
         else {
             this._evaluateBarCharts();
         }
-        this._evaluateBarTicks();
     } else if (this.style == "pie") {
-        this._evaluatePieCharts();
         this._evaluatePieTicks();
+        this._evaluatePieCharts();
     } else {
-        this._evaluateLineCharts();
         this._evaluateLineTicks();
+        this._evaluateLineCharts();
     }
 };
 
@@ -371,22 +371,18 @@ PlotKit.Layout.prototype._barChartXDelta = function() {
        xbin = Math.min(Math.abs(xvalues[i] - xvalues[i-1]), xbin);
    }
 
-   return xbin;
+   this.minxdelta = xbin;
+   // Now that we have the maximum bin size we need to re-adjust the xscale to take this into account.
+   this.xscale = 1 / (this.xrange + this.minxdelta);
 };
 
 // Create the bars
 PlotKit.Layout.prototype._evaluateBarCharts = function() {
     var setCount = this.datasetNames.length;
-    var xdelta = this._barChartXDelta();
 
-    // Now that we have the maximum bin size we need to re-adjust the xscale to take this into account.
-    this.xscale = 1 / (this.xrange + xdelta);
-
-    var barWidth = xdelta * this.xscale * this.options.barWidthFillFraction;
+    var barWidth = this.minxdelta * this.xscale * this.options.barWidthFillFraction;
     var barWidthForSet = barWidth / setCount;
-    var barMargin = (xdelta * this.xscale - barWidth) / 2;
-
-    this.minxdelta = xdelta; // need this for tick positions
+    var barMargin = (this.minxdelta * this.xscale - barWidth) / 2;
 
     // add all the rects
     this.bars = new Array();
@@ -416,16 +412,10 @@ PlotKit.Layout.prototype._evaluateBarCharts = function() {
 // Create the horizontal bars
 PlotKit.Layout.prototype._evaluateHorizBarCharts = function() {
     var setCount = this.datasetNames.length;
-    var xdelta = this._barChartXDelta();
 
-    // re-adjust the xscale to take xdelta into account.
-    this.xscale = 1 / (this.xrange + xdelta);
-
-    var barWidth = xdelta * this.xscale * this.options.barWidthFillFraction;
+    var barWidth = this.minxdelta * this.xscale * this.options.barWidthFillFraction;
     var barWidthForSet = barWidth / setCount;
-    var barMargin = (xdelta * this.xscale - barWidth) / 2;
-
-    this.minxdelta = xdelta; // need this for tick positions
+    var barMargin = (this.minxdelta * this.xscale - barWidth) / 2;
 
     // add all the rects
     this.bars = new Array();
@@ -531,6 +521,88 @@ PlotKit.Layout.prototype._evaluatePieCharts = function() {
     }
 };
 
+/**
+ * Chooses a visually appealing scale to use for a chart axis. The idea is to place ticks (subdivision
+ * markers) in regularly spaced intervals, where the interval is a pretty round number. If minValue is
+ * negative and maxValue is positive we ensure that there is a tick at zero.
+ *
+ * @param minValue {float} The smallest value which must fit in the chart.
+ * @param maxValue {float} The greatest value which must fit in the chart.
+ * @param numTicks {int or array of int} If the value is a number, the exact number of ticks
+ *      required; if the value is an array [a, b] then we search for the best-matching scale
+ *      with at least a and at most b ticks.
+ * @param maxTicks {int} The maximum number of ticks allowed.
+ * @returns {object} An object with the following fields:
+ *      ticks: {int} The number of ticks on the axis (including the zero tick and the maximum tick)
+ *      spacing: {float} The interval by which the value increases on each tick
+ *      min: {float} The minimum value on the axis.
+ *      max: {float} The maximum value on the axis. We have max-min=spacing*(ticks-1).
+ */
+PlotKit.Layout.prototype._getBestScale = function(minValue, maxValue, numTicks) {
+    // The spacings which we want to allow. For example, a spacing of 3 could produce a list
+    // of ticks like 0, 300, 600, 900, 1200, 1500.
+    var spacings = [1, 2, 3, 4, 5];
+    
+    var minTicks = 5; var maxTicks = 8; // defaults if nothing else is set
+    if (MochiKit.Base.isArrayLike(numTicks)) {
+        if (numTicks.length >= 2) {
+            minTicks = numTicks[0]; maxTicks = numTicks[1];
+        } else {
+            numTicks = numTicks[0];
+        }
+    }
+    if (typeof(numTicks) == 'number') {
+        minTicks = maxTicks = numTicks;
+    }
+
+    // If there's no variation in the values, force a scale with a range of 1.
+    if (maxValue < minValue) {
+        var tmp = maxValue; maxValue = minValue; minValue = tmp;
+    }
+    var valueRange = maxValue - minValue;
+    if (valueRange < 1e-10) {
+        maxValue = minValue + 1; valueRange = 1;
+    }
+    
+    // Iterate over all possible combinations of number of ticks and spacings, and choose the best
+    var bestFit = null;
+    for (var ticks = minTicks; ticks <= maxTicks; ticks++) {
+        for (var spacingIndex = 0; spacingIndex < spacings.length; spacingIndex++) {
+            
+            // Find the right order of magnitude for our range
+            var thisRange = spacings[spacingIndex] * (ticks - 1);
+            while (thisRange < valueRange) {
+                thisRange *= 10;
+            }
+            while (thisRange > valueRange*10) {
+                thisRange /= 10;
+            }
+            
+            // Round maxValue upwards and minValue downwards to the nearest tick. This might cause
+            // us to burst the range we just chose; if that is the case, just ignore this combination
+            // of spacing and number of ticks (we'd have to go up by an order of magnitude, which
+            // would make it a rubbish choice of scale).
+            var spacing = thisRange / (ticks - 1);
+            var maxRounded = spacing * Math.ceil(maxValue / spacing);
+            var minRounded = spacing * Math.floor(minValue / spacing);
+            var roundedRange = maxRounded - minRounded;
+            if (roundedRange > thisRange) {
+                continue;
+            }
+
+            // The best fit is the one where the distance of the extreme values from the rounded extreme
+            // values is smallest.
+            var error = thisRange - valueRange;
+            if ((bestFit == null) || (error < bestFit.error)) {
+                bestFit = {ticks: ticks, spacing: spacing, max: minRounded + thisRange, min: minRounded, error: error};
+            }
+        }
+    }
+
+    MochiKit.Logging.log("bestFit");
+    return bestFit;
+};
+
 PlotKit.Layout.prototype._evaluateLineTicksForXAxis = function() {
     var isNil = MochiKit.Base.isUndefinedOrNull;
 
@@ -553,29 +625,46 @@ PlotKit.Layout.prototype._evaluateLineTicksForXAxis = function() {
                               MochiKit.Base.bind(makeTicks, this));
     }
     else if (this.options.xNumberOfTicks) {
-        // we use defined number of ticks as hint to auto generate
+        // Automatically determine ticks
+        var prec = this.options.xTickPrecision;
         var xvalues = this._uniqueXValues();
-        var roughSeparation = this.xrange / this.options.xNumberOfTicks;
-        var tickCount = 0;
-
+        var maxTicks = this.options.xNumberOfTicks;
+        if (MochiKit.Base.isArrayLike(this.options.xNumberOfTicks)) {
+            maxTicks = this.options.xNumberOfTicks[1];
+        }
         this.xticks = new Array();
-        for (var i = 0; i <= xvalues.length; i++) {
-            if ((xvalues[i] - this.minxval) >= (tickCount * roughSeparation)) {
+        
+        // TODO: how do we know whether we should use the exact x values as ticks
+        // or create a scale based on their minimum and maximum? Current heuristic:
+        // number of unique x values > maximum number of ticks => generate scale.
+        // Might be better though to examine how 'round' the actual values are.
+        if (true) { //(xvalues.length > maxTicks) { // FIXME this heuristic doesn't work
+            // Create one tick for each unique x value
+            for (var i = 0; i < xvalues.length; i++) {
                 var pos = this.xscale * (xvalues[i] - this.minxval);
-                if ((pos > 1.0) || (pos < 0.0))
-                    continue;
+                // FIXME take xTickPrecision option into account?
+                //this.xticks.push([pos, MochiKit.Format.roundToFixed(xvalues[i], prec)]);
                 this.xticks.push([pos, xvalues[i]]);
-                tickCount++;
             }
-            if (tickCount > this.options.xNumberOfTicks)
-                break;
+            
+        } else {
+            // Generate a scale based on the minimum and maximum x values
+            var scale = this._getBestScale(this.minxval, this.maxxval, this.options.xNumberOfTicks);
+
+            this.minxval = scale.min;
+            this.maxxval = scale.max;
+
+            for (var i = 0; i < scale.ticks; i++) {
+                var xval = scale.min + i * scale.spacing;
+                var pos = i / (scale.ticks - 1); // 0 to 1
+                this.xticks.push([pos, MochiKit.Format.roundToFixed(xval, prec)]);
+            }
         }
     }
 };
 
 PlotKit.Layout.prototype._evaluateLineTicksForYAxis = function() {
     var isNil = MochiKit.Base.isUndefinedOrNull;
-
 
     if (this.options.yTicks) {
         this.yticks = new Array();
@@ -594,22 +683,17 @@ PlotKit.Layout.prototype._evaluateLineTicksForYAxis = function() {
                               MochiKit.Base.bind(makeTicks, this));
     }
     else if (this.options.yNumberOfTicks) {
-        // We use the optionally defined number of ticks as a guide
-        this.yticks = new Array();
-
-        // if we get this separation right, we'll have good looking graphs
-        var roundInt = PlotKit.Base.roundInterval;
+        // Automatically determine ticks
+        var scale = this._getBestScale(this.minyval, this.maxyval, this.options.yNumberOfTicks);
         var prec = this.options.yTickPrecision;
-        var roughSeparation = roundInt(this.yrange,
-                                       this.options.yNumberOfTicks, prec);
-
-        // round off each value of the y-axis to the precision
-        // eg. 1.3333 at precision 1 -> 1.3
-        for (var i = 0; i <= this.options.yNumberOfTicks; i++) {
-            var yval = this.minyval + (i * roughSeparation);
-            var pos = 1.0 - ((yval - this.minyval) * this.yscale);
-            if ((pos > 1.0) || (pos < 0.0))
-                continue;
+        
+        this.minyval = scale.min;
+        this.maxyval = scale.max;
+        this.yticks = new Array();
+        
+        for (var i = 0; i < scale.ticks; i++) {
+            var yval = scale.min + i * scale.spacing;
+            var pos = (scale.ticks - i - 1) / (scale.ticks - 1); // 0 to 1, with 0 being the highest-value tick
             this.yticks.push([pos, MochiKit.Format.roundToFixed(yval, prec)]);
         }
     }
@@ -618,12 +702,18 @@ PlotKit.Layout.prototype._evaluateLineTicksForYAxis = function() {
 PlotKit.Layout.prototype._evaluateLineTicks = function() {
     this._evaluateLineTicksForXAxis();
     this._evaluateLineTicksForYAxis();
+    this._evaluateScales(); // minxval, maxxval, minyval and maxyval might have changed
 };
 
 PlotKit.Layout.prototype._evaluateBarTicks = function() {
     this._evaluateLineTicks();
+    this._barChartXDelta();
+    
+    var deltaRange = this.maxxval - this.minxval + this.minxdelta;
+    var offset = 0.5 * this.minxdelta / deltaRange;
+    var rescale = (this.maxxval - this.minxval) / deltaRange;
     var centerInBar = function(tick) {
-        return [tick[0] + (this.minxdelta * this.xscale)/2, tick[1]];
+        return [offset + tick[0] * rescale, tick[1]];
     };
     this.xticks = MochiKit.Base.map(MochiKit.Base.bind(centerInBar, this), this.xticks);
 
