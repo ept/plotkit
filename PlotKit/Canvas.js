@@ -37,9 +37,10 @@ catch (e) {
 //  Defines the renderer class
 // ------------------------------------------------------------------------
 
-if (typeof(PlotKit.CanvasRenderer) == 'undefined') {
-    PlotKit.CanvasRenderer = {};
-}
+PlotKit.CanvasRenderer = function(element, layout, options) {
+    if (arguments.length  > 0)
+        this.__init__(element, layout, options);
+};
 
 PlotKit.CanvasRenderer.NAME = "PlotKit.CanvasRenderer";
 PlotKit.CanvasRenderer.VERSION = PlotKit.VERSION;
@@ -51,11 +52,6 @@ PlotKit.CanvasRenderer.__repr__ = function() {
 PlotKit.CanvasRenderer.toString = function() {
     return this.__repr__();
 }
-
-PlotKit.CanvasRenderer = function(element, layout, options) {
-    if (arguments.length  > 0)
-        this.__init__(element, layout, options);
-};
 
 PlotKit.CanvasRenderer.prototype.__init__ = function(element, layout, options) {
     var isNil = MochiKit.Base.isUndefinedOrNull;

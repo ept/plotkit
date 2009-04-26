@@ -30,10 +30,6 @@ catch (e) {
     throw "PlotKit depends on MochiKit.{Base,Color,DOM,Format}"
 }
 
-if (typeof(PlotKit.LegendRenderer) == 'undefined') {
-    PlotKit.LegendRenderer = {};
-}
-
 PlotKit.LegendRenderer = function(element, layout, options) {
     if (arguments.length  > 0)
         this.__init__(element, layout, options);

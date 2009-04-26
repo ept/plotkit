@@ -25,10 +25,6 @@ catch (e) {
 }
 
 
-if (typeof(PlotKit.SweetSVGRenderer) == 'undefined') {
-    PlotKit.SweetSVGRenderer = {};
-}
-
 PlotKit.SweetSVGRenderer = function(element, layout, options) {
     if (arguments.length > 0) {
         this.__init__(element, layout, options);

@@ -27,27 +27,6 @@ catch (e) {
 // Start of Layout definition
 // --------------------------------------------------------------------
 
-if (typeof(PlotKit.Layout) == 'undefined') {
-    PlotKit.Layout = {};
-}
-
-PlotKit.Layout.NAME = "PlotKit.Layout";
-PlotKit.Layout.VERSION = PlotKit.VERSION;
-
-PlotKit.Layout.__repr__ = function() {
-    return "[" + this.NAME + " " + this.VERSION + "]";
-};
-
-PlotKit.Layout.toString = function() {
-    return this.__repr__();
-}
-
-PlotKit.Layout.valid_styles = ["bar", "line", "pie", "point"];
-
-// --------------------------------------------------------------------
-// Start of Layout definition
-// --------------------------------------------------------------------
-
 PlotKit.Layout = function(style, options) {
 
     this.options = {
@@ -112,6 +91,21 @@ PlotKit.Layout = function(style, options) {
     this.hitTestCache = {x2maxy: null};
 
 };
+
+PlotKit.Layout.NAME = "PlotKit.Layout";
+PlotKit.Layout.VERSION = PlotKit.VERSION;
+
+PlotKit.Layout.__repr__ = function() {
+    return "[" + this.NAME + " " + this.VERSION + "]";
+};
+
+PlotKit.Layout.toString = function() {
+    return this.__repr__();
+}
+
+PlotKit.Layout.valid_styles = ["bar", "line", "pie", "point"];
+
+
 
 // --------------------------------------------------------------------
 // Dataset Manipulation

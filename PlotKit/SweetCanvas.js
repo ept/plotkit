@@ -24,10 +24,6 @@ catch (e) {
 }
 
 
-if (typeof(PlotKit.SweetCanvasRenderer) == 'undefined') {
-    PlotKit.SweetCanvasRenderer = {};
-}
-
 PlotKit.SweetCanvasRenderer = function(element, layout, options) {
     if (arguments.length > 0) {
         this.__init__(element, layout, options);

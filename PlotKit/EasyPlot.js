@@ -25,25 +25,6 @@ catch (e) {
 // Start of EasyPlot definition
 // --------------------------------------------------------------------
 
-if (typeof(PlotKit.EasyPlot) == 'undefined') {
-    PlotKit.EasyPlot = {};
-}
-
-PlotKit.EasyPlot.NAME = "PlotKit.EasyPlot";
-PlotKit.EasyPlot.VERSION = PlotKit.VERSION;
-
-PlotKit.EasyPlot.__repr__ = function() {
-    return "[" + this.NAME + " " + this.VERSION + "]";
-};
-
-PlotKit.EasyPlot.toString = function() {
-    return this.__repr__();
-}
-
-// --------------------------------------------------------------------
-// Start of EasyPlot definition
-// --------------------------------------------------------------------
-
 PlotKit.EasyPlot = function(style, options, divElem, datasources) {
     this.layout = new PlotKit.Layout(style, options);
     this.divElem = divElem;
@@ -104,6 +85,17 @@ PlotKit.EasyPlot = function(style, options, divElem, datasources) {
     }
     
 };
+
+PlotKit.EasyPlot.NAME = "PlotKit.EasyPlot";
+PlotKit.EasyPlot.VERSION = PlotKit.VERSION;
+
+PlotKit.EasyPlot.__repr__ = function() {
+    return "[" + this.NAME + " " + this.VERSION + "]";
+};
+
+PlotKit.EasyPlot.toString = function() {
+    return this.__repr__();
+}
 
 PlotKit.EasyPlot.onDataLoaded = function(request) {
     
