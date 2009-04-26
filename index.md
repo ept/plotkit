@@ -12,8 +12,8 @@ PlotKit is a Chart and Graph Plotting Library for
 Javascript. It has support for HTML Canvas and also SVG via Adobe
 SVG Viewer and native browser support.
 
-PlotKit is [fully documented](http://media.liquidx.net/js/plotkit-doc/PlotKit.html)
-and there is a [quick tutorial](http://media.liquidx.net/js/plotkit-doc/PlotKit.QuickStart.html)
+PlotKit is [fully documented](doc/PlotKit.html)
+and there is a [quick tutorial](doc/PlotKit.QuickStart.html)
 to get you started.
 
 PlotKit is a complete rewrite of CanvasGraph. It is better structured
@@ -48,14 +48,14 @@ Get/Download
   * [0.9.1 (29 August 2006)](http://media.liquidx.net/static/plotkit/plotkit-0.9.1.zip)
   * [0.9 (14 June 2006)](http://media.liquidx.net/static/plotkit/plotkit-0.9.zip)
   * [0.8 (21 March 2006)](http://media.liquidx.net/static/plotkit/plotkit-0.8.zip)
-  * For changes in older versions, look in the [PlotKit Documentation](http://media.liquidx.net/js/plotkit-doc/PlotKit.html).
+  * For changes in older versions, look in the [PlotKit Documentation](doc/PlotKit.html).
 
 
 Documentation
 -------------
 
-* [PlotKit Documentation](http://media.liquidx.net/js/plotkit-doc/PlotKit.html) - Complete documentation
-* [PlotKit Quick Start](http://media.liquidx.net/js/plotkit-doc/PlotKit.QuickStart.html)
+* [PlotKit Documentation](doc/PlotKit.html) - Complete documentation
+* [PlotKit Quick Start](doc/PlotKit.QuickStart.html)
 
 
 Development
@@ -66,23 +66,22 @@ Development
 * [PlotKit Source Code](http://code.google.com/p/plotkit/source) - Old SVN repository
 * [PlotKit Wiki](http://code.google.com/p/plotkit/) - If you have notes to contribute, here is the place.
 
-* [SVG/Canvas Browser Status](http://media.liquidx.net/js/plotkit-doc/SVGCanvasCompat.html) - A summary on
+* [SVG/Canvas Browser Status](doc/SVGCanvasCompat.html) - A summary on
   SVG and HTML Canvas support in various browsers.
 
 
 Examples
 --------
 
-* [PlotKit Dynamic Charting Test](http://media.liquidx.net/js/plotkit-tests/dynamic.html) -
-   Redrawing values from a dynamic table.
-* [PlotKit Simple Canvas Demo](http://media.liquidx.net/js/plotkit-tests/quickstart.html) -
+* [PlotKit Dynamic Charting Test](tests/dynamic.html) - Redrawing values from a dynamic table.
+* [PlotKit Simple Canvas Demo](tests/quickstart.html) -
   A self contained demo in a single file. *Use this to get started!*
-* [PlotKit Simple SVG Demo](http://media.liquidx.net/js/plotkit-tests/quickstart-svg.html) -
+* [PlotKit Simple SVG Demo](tests/quickstart-svg.html) -
   A self contained demo in a single file. *Use this to get started!*
-* [Sweet Canvas Test](http://media.liquidx.net/js/plotkit-tests/sweet.html)
-* [Sweet SVG Test](http://media.liquidx.net/js/plotkit-tests/svg-sweet.html)
-* [Simple Canvas Test](http://media.liquidx.net/js/plotkit-tests/basic.html)
-* [Simple SVG Test](http://media.liquidx.net/js/plotkit-tests/svg.html)
+* [Sweet Canvas Test](tests/sweet.html)
+* [Sweet SVG Test](tests/svg-sweet.html)
+* [Simple Canvas Test](tests/basic.html)
+* [Simple SVG Test](tests/svg.html)
 
 
 About

@@ -36,4 +36,4 @@ EasyPlot Example
 In this example, two datasets are passed, one defined as a 2D array and another which is a comma separated text file (CSV) at the location "sample.txt".  A demonstration of this is found in the [QuickStartEasy][] example.
 
 
-[QuickStartEasy]: http://media.liquidx.net/js/plotkit-tests/quickstart-easy.html
+[QuickStartEasy]: tests/quickstart-easy.html

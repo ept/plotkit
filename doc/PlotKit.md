@@ -135,15 +135,15 @@ Road Map
 [SweetSVGRenderer]: PlotKit.SweetSVG.html
 [EasyPlot]: PlotKit.EasyPlot.html
 [Browser]: SVGCanvasCompat.html
-[CanvasTest]: http://media.liquidx.net/js/plotkit-tests/basic.html
-[SVGTest]: http://media.liquidx.net/js/plotkit-tests/svg.html
-[SCanvasTest]: http://media.liquidx.net/js/plotkit-tests/sweet.html
-[SSVGTest]: http://media.liquidx.net/js/plotkit-tests/sweet-svg.html
-[QuickstartCanvasDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart.html
-[QuickstartSVGDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart-svg.html
-[QuickstartEasyDemo]: http://media.liquidx.net/js/plotkit-tests/quickstart-easy.html
-[DynamicTest]: http://media.liquidx.net/js/plotkit-tests/dynamic.html
-[Labels Example]: http://media.liquidx.net/js/plotkit-tests/labels.html
-[Labels with Images]: http://media.liquidx.net/js/plotkit-tests/labels-img.html
-[Axis Restrictions]: http://media.liquidx.net/js/plotkit-tests/axis.html
+[CanvasTest]: tests/basic.html
+[SVGTest]: tests/svg.html
+[SCanvasTest]: tests/sweet.html
+[SSVGTest]: tests/sweet-svg.html
+[QuickstartCanvasDemo]: tests/quickstart.html
+[QuickstartSVGDemo]: tests/quickstart-svg.html
+[QuickstartEasyDemo]: tests/quickstart-easy.html
+[DynamicTest]: tests/dynamic.html
+[Labels Example]: tests/labels.html
+[Labels with Images]: tests/labels-img.html
+[Axis Restrictions]: tests/axis.html
 
