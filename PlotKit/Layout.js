@@ -638,7 +638,9 @@ PlotKit.Layout.prototype._evaluateLineTicksForXAxis = function() {
                 var pos = this.xscale * (xvalues[i] - this.minxval);
                 // FIXME take xTickPrecision option into account?
                 //this.xticks.push([pos, MochiKit.Format.roundToFixed(xvalues[i], prec)]);
-                this.xticks.push([pos, xvalues[i]]);
+                if ((pos >= 0) && (pos <= 1)) {
+                    this.xticks.push([pos, xvalues[i]]);
+                }
             }
             
         } else {
