@@ -173,8 +173,8 @@ PlotKit.Layout.prototype.evaluate = function() {
             this._evaluateBarCharts();
         }
     } else if (this.style == "pie") {
-        this._evaluatePieTicks();
         this._evaluatePieCharts();
+        this._evaluatePieTicks();
     } else {
         this._evaluateLineTicks();
         this._evaluateLineCharts();
