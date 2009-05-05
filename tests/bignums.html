@@ -1,30 +1,15 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-   <title>PlotKit: Multi-Line Chart Test</title>
-   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-   <link href="tests.css" media="screen" rel="Stylesheet" type="text/css" />
-   <script src="http://github.com/ept/plotkit/raw/master/PlotKit/MochiKit.js" type="text/javascript"></script>
-   <script src="http://github.com/ept/plotkit/raw/master/PlotKit/excanvas.js" type="text/javascript"></script>
-   <script src="http://github.com/ept/plotkit/raw/master/PlotKit/PlotKit.js" type="text/javascript"></script>
-</head>
+---
+title: Test for large Y values
+scripts: [MochiKit, excanvas, PlotKit]
+layout: test
+---
 
+<div id="example" style="margin: 0 auto 0 auto;" width="400" height="400"></div>
 
-<body>
-    <div id="body">
-    <h2>Test for large Y values</h2>
-    
-    <div id="example" style="margin: 0 auto 0 auto;" width="400" height="400"></div>
-    
-    <script type="text/javascript">
-        var data = [
-            [[0, 10000000], [1, 9100000], [2, 15000000], [3, 18765432], [4, 12000000], [5, 14000000]]
-        ];
-        var options = {};
-        var plotter = EasyPlot("line", options, $("example"), data);
-    </script>
-    </div>
-    
-    <div class="footer"><a href="http://www.liquidx.net/plotkit/">PlotKit</a></div>    
-</div>
-</body></html>
+<script type="text/javascript">
+    var data = [
+        [[0, 10000000], [1, 9100000], [2, 15000000], [3, 18765432], [4, 12000000], [5, 14000000]]
+    ];
+    var options = {};
+    var plotter = EasyPlot("line", options, $("example"), data);
+</script>

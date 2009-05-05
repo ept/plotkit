@@ -1,0 +1,22 @@
+body {
+    font-family: Lucida Grande, Verdana, Sans;
+    font-size: small;
+}
+
+table#datatable td {
+     padding: 2px;        
+}
+
+table#datatable thead td {
+     border-top: 1px solid #e0e0e0;
+     background-color: #d0d0d0;
+     border-bottom: 1px solid #c0c0c0;
+     padding-left: 10px;
+     padding-right: 10px;
+}
+
+table#datatable tbody input {
+     border: 1px solid #eee;
+     padding: 2px;
+     width: 90px;
+}
