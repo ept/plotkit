@@ -19,7 +19,8 @@ function approximately_equal(t, val1, val2, name) {
 
 /**
  * Compares two arrays of JavaScript objects. Only those array items and object field names
- * which appear in 'expected' are compared.
+ * which appear in 'expected' are compared, allowing the actually returned objects to be
+ * extended with additional fields in future versions.
  */
 function compare_array_of_objects(t, was, expected, title, name) {
     for (var i=0; i < expected.length; i++) {
@@ -30,6 +31,9 @@ function compare_array_of_objects(t, was, expected, title, name) {
     }
 }
 
+/**
+ * Unit tests for the Layout module.
+ */
 tests.test_Layout = function(t) {
     var layout;
     
@@ -74,4 +78,15 @@ tests.test_Layout = function(t) {
         {x: 0.700, y: 0.50, h: 0.50, w: 0.075}, // data2, [3, 2]
         {x: 0.900, y: 0.75, h: 0.25, w: 0.075}  // data2, [4, 1]
     ], "bar chart with two series", "layout.bars");
+    
+    // Bar chart with positive and negative values
+    layout = new PlotKit.Layout('bar', {yOriginIsZero: false});
+    layout.addDataset('data1', [[0, 1], [1, -1], [2, 3], [3, -2]]);
+    layout.evaluate();
+    compare_array_of_objects(t, layout.bars, [
+        {x: 0.03125, y: 0.40, h: 0.20, w: 0.1875}, // [0,  1]
+        {x: 0.28125, y: 0.60, h: 0.20, w: 0.1875}, // [1, -1]
+        {x: 0.53125, y: 0.00, h: 0.60, w: 0.1875}, // [2,  3]
+        {x: 0.78125, y: 0.60, h: 0.40, w: 0.1875}  // [3, -2]
+    ], "bar chart with positive and negative values", "layout.bars")
 };
