@@ -30,9 +30,13 @@ function approximately_equal(t, val1, val2, name) {
  */
 function compare_array_of_objects(t, was, expected, title, name) {
     for (var i=0; i < expected.length; i++) {
-        for (var field in expected[i]) if (expected[i].hasOwnProperty(field)) {
-            approximately_equal(t, was[i][field], expected[i][field], 
-                title + ", property " + name + "[" + i + "]." + field);
+        if (typeof(was[i]) == 'undefined') {
+            t.ok(false, title + ", property " + name + "[" + i + "]", "array element not found");
+        } else {
+            for (var field in expected[i]) if (expected[i].hasOwnProperty(field)) {
+                approximately_equal(t, was[i][field], expected[i][field], 
+                    title + ", property " + name + "[" + i + "]." + field);
+            }
         }
     }
 }
@@ -224,10 +228,17 @@ tests.test_Layout = function(t) {
     ], "line chart with multiple series", "layout.points");
 
     // Line chart with over-constrained x axis range
-    layout = new PlotKit.Layout('line', {xAxis: [10, 20]});
-    layout.addDataset('data1', [[5, 0], [15, 10], [20, 15], [25, 20]]);
+    layout = new PlotKit.Layout('line', {xAxis: [10, 20], yOriginIsZero: false});
+    layout.addDataset('data1', [[4, 40], [5, 0], [15, 10], [26, 0], [25, 20]]);
     layout.evaluate();
+    t.is(layout.minyval, 5.0, "y axis minimum using interpolated point");
+    t.is(layout.maxyval, 15.0, "y axis maximum using interpolated point");
     compare_array_of_objects(t, layout.points, [
         {x: 0.0, y: 1.0}, {x: 0.5, y: 0.5}, {x: 1.0, y: 0.0}
     ], "line chart with over-constrained x axis range", "layout.points");
+    
+    //layout = new PlotKit.Layout('line', {xAxis: [0, 10], yAxis: [0, 10]});
+    //layout.addDataset('data1', [[-10, 25], [20, -5]]);
+    //layout.evaluate();
+    //[{x: 0.0, y: 0.0}, {x: 0.5, y: 0.0}, {x: 1.0, y: 0.5}]
 };
