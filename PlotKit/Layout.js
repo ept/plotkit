@@ -417,41 +417,17 @@ PlotKit.Layout.prototype._evaluateBarCharts = function() {
 
 // Create the horizontal bars
 PlotKit.Layout.prototype._evaluateHorizBarCharts = function() {
-    var setCount = this.datasetNames.length;
-
-    var barWidth = this.minxdelta * this.xscale * this.options.barWidthFillFraction;
-    var barWidthForSet = barWidth / setCount;
-    var barMargin = (this.minxdelta * this.xscale - barWidth) / 2;
-
-    // add all the rects
-    this.bars = new Array();
-    for (var i = 0; i < this.datasetNames.length; i++) {
-        var setName = this.datasetNames[i];
-        var dataset = this.datasets[setName];
-        if (PlotKit.Base.isFuncLike(dataset)) continue;
-        for (var j = 0; j < dataset.length; j++) {
-            var item = dataset[j];
-            var rect = {
-                y: ((parseFloat(item[0]) - this.minxval) * this.xscale) + (i * barWidthForSet) + barMargin,
-                x: 0.0,
-                h: barWidthForSet,
-                w: ((parseFloat(item[1]) - this.minyval) * this.yscale),
-                xval: parseFloat(item[0]),
-                yval: parseFloat(item[1]),
-                name: setName
-            };
-
-            // limit the x, y values so they do not overdraw
-            if (rect.y <= 0.0) {
-                rect.y = 0.0;
-            }
-            if (rect.y >= 1.0) {
-                rect.y = 1.0;
-            }
-            if ((rect.x >= 0.0) && (rect.x <= 1.0)) {
-                this.bars.push(rect);
-            }
-        }
+    this._evaluateBarCharts();
+    
+    // Swap the x and y axes
+    for (var i = 0; i < this.bars.length; i++) {
+        var oldrect = this.bars[i];
+        var newrect = {
+            x: 1.0 - oldrect.y - oldrect.h, w: oldrect.h,
+            y: oldrect.x, h: oldrect.w,
+            xval: oldrect.xval, yval: oldrect.yval, name: oldrect.name
+        };
+        this.bars[i] = newrect;
     }
 };
 
