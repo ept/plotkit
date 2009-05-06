@@ -278,8 +278,22 @@ PlotKit.Layout.prototype.angleRangeForX = function(x) {
 // START Internal Functions
 // --------------------------------------------------------------------
 
+/**
+ * Takes as arguments the name of a dataset and a single datapoint from that dataset, and transforms
+ * it into a canonical format: an object with attributes 'x', 'y' and 'name'.
+ */
+PlotKit.Layout.prototype._parseDatapoint = function(datasetName, point) {
+    return {x: parseFloat(point[0]), y: parseFloat(point[1]), name: datasetName};
+};
+
+/**
+ * Determines the minimum and maximum values which need to fit into the chart in both the x
+ * and the y axis, and writes these to the fields this.{min,max}{x,y}val. If axis ranges were
+ * explicitly specified as an option, these are used; otherwise we observe the values in
+ * our datasets.
+ */
 PlotKit.Layout.prototype._evaluateLimits = function() {
-    // take all values from all datasets and find max and min
+    // Convenient shortcuts
     var map = PlotKit.Base.map;
     var items = PlotKit.Base.items;
     var itemgetter = MochiKit.Base.itemgetter;
@@ -287,37 +301,97 @@ PlotKit.Layout.prototype._evaluateLimits = function() {
     var listMin = MochiKit.Base.listMin;
     var listMax = MochiKit.Base.listMax;
     var isNil = MochiKit.Base.isUndefinedOrNull;
+    var bind = MochiKit.Base.bind;
+    var partial = MochiKit.Base.partial;
+    var compose = MochiKit.Base.compose;
+    var operator = MochiKit.Base.operator;
 
-
-    var all = collapse(map(itemgetter(1), items(this.datasets)));
-    if (isNil(this.options.xAxis)) { // calc minxval, maxxval from dataset
-        if (this.options.xOriginIsZero)
-            this.minxval = 0;
-        else
-            this.minxval = listMin(map(parseFloat, map(itemgetter(0), all)));
-
-        this.maxxval = listMax(map(parseFloat, map(itemgetter(0), all)));
-    }
-    else {
+    // Array of all datapoints (regardless of the series they belong to) sorted by x value,
+    // represented as objects with fields 'x', 'y' and 'name'.
+    var all = collapse(map(bind(function(dataset) {
+        var parse = partial(this._parseDatapoint, dataset[0]);
+        return map(parse, dataset[1]);
+    }, this), items(this.datasets)));
+    all.sort(function(a, b) {
+        return MochiKit.Base.compare(a.x, b.x);
+    });
+    
+    ///////// Determine x axis range
+    if (!isNil(this.options.xAxis)) {
+        // use the xAxis option value
         this.minxval = this.options.xAxis[0];
         this.maxxval = this.options.xAxis[1];
-        this.xscale = this.maxval - this.minxval;
+        
+    } else {
+        // no x range specified - calc minxval, maxxval from dataset
+        if (this.options.xOriginIsZero || all.length == 0) this.minxval = 0;
+        else this.minxval = all[0].x;
+
+        if (all.length == 0) this.maxxval = 1; // arbitrary default if no data is present
+        else this.maxxval = all[all.length - 1].x;
     }
 
-    if (isNil(this.options.yAxis)) {
-        if (this.options.yOriginIsZero)
-            this.minyval = 0;
-        else
-            this.minyval = listMin(map(parseFloat, map(itemgetter(1), all)));
-
-        this.maxyval = listMax(map(parseFloat, map(itemgetter(1), all)));
-    }
-    else {
+    ///////// Determine y axis range
+    if (!isNil(this.options.yAxis)) {
+        // use the yAxis option value
         this.minyval = this.options.yAxis[0];
         this.maxyval = this.options.yAxis[1];
-        this.yscale = this.maxyval - this.minyval;
-    }
+        
+    } else if (!isNil(this.options.xAxis) && (all.length > 0) && (this.style == 'line')) {
+        // if the x axis range is constrained but the y axis range is not, we examine only the
+        // datapoints within that range of x values to find the minimum and maximum y values.
+        // we also look at the boundaries and interpolate the line to the nearest data points
+        // just outside the selected x range; this allows us to fit in the interpolated lines
+        // up to the x axis range boundary.
+        this.minyval = this.maxyval = null;
+        var closestBelow = {}, closestAbove = {}, firstInside = {}, lastInside = {};
+        
+        for (var i = 0; i < all.length; i++) {
+            var p = all[i];
+            if (p.x < this.minxval) {
+                closestBelow[p.name] = p;
+            } else if (p.x <= this.maxxval) {
+                if ((this.minyval == null) || (p.y < this.minyval)) this.minyval = p.y;
+                if ((this.maxyval == null) || (p.y > this.maxyval)) this.maxyval = p.y;
+                if (typeof(firstInside[p.name]) == 'undefined') firstInside[p.name] = p;
+                lastInside[p.name] = p;
+            } else if (typeof(closestAbove[p.name]) == 'undefined') {
+                closestAbove[p.name] = p;
+            }
+        }
+        
+        // Interpolation on the left-hand boundary
+        var intersect = filter(compose(operator.lognot, isNull), map(bind(function(itemBelow) {
+            var below = itemBelow[1];
+            var inside = firstInside[itemBelow[0]] || closestAbove[itemBelow[0]];
+            if (typeof(inside) == 'undefined') return null;
+            return (inside.y - below.y) * (this.minxval - below.x) / (inside.x - below.x) + below.y;
+        }, this), items(closestBelow)));
+        this.minyval = Math.min(this.minyval, listMin(intersect));
+        this.maxyval = Math.max(this.maxyval, listMax(intersect));
+        
+        // Interpolation on the right-hand boundary
+        intersect = filter(compose(operator.lognot, isNull), map(bind(function(itemAbove) {
+            var above = itemAbove[1];
+            var inside = lastInside[itemAbove[0]] || closestBelow[itemAbove[0]];
+            if (typeof(inside) == 'undefined') return null;
+            return (above.y - inside.y) * (this.maxxval - inside.x) / (above.x - inside.x) + inside.y;
+        }, this), items(closestAbove)));
+        this.minyval = Math.min(this.minyval, listMin(intersect));
+        this.maxyval = Math.max(this.maxyval, listMax(intersect));
+        
+        // yOriginIsZero override
+        if (this.options.yOriginIsZero) this.minyval = 0;
+        
+    } else {
+        // if neither xAxis nor yAxis is specified, find the minimum and maximum over the entire
+        // list of data points
+        if (this.options.yOriginIsZero || all.length == 0) this.minyval = 0;
+        else this.minyval = listMin(map(itemgetter('y'), all));
 
+        if (all.length == 0) this.maxyval = 1; // arbitrary default if no data is present
+        else this.maxyval = listMax(map(itemgetter('y'), all));
+    }
 };
 
 PlotKit.Layout.prototype._evaluateScales = function() {
