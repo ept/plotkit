@@ -436,25 +436,25 @@ PlotKit.Layout.prototype._evaluateHorizBarCharts = function() {
 PlotKit.Layout.prototype._evaluateLineCharts = function() {
     var setCount = this.datasetNames.length;
 
-    // add all the rects
+    // add all the points
     this.points = new Array();
     for (var i = 0; i < this.datasetNames.length; i++) {
         var setName = this.datasetNames[i];
         var dataset = this.datasets[setName];
         if (PlotKit.Base.isFuncLike(dataset)) continue;
-        if (this.style != "area") {
-            dataset.sort(function(a, b) {
-                return MochiKit.Base.compare(parseFloat(a[0]), parseFloat(b[0]));
-            });
-        }
+
+        dataset.sort(function(a, b) {
+            return MochiKit.Base.compare(parseFloat(a[0]), parseFloat(b[0]));
+        });
+
         for (var j = 0; j < dataset.length; j++) {
             var item = dataset[j];
+            var xval = parseFloat(item[0]);
+            var yval = parseFloat(item[1]);
             var point = {
-                x: ((parseFloat(item[0]) - this.minxval) * this.xscale),
-                y: 1.0 - ((parseFloat(item[1]) - this.minyval) * this.yscale),
-                xval: parseFloat(item[0]),
-                yval: parseFloat(item[1]),
-                name: setName
+                x: ((xval - this.minxval) * this.xscale),
+                y: 1.0 - ((yval - this.minyval) * this.yscale),
+                xval: xval, yval: yval, name: setName
             };
 
             // limit the x, y values so they do not overdraw
