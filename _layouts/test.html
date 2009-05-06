@@ -21,6 +21,12 @@
     <script src="http://github.com/ept/plotkit/raw/master/PlotKit/{{ script }}.js" type="text/javascript"></script>
     {% endfor %}
 
+    {% if page.unit_test %}
+    <link href="../stylesheets/simple_test.css" media="screen" rel="Stylesheet" type="text/css" />
+    <script src="http://svn.mochikit.com/mochikit/trunk/tests/SimpleTest/SimpleTest.js" type="text/javascript"></script>
+    <script src="{{ page.unit_test }}.js" type="text/javascript"></script>
+    {% endif %}
+
     {% for script in page.test_scripts %}
     <script src="{{ script }}.js" type="text/javascript"></script>
     {% endfor %}
@@ -38,6 +44,30 @@
 
     {{ content }}
     
+    {% if page.unit_test %}
+    <!-- unit testing borrowed from MochiKit -->
+    <script type="text/javascript">
+    try {
+        //SimpleTest.saveScope(this);
+        tests.{{ page.unit_test }}({ok:ok, is:is});
+        //SimpleTest.verifyScope(this);
+        //ok(true, "test suite finished!");
+    } catch (err) {
+        var s = "test suite failure!\n";
+        var o = {};
+        var k = null;
+        for (k in err) {
+            // ensure unique keys?!
+            if (!o[k]) {
+                s +=  k + ": " + err[k] + "\n";
+                o[k] = err[k];
+            }
+        }
+        ok(false, s);
+    }
+    </script>
+    {% endif %}
+
     <div class="footer"><a href="http://www.liquidx.net/plotkit/">PlotKit</a></div>    
 </body>
 </html>
