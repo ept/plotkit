@@ -384,21 +384,33 @@ PlotKit.Layout.prototype._evaluateBarCharts = function() {
         var setName = this.datasetNames[i];
         var dataset = this.datasets[setName];
         if (PlotKit.Base.isFuncLike(dataset)) continue;
+        
         for (var j = 0; j < dataset.length; j++) {
             var item = dataset[j];
-            var rect = {
-                x: ((parseFloat(item[0]) - this.minxval) * this.xscale) + (i * barWidthForSet) + barMargin,
-                y: 1.0 - ((parseFloat(item[1]) - this.minyval) * this.yscale),
-                w: barWidthForSet,
-                h: ((parseFloat(item[1]) - this.minyval) * this.yscale),
-                xval: parseFloat(item[0]),
-                yval: parseFloat(item[1]),
-                name: setName
-            };
-            if ((rect.x >= 0.0) && (rect.x <= 1.0) &&
-                (rect.y >= 0.0) && (rect.y <= 1.0)) {
-                this.bars.push(rect);
+            var xval = parseFloat(item[0]);
+            var yval = parseFloat(item[1]);
+            
+            // Positive bars above x axis, negative bars below x axis
+            var height = Math.abs(yval * this.yscale);
+            var xaxispos = 1.0 + this.minyval * this.yscale;
+            var y = (yval >= 0.0) ? xaxispos - height : xaxispos;
+            
+            // What happens if the values go beyond our defined axis range
+            if (y < 0.0) { // limit at top end of axis range
+                height += y; y = 0.0;
             }
+            if (y + height > 1.0) { // limit at bottom end of axis range
+                height = 1.0 - y;
+            }
+            if (height < 0.0) height = 0.0;
+            if (y > 1.0) y = 1.0;
+            
+            // Create the bar
+            var rect = {
+                x: ((xval - this.minxval) * this.xscale) + (i * barWidthForSet) + barMargin,
+                w: barWidthForSet, y: y, h: height, xval: xval, yval: yval, name: setName
+            };
+            if ((rect.x >= 0.0) && (rect.x <= 1.0)) this.bars.push(rect);
         }
     }
 };
