@@ -1,6 +1,6 @@
 // TODO: test...
 // - bar chart with non-numeric x values
-// - line chart (all variations)
+// - line chart with only one point -- is the right behaviour well-defined?
 // - pie chart (all variations)
 // - axis scaling and axis tick placement in general
 
@@ -189,4 +189,45 @@ tests.test_Layout = function(t) {
         {y: 0.625, h: 0.150, x: 0.00, w: 1.00}, // [3, 7]
         {y: 0.825, h: 0.150, x: 0.00, w: 1.00}  // [4, 9]
     ], "horizontal bar chart with over-constrained y axis range", "layout.bars");
+    
+    
+    /*
+     * LINE CHART
+     */
+     
+    // Line chart with negative y value
+    layout = new PlotKit.Layout('line', {yOriginIsZero: false});
+    layout.addDataset('data1', [[0, 1], [1, -0.85]]);
+    layout.evaluate();
+    compare_array_of_objects(t, layout.points, [
+        {x: 0, y: 0}, {x: 1, y: 0.925}
+    ], "line chart with negative y value", "layout.points");
+    
+    // Line chart with points out of order
+    layout = new PlotKit.Layout('line', {});
+    layout.addDataset('data1', [[1, 1], [2, 0.5], [0, 0.25], [4, 0], [3, 0.75]]);
+    layout.evaluate();
+    compare_array_of_objects(t, layout.points, [
+        {x: 0.0, y: 0.75}, {x: 0.25, y: 0.0}, {x: 0.5, y: 0.5}, {x: 0.75, y: 0.25}, {x: 1.0, y: 1.0}
+    ], "line chart with points out of order", "layout.points");
+    
+    // Line chart with multiple series
+    layout = new PlotKit.Layout('line', {});
+    layout.addDataset('data1', [[0, 1], [1, 2], [2, 3]]);
+    layout.addDataset('data2', [[1, 4], [2, 3], [3, 2], [4, 1]]);
+    layout.addDataset('data3', [[3, 0], [4, 1]]);
+    layout.evaluate();
+    compare_array_of_objects(t, layout.points, [
+        {x: 0.0,  y: 0.75, name: 'data1'}, {x: 0.25, y: 0.5,  name: 'data1'}, {x: 0.5,  y: 0.25, name: 'data1'},
+        {x: 0.25, y: 0.0,  name: 'data2'}, {x: 0.5,  y: 0.25, name: 'data2'}, {x: 0.75, y: 0.5,  name: 'data2'},
+        {x: 1.0,  y: 0.75, name: 'data2'}, {x: 0.75, y: 1.0,  name: 'data3'}, {x: 1.0,  y: 0.75, name: 'data3'}
+    ], "line chart with multiple series", "layout.points");
+
+    // Line chart with over-constrained x axis range
+    layout = new PlotKit.Layout('line', {xAxis: [10, 20]});
+    layout.addDataset('data1', [[5, 0], [15, 10], [20, 15], [25, 20]]);
+    layout.evaluate();
+    compare_array_of_objects(t, layout.points, [
+        {x: 0.0, y: 1.0}, {x: 0.5, y: 0.5}, {x: 1.0, y: 0.0}
+    ], "line chart with over-constrained x axis range", "layout.points");
 };
