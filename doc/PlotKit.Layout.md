@@ -20,7 +20,7 @@ Constructor
 
 Layout takes the following arguments:
 
-__style__ which can be `bar`, `line` or `pie` which represnts the style of the graph that is desired.
+__style__ which can be `bar`, `line` or `pie` which represents the style of the graph that is desired.
 
 __options__ is a dictionary/associative array of layout options. Unrecognised keys are ignored. The following options are supported:
 
