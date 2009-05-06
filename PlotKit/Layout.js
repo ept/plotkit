@@ -535,7 +535,7 @@ PlotKit.Layout.prototype._evaluatePieCharts = function() {
 PlotKit.Layout.prototype._getBestScale = function(minValue, maxValue, numTicks) {
     // The spacings which we want to allow. For example, a spacing of 3 could produce a list
     // of ticks like 0, 300, 600, 900, 1200, 1500.
-    var spacings = [1, 2, 3, 4, 5];
+    var spacings = [1, 2, 2.5, 3, 4, 5];
     
     var minTicks = 5; var maxTicks = 8; // defaults if nothing else is set
     if (MochiKit.Base.isArrayLike(numTicks)) {
@@ -568,7 +568,7 @@ PlotKit.Layout.prototype._getBestScale = function(minValue, maxValue, numTicks) 
             while (thisRange < valueRange) {
                 thisRange *= 10;
             }
-            while (thisRange > valueRange*10) {
+            while (thisRange >= valueRange*10) {
                 thisRange /= 10;
             }
             
