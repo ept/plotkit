@@ -520,6 +520,8 @@ PlotKit.Layout.prototype._evaluateLineCharts = function() {
         dataset.sort(function(a, b) {
             return MochiKit.Base.compare(parseFloat(a[0]), parseFloat(b[0]));
         });
+        
+        var pointBeforeRange = null, lastPoint = null;
 
         for (var j = 0; j < dataset.length; j++) {
             var item = dataset[j];
@@ -531,16 +533,48 @@ PlotKit.Layout.prototype._evaluateLineCharts = function() {
                 xval: xval, yval: yval, name: setName
             };
 
-            // limit the x, y values so they do not overdraw
-            if (point.y <= 0.0) {
-                point.y = 0.0;
+            if (point.x < 0.0) {
+                pointBeforeRange = point; // potentially used in next iteration
+            } else {
+                if (pointBeforeRange !== null) {
+                    // This is the first point in the visible range, but there is another point further left
+                    // which is out of view. In this case we can interpolate the line between those points
+                    // and draw the line segment starting with minxval.
+                    if (point.x - pointBeforeRange.x > 0.001) {
+                        var factor = point.x / (point.x - pointBeforeRange.x);
+                        this.points.push({
+                            x: 0, xval: this.minxval, name: setName,
+                            y: point.y - factor * (point.y - pointBeforeRange.y),
+                            yval: point.yval - factor * (point.yval - pointBeforeRange.yval)
+                        });
+                    }
+                    pointBeforeRange = null;
+                }
+                
+                if (point.x <= 1.0) {
+                    // The point is within our visible range. Clip the y value to the displayable range.
+                    if (point.y <= 0.0) {
+                        point.y = 0.0;
+                    }
+                    if (point.y >= 1.0) {
+                        point.y = 1.0;
+                    }
+                    this.points.push(point);
+                } else {
+                    // This is the first point outside our visible range to the right. As before, we may
+                    // want to interpolate so that we can draw the line segment up to maxxval.
+                    if ((lastPoint !== null) && (point.x - lastPoint.x > 0.001)) {
+                        var factor = (1.0 - lastPoint.x) / (point.x - lastPoint.x);
+                        this.points.push({
+                           x: 1, xval: this.maxxval, name: setName,
+                           y: lastPoint.y + factor * (point.y - lastPoint.y),
+                           yval: lastPoint.yval + factor * (point.yval - lastPoint.yval)
+                        });
+                    }
+                    break; // Don't consider any further points in this dataset
+                }
             }
-            if (point.y >= 1.0) {
-                point.y = 1.0;
-            }
-            if ((point.x >= 0.0) && (point.x <= 1.0)) {
-                this.points.push(point);
-            }
+            lastPoint = point;
         }
     }
 };
