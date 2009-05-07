@@ -505,7 +505,6 @@ PlotKit.Layout.prototype._evaluateHorizBarCharts = function() {
     }
 };
 
-
 // Create the line charts
 PlotKit.Layout.prototype._evaluateLineCharts = function() {
     var setCount = this.datasetNames.length;
@@ -542,30 +541,26 @@ PlotKit.Layout.prototype._evaluateLineCharts = function() {
                     // and draw the line segment starting with minxval.
                     if (point.x - pointBeforeRange.x > 0.001) {
                         var factor = point.x / (point.x - pointBeforeRange.x);
-                        this.points.push({
+                        lastPoint = {
                             x: 0, xval: this.minxval, name: setName,
                             y: point.y - factor * (point.y - pointBeforeRange.y),
                             yval: point.yval - factor * (point.yval - pointBeforeRange.yval)
-                        });
+                        };
+                        this._clipLineSegment(null, lastPoint);
                     }
                     pointBeforeRange = null;
                 }
                 
                 if (point.x <= 1.0) {
-                    // The point is within our visible range. Clip the y value to the displayable range.
-                    if (point.y <= 0.0) {
-                        point.y = 0.0;
-                    }
-                    if (point.y >= 1.0) {
-                        point.y = 1.0;
-                    }
-                    this.points.push(point);
+                    // The point is within our visible range on the x axis.
+                    this._clipLineSegment(lastPoint, point);
+
                 } else {
                     // This is the first point outside our visible range to the right. As before, we may
                     // want to interpolate so that we can draw the line segment up to maxxval.
                     if ((lastPoint !== null) && (point.x - lastPoint.x > 0.001)) {
                         var factor = (1.0 - lastPoint.x) / (point.x - lastPoint.x);
-                        this.points.push({
+                        this._clipLineSegment(lastPoint, {
                            x: 1, xval: this.maxxval, name: setName,
                            y: lastPoint.y + factor * (point.y - lastPoint.y),
                            yval: lastPoint.yval + factor * (point.yval - lastPoint.yval)
@@ -577,6 +572,56 @@ PlotKit.Layout.prototype._evaluateLineCharts = function() {
             lastPoint = point;
         }
     }
+};
+
+/**
+ * Used in plotting a line chart. Adds one or more points to the list of rendered points,
+ * constituting a line segment, clipped to the viewable y axis range if necessary.
+ */
+PlotKit.Layout.prototype._clipLineSegment = function(prevPoint, thisPoint) {
+    if ((prevPoint != null) && (thisPoint.x - prevPoint.x < 1e-6)) return; // Ignore points that are very close together
+    
+    // Function to find the intersection point between the upper limit of the viewable
+    // y range and the line joining prevPoint and thisPoint.
+    var maxyvalCrossing = MochiKit.Base.bind(function() {
+        var factor = (0.0 - prevPoint.y) / (thisPoint.y - prevPoint.y);
+        this.points.push({
+            x: prevPoint.x + factor * (thisPoint.x - prevPoint.x),
+            xval: prevPoint.xval + factor * (thisPoint.xval - prevPoint.xval),
+            y: 0.0, yval: this.maxyval, name: thisPoint.name
+        });
+    }, this);
+    
+    // Function to find the intersection point between the lower limit of the viewable
+    // y range and the line joining prevPoint and thisPoint.
+    var minyvalCrossing = MochiKit.Base.bind(function() {
+        var factor = (1.0 - prevPoint.y) / (thisPoint.y - prevPoint.y);
+        this.points.push({
+            x: prevPoint.x + factor * (thisPoint.x - prevPoint.x),
+            xval: prevPoint.xval + factor * (thisPoint.xval - prevPoint.xval),
+            y: 1.0, yval: this.minyval, name: thisPoint.name
+        });
+    }, this);
+    
+    if ((prevPoint != null) && (Math.abs(prevPoint.y - thisPoint.y) > 1e-6)) {
+        if ((prevPoint.y < 0) && (thisPoint.y >= 0)) {
+            maxyvalCrossing(); // Line segment starts above the visible y range and enters the range
+        }
+        if ((prevPoint.y > 1) && (thisPoint.y <= 1)) {
+            minyvalCrossing(); // Line segment starts below the visible y range and enters the range
+        }
+        if ((prevPoint.y >= 0) && (thisPoint.y < 0)) {
+            maxyvalCrossing(); // Line segment ends above the visible y range, having left the range
+        }
+        if ((prevPoint.y <= 1) && (thisPoint.y > 1)) {
+            minyvalCrossing(); // Line segment ends below the visible y range, having left the range
+        }
+    }
+    
+    // The end of the line segment can simply be bracketed to the visible y range.
+    var point = MochiKit.Base.clone(thisPoint);
+    point.y = Math.max(0.0, Math.min(1.0, point.y));
+    this.points.push(point);
 };
 
 // Create the pie charts
