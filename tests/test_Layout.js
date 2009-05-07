@@ -227,7 +227,7 @@ tests.test_Layout = function(t) {
         {x: 1.0,  y: 0.75, name: 'data2'}, {x: 0.75, y: 1.0,  name: 'data3'}, {x: 1.0,  y: 0.75, name: 'data3'}
     ], "line chart with multiple series", "layout.points");
 
-    // Line chart with over-constrained x axis range
+    // Line chart with x value clipping + y axis auto-scaling
     layout = new PlotKit.Layout('line', {xAxis: [10, 20], yOriginIsZero: false});
     layout.addDataset('data1', [[4, 40], [5, 0], [15, 10], [26, 0], [25, 20]]);
     layout.evaluate();
@@ -235,10 +235,24 @@ tests.test_Layout = function(t) {
     t.is(layout.maxyval, 15.0, "y axis maximum using interpolated point");
     compare_array_of_objects(t, layout.points, [
         {x: 0.0, y: 1.0}, {x: 0.5, y: 0.5}, {x: 1.0, y: 0.0}
-    ], "line chart with over-constrained x axis range", "layout.points");
+    ], "line chart x axis clipping", "layout.points");
     
-    //layout = new PlotKit.Layout('line', {xAxis: [0, 10], yAxis: [0, 10]});
-    //layout.addDataset('data1', [[-10, 25], [20, -5]]);
-    //layout.evaluate();
-    //[{x: 0.0, y: 0.0}, {x: 0.5, y: 0.0}, {x: 1.0, y: 0.5}]
+    // Line chart with y axis clipping
+    layout = new PlotKit.Layout('line', {xAxis: [1, 5], yAxis: [-1, 1]});
+    layout.addDataset('data1', [[1, 0], [2, 2], [4, -2], [5, 0]]);
+    layout.evaluate();
+    compare_array_of_objects(t, layout.points, [
+        {x: 0.0,   y: 0.5},
+        {x: 0.125, y: 0.0}, {x: 0.250, y: 0.0}, {x: 0.375, y: 0.0},
+        {x: 0.625, y: 1.0}, {x: 0.750, y: 1.0}, {x: 0.875, y: 1.0},
+        {x: 1.0,   y: 0.5}
+    ], "line chart y axis clipping", "layout.points");
+
+    // Line chart with cross-axis clipping
+    layout = new PlotKit.Layout('line', {xAxis: [0, 10], yAxis: [0, 10]});
+    layout.addDataset('data1', [[-10, 25], [20, -5]]);
+    layout.evaluate();
+    compare_array_of_objects(t, layout.points, [
+        {x: 0.0, y: 0.0}, {x: 0.5, y: 0.0}, {x: 1.0, y: 0.5}
+    ], "line chart cross-axis clipping", "layout.points");
 };
